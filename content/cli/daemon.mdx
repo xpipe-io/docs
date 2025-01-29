@@ -1,11 +1,7 @@
 ---
-title: Hello World
-description: Your first document
+title: Controlling the daemon
+description: How to interact with the XPipe daemon from the command-line
 ---
-
-
-# Basics
-
 
 ## The XPipe Daemon
 
@@ -14,12 +10,22 @@ The CLI executable therefore needs to communicate with the daemon to pass the co
 Any executed ``xpipe`` command starts the daemon if it is not running yet.
 In case the daemon needs to be started prior to executing a command, you will see something like this:
 
-    Starting XPipe daemon ...
-    [ - ] 1s
+
+```
+Starting XPipe daemon ...
+[ - ] 1s
+```
 
 This one-time startup should only take a few seconds.
 
+## Commands
+
 You can also control the daemon manually from the command-line. There are several commands to achieve this:
+
+-  [xpipe open](man/xpipe-open):
+   Starts the daemon if not running and opens the GUI.
+   This can be useful when wanting to quickly launch the desktop application from the command-line.
+
 
 -  [xpipe daemon status](man/xpipe-daemon-status):
    Reports the current status of the daemon.
@@ -35,5 +41,3 @@ You can also control the daemon manually from the command-line. There are severa
 -  [xpipe daemon mode](man/xpipe-daemon-mode):
    Changes the daemon operation mode.
    Can be useful to manually let the daemon run in the background.
-
-Note that for everyday work, these commands are not needed.

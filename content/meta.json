@@ -1,0 +1,25 @@
+{
+  "title": "XPipe documentation",
+  "description": "Your entire server infrastructure at your fingertips",
+  "root": true,
+  "pages": [
+    "---Guide---",
+    "index",
+    "---Command-line---",
+    "cli/introduction",
+    "cli/daemon",
+    "cli/man",
+    "---Reference---",
+    "reference/directories",
+    "---Troubleshoot---",
+    "troubleshoot/license-activation",
+    "troubleshoot/ssh-agent-socket",
+    "troubleshoot/two-step-connections",
+    "---Legal---",
+    "legal/license",
+    "legal/privacy-policy",
+    "legal/reporter-privacy-policy",
+    "legal/end-user-license-agreement",
+    "legal/terms-of-service"
+  ]
+}
