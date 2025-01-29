@@ -11,6 +11,7 @@ export const baseOptions: BaseLayoutProps = {
   nav: {
     // can be JSX too!
     title: 'XPipe Documentation',
+    enabled: false
   },
   links: [
     {
@@ -19,4 +20,5 @@ export const baseOptions: BaseLayoutProps = {
       active: 'nested-url',
     },
   ],
+  githubUrl: 'https://github.com',
 };
