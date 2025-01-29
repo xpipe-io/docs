@@ -9,16 +9,8 @@ import type { BaseLayoutProps } from 'fumadocs-ui/layouts/shared';
  */
 export const baseOptions: BaseLayoutProps = {
   nav: {
-    // can be JSX too!
     title: 'XPipe Documentation',
     enabled: false
   },
-  links: [
-    {
-      text: 'Documentation',
-      url: '/docs',
-      active: 'nested-url',
-    },
-  ],
   githubUrl: 'https://github.com',
 };
