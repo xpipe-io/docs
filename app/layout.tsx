@@ -15,15 +15,7 @@ export default function Layout({ children }: { children: ReactNode }) {
     <html lang="en" className={inter.className} suppressHydrationWarning>
       <body className="flex flex-col min-h-screen">
         <RootProvider>
-            <DocsLayout tree={source.pageTree} {...baseOptions} sidebar={{
-
-                tabs: {
-                    transform: (option, node) => ({
-                        ...option,
-                        icon: 'my icon',
-                    }),
-                },
-            }}>
+            <DocsLayout tree={source.pageTree} {...baseOptions}>
                 {children}
             </DocsLayout>
         </RootProvider>
