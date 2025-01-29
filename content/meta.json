@@ -5,7 +5,8 @@
   "pages": [
     "---Guide---",
     "index",
-    "installation",
+    "setup/installation",
+    "setup/managed-installation",
     "---Command-line---",
     "cli/introduction",
     "cli/daemon",
