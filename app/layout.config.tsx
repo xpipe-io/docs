@@ -26,5 +26,5 @@ export const baseOptions: BaseLayoutProps = {
       ),
     enabled: false
   },
-  githubUrl: 'https://github.com',
+  githubUrl: 'https://github.com/xpipe-io/docs',
 };

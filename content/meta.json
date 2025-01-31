@@ -12,16 +12,13 @@
     "cli/daemon",
     "cli/man",
     "---Reference---",
+    "reference/security",
     "reference/directories",
-    "---Troubleshoot---",
+    "---Troubleshooting---",
     "troubleshoot/license-activation",
     "troubleshoot/ssh-agent-socket",
     "troubleshoot/two-step-connections",
-    "---Legal---",
-    "legal/license",
-    "legal/privacy-policy",
-    "legal/reporter-privacy-policy",
-    "legal/end-user-license-agreement",
-    "legal/terms-of-service"
+    "---Miscellaneous---",
+    "legal"
   ]
 }
