@@ -1,0 +1,27 @@
+---
+title: xpipe-open(1)
+description: Opens the XPipe application
+---
+
+## Synopsis
+
+**xpipe open** [**-d**=_&lt;directory>_] [**--port**=_&lt;port>_] [_&lt;input>_...]
+
+
+## Description
+
+Opens the XPipe application
+
+
+## Options
+
+**--port**=_&lt;port>_::
+  The HTTP server port
+
+**-d**, **--directory**=_&lt;directory>_::
+  Overrides the used data directory that should be used by the daemon, which by default is &lt;User Home>/.xpipe. This allows you to operate on a separate set of connections in configurations. This option will only be applied if the daemon is not running yet.
+
+
+## Arguments
+
+[_&lt;input>_...]::

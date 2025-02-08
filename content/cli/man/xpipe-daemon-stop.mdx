@@ -1,0 +1,22 @@
+---
+title: xpipe-daemon-stop(1)
+description: Stops the XPipe daemon if it is running
+---
+
+## Synopsis
+
+**xpipe daemon stop** [**-f**] [**--port**=_&lt;port>_]
+
+
+## Description
+
+Stops the XPipe daemon if it is running.
+
+
+## Options
+
+**-f**, **--force**::
+  Attempts to forcefully kill the running xpipe daemon process. Note that if this option is specified, the daemon process will be killed instantly and no attempt at a graceful shutdown is made.
+
+**--port**=_&lt;port>_::
+  The HTTP server port
