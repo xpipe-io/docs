@@ -17,6 +17,7 @@
     "---Troubleshooting---",
     "troubleshoot/license-activation",
     "troubleshoot/ssh-agent-socket",
+    "troubleshoot/tty",
     "troubleshoot/two-step-connections",
     "---Miscellaneous---",
     "legal"
