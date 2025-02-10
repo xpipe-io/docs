@@ -39,6 +39,23 @@ Furthermore, there is also a winget package available that provides the same .ms
 winget install xpipe-io.xpipe --source winget
 ```
 
+## macOS
+
+The macOS [.pkg installer](https://github.com/xpipe-io/xpipe/releases/latest/download/xpipe-installer-macos-arm64.pkg) can be called from the command line as well to install XPipe silently:
+
+```bash
+curl --output xpipe-installer-macos-arm64.pkg https://github.com/xpipe-io/xpipe/releases/latest/download/xpipe-installer-macos-arm64.pkg
+sudo installer -verboseR -pkg xpipe-installer-macos-arm64.pkg -target /
+```
+
+### Homebrew
+
+There is also a [homebrew tap](https://github.com/xpipe-io/homebrew-tap) that can be used to install XPipe as a cask. It can be installed with the following command:
+
+```bash
+brew install --cask xpipe-io/tap/xpipe
+```
+
 ## Linux
 
 The rpm releases are signed with the GPG key https://xpipe.io/signatures/crschnick.asc. So please make sure so check any releases against this GPG key. This can be done automatically by your package manager if you import the key.
@@ -85,21 +102,4 @@ sudo dnf install xpipe
 sudo rpm --import https://xpipe.io/signatures/crschnick.asc
 sudo zypper ar -f https://rpm.xpipe.io xpipe
 sudo zypper install xpipe
-```
-
-## macOS
-
-The macOS [.pkg installer](https://github.com/xpipe-io/xpipe/releases/latest/download/xpipe-installer-macos-arm64.pkg) can be called from the command line as well to install XPipe silently:
-
-```bash
-curl --output xpipe-installer-macos-arm64.pkg https://github.com/xpipe-io/xpipe/releases/latest/download/xpipe-installer-macos-arm64.pkg
-sudo installer -verboseR -pkg xpipe-installer-macos-arm64.pkg -target /
-```
-
-### Homebrew
-
-There is also a [homebrew tap](https://github.com/xpipe-io/homebrew-tap) that can be used to install XPipe as a cask. It can be installed with the following command:
-
-```bash
-brew install --cask xpipe-io/tap/xpipe
 ```
