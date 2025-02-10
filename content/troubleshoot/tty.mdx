@@ -1,0 +1,26 @@
+---
+title: PTY/TTY allocation
+description: How to handle remote connections with allocated PTYs
+---
+
+## About
+
+A [TTY](https://askubuntu.com/questions/481906/what-does-tty-stand-for) can be thought of, at least in very nontechnical terms, as an output destination for command-line-based sessions that is made for humans to be read on a display. It contains various formatting options that allow any applications that run in it to pretty-print or format any output with colors, animations, escape codes, and more. It is essentially what you are using every day when you open a terminal. A [PTY](https://stackoverflow.com/questions/4426280/what-do-pty-and-tty-mean), or pseudo TTY, is essentially the same thing, just that it is virtually allocated and not provided by the OS itself. On Windows, this it is also called a pseudo console.
+
+However, when XPipe wants to interact with a system through a shell, it does not want to run in a PTY because it doesn't want to read output that is formatted to look pretty in a terminal, it wants the raw output instead. That is why XPipe tries its best to disable any PTY allocation. However, in certain cases when some external configuration is overriding this behavior, XPipe might detect that a PTY is present and complain about it. If that occurs, XPipe will run the connection in a limited mode where many operations are not possible anymore.
+
+## Refreshing the PTY state
+
+If you perform any changes to potentially fix the issue, you have to keep in mind that XPipe does not automatically refresh the PTY state when you launch a terminal. It only refreshes this state for a PTY connection if you try to open it in the file browser. So always make sure to do that after trying the fixes you find on this page.
+
+## SSH
+
+If a connection reports an allocated PTY for SSH connections, you can check whether any SSH client config contains the option `RequestTTY` to force a PTY for a connection. If this is not set anywhere, it might still be an issue with your locally used SSH client. For example, if you are using the Windows git bash tools, including SSH, it might make sense to try to use the native Windows OpenSSH port that is available on every Windows system nowadays. Looking at the sshd config might also be useful. Because at the end of the day, something is forcing the SSH connection to allocate a PTY, this is not done automatically.
+
+## SSH ProxyCommands
+
+If you are using an SSH ProxyCommand in your SSH client config, the proxy command might allocate a PTY. You can try to look up in the documentation or help page of the command you are running whether there is some option to disable a PTY allocation. If there is, adding such an option might fix it.
+
+## Shell init files
+
+Some tools for shells, particularly zsh extensions, might be poorly designed and will always act like they are run in a terminal and disregard any signs that this is not the case. This will result in XPipe complaining about it as well. If you are dealing with PTY issues for a connection, and you have configured zsh as a login shell or added any other tool to the shell's init files, it might be useful to try to disable them temporarily.
