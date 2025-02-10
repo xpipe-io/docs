@@ -5,7 +5,7 @@ description: Configure your SSH agent socket on Linux to be recognized by XPipe
 
 ## Socket
 
-To interact with an SSH agent, XPipe utilizes the same interface as the SSH client. On Windows, this is a named pipe, which it does not require any setup and will usually work out of the box. On Linux, you have to properly configure the agent via the `SSH_AUTH_SOCK` environment variable such that other applications know where to find the socket.
+To interact with an SSH agent, XPipe utilizes the same interface as the SSH client. On Windows, this is a named pipe, which does not require any setup and will usually work out of the box. On Linux, you have to properly configure the agent via the `SSH_AUTH_SOCK` environment variable such that other applications know where to find the socket.
 
 Note that this also applies to various other agents and environment variables, not only the OpenSSH agent.
 
