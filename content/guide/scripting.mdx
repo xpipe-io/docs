@@ -1,0 +1,120 @@
+---
+title: Scripting
+description: Fully customize your workflows with scripts
+---
+
+## Video
+
+If you prefer videos, check out the scripting guide video that covers the same aspects as this page:
+
+<div class="video-wrapper">
+    <iframe src="https://www.youtube.com/embed/0o7oy8k-qlA?si=eVpnmMug4J6NwG-N" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+</div>
+
+## About
+
+With XPipe's scripting functionality, you can enhance and customize your workflow. Scripts can be applied at many locations in XPipe, each one having unique properties. In summary, you can run scripts at:
+
+- On remote shell init in your terminal in addition to the shell's rc files
+- In the connection hub at the dedicated scripts button for each connection
+- In the file browser, with selected file paths as script arguments
+- In an active terminal session that was opened from XPipe
+
+As you can use a script in multiple different scenarios, you should first choose for which execution type you want to create the script for. These different types are explained on this page next.
+
+![script-types](/script-types.png)
+
+You can also tick multiple boxes for execution types of a script if it should be used in multiple scenarios.
+
+## Shell compatibility
+
+Any remote system that you connect to has a certain login shell dialect. This can be anything like cmd, powershell, bash, etc. Any scripts that you create are also bound by these shell dialects. For example, a bash script that you write can't be run in a powershell connection. Therefore, the first choice you have to make is for which shell dialect you are creating a script for:
+
+![script-dialects](/script-dialects.png)
+
+Any script declared as a `sh` script is able to run in any posix-related shell environment such as `bash` or `zsh`.
+If you intend to run a basic script on many different systems, then using only `sh` syntax scripts is the best solution for that.
+
+Scripts declared as normal `powershell` scripts are also able to run in `pwsh` environments.
+
+## Enabled state
+
+Every script has a toggle that you can use to enable or disable a script. A script has to be enabled first for it to show up anywhere with XPipe. This toggle allows you to control which scripts you currently want to use, allowing you to ignore the ones you currently don't need without having to delete them. You can also enable whole groups by toggling the group itself.
+
+![script-toggle](/script-toggle.png)
+
+It is important to always check whether a script is enabled if it is not showing up in menus as expected.
+
+## Init scripts
+
+The idea of init scripts is to be able to take your environment configuration  to all remote shells. Essentially, you can configure which commands should be run whenever you log into a remote system in a terminal. For example, if you like certain aliases, prompt settings, or extensions to be automatically available in your remote shell session, then init scripts are the right way to go.
+
+Any script that is enabled, compatible with the remote system shell, and is marked as an init script, will be run when a new terminal session to any connection is launched.
+
+As a simple example, you can create a script like
+
+![script-alias](/script-alias.png)
+
+to have your aliases be available in your remote shells.
+
+Of course, you can also create much more advanced init scripts. If you, for example, want to have the starship prompt configured in all your remote terminal sessions, you can use this script:
+
+```bash
+dir="/tmp/xpipe/$USER/scriptdata/starship"
+export PATH="$PATH:$dir"
+which starship > /dev/null 2>&1
+if [ "$?" != 0 ]; then
+    mkdir -p "$dir" && \
+    which curl > /dev/null && \
+    curl -sS https://starship.rs/install.sh | sh /dev/stdin -y --bin-dir "$dir" > /dev/null
+fi
+eval "$(starship init bash)"
+```
+
+This script also takes care of checking whether it is already installed. If not, starship will be dynamically downloaded and installed on the system. Using such scripts allows you to implement complex initialization routines on your remote shells.
+
+## Runnable scripts
+
+Scripts can also be run on demand on every system from the connection hub. Any script that is enabled, compatible with the remote system shell, and is marked as a runnable script, can be launched from the script context menu for a connection.
+
+![scripts-hub](/scripts-hub.png)
+
+This is useful for actions you want to perform at any time. In this example, a simple
+
+```bash
+sudo apt update && sudo apt upgrade
+```
+
+script for an action that is frequently performed.
+
+## File browser scripts
+
+All file browser sessions that work through shell connections also support running arbitrary commands. In addition to the preexisting actions that you can find in the context menu for files, you can add your own commands as well.
+
+Any script that is enabled, compatible with the file browser session shell, and is marked as a file script, will show up in the file browser context menu.
+
+![/script-browser-menu](/script-browser-menu.png)
+
+One of the core features of file scripts is supporting arguments, which are supplied by the file browser selection. So if you have one or more files selected in the file browser, these will automatically be passed as arguments to the script as normal. Essentially, it behaves the same as just calling `myscript.sh "<file 1>" "<file 2>"`. The behavior of passing arguments is the same for all shells, so if you're implementing a cmd script instead, you can referred to them via `~%1`, `~%2`, and so on. The arguments are ordered by the time of selection.
+
+You can run the script either in a new terminal window or in the file browser to just display the output of it. If your script requires any interactive inputs, you should run it in a terminal. If you only care about the outputs and there is no interactivity required, running it within the file browser will work fine.
+
+For example, if you want to create a script to diff two files, providing the script
+
+![script-diff](/script-diff.png)
+
+will allow you to do this by calling the script with two files selected.
+
+The working directory of the scripts will also be equal to the current directory you are in the file browser. So it also makes sense to have scripts that don't take any arguments and just work on the working directory.
+
+Note that there is currently no checking for arguments, so if you have a different number of files selected than your script actually requires, you are still able to call the script from the menu. So to prevent any mishaps, it is recommended to validate the script arguments to have to correct amount. This also applies to file types, so a script that requires a directory as input should check whether it was not called accidentally on a file instead.
+
+## Shell session scripts
+
+A session script is intended to be called in a shell session in your terminal. Any script that is enabled, compatible with the session shell, and is marked as a shell script, will be copied to the target system and put into the PATH. This allows you to call the script from anywhere in a terminal session. The script name will be lowercased, and spaces will be replaced with underscores, allowing you to easily call the script.
+
+For example, if you create a simple shell script
+
+![/script-shell](/script-shell.png)
+
+you can call the script on any compatible system with `git-push.sh "<message>"` in a terminal session if the script is enabled. The script file is automatically created on the target system in the background by XPipe and added to the terminal session PATH so that you can call it instantly.
