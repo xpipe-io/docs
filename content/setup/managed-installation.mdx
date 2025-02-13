@@ -85,6 +85,8 @@ If you are looking for early access builds for new releases, you can replace the
 
 You can use the repository as follows:
 
+#### Yum
+
 ```bash
 sudo rpm --import https://xpipe.io/signatures/crschnick.asc
 sudo yum install yum-config-manager
@@ -92,11 +94,22 @@ sudo yum-config-manager --add-repo https://rpm.xpipe.io/xpipe.repo
 sudo yum install xpipe --refresh
 ```
 
+#### DNF 4
+
 ```bash
 sudo rpm --import https://xpipe.io/signatures/crschnick.asc
 sudo dnf config-manager --add-repo https://rpm.xpipe.io/xpipe.repo
 sudo dnf install xpipe
 ```
+
+#### DNF 5
+
+```bash
+sudo dnf config-manager addrepo --from-repofile=https://rpm.xpipe.io/xpipe.repo
+sudo dnf install xpipe
+```
+
+#### Zypper
 
 ```bash
 sudo rpm --import https://xpipe.io/signatures/crschnick.asc
