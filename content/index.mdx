@@ -9,3 +9,26 @@ To get started, check out the [installation instructions](/setup/installation).
 
 This documentation site is work in progress. More content will be added over time.
 
+## What's new about XPipe?
+
+In contrast to other tools, XPipe utilizes a shell-based approach that works on top of command-line programs to connect to remote systems. For that, it exclusively interacts with your installed command-line programs via their stdout, stderr, and stdin to handle local and remote shell connections. This approach makes it much more flexible as it doesn't have to deal with any file system APIs, remote file handling protocols, or libraries at all as that part is delegated to your existing programs.
+
+Let's use the example of SSH. Other protocol-based programs come with an included SSH library that allows them to interact with a remote system via SSH. XPipe does not ship with any sort of SSH library or similar. Instead, XPipe starts a new process using your local ssh executable, which is usually the OpenSSH client. I.e. it launches the process ``ssh user@host`` in the background and communicates with the opened remote shell through the stdout, stderr, stdin of the process. From there, it detects what kind of server and environment, e.g., shell type, os, etc. you have logged into with that shell connection, and adjusts how it talks to the remote system from there. It effectively delegates everything protocol and connection related to your external programs.
+
+As a result of this approach, you can do stuff with XPipe that you can't do with other tools. One example would be connecting and accessing files on a docker container as there's no real protocol to formally connect here by default. XPipe can simply execute ``docker exec -i container sh`` to open a shell into the container and handle the file management through this opened shell by sending commands like ls, touch, and more.
+
+More broadly, XPipe can work on any shell connection, regardless of how it is established. From its perspective, there's no visible difference between a remote ssh connection, a shell in a docker container, or your local system shell.
+
+## How will this make my life easier?
+
+If you are dealing with many remote shells daily, whether these might be SSH connections or shells into containers or VMs, things will get tedious to manage at some point. There are already many tools to help you with this task such as graphical SFTP clients and terminals with built-in connection managers, so this is nothing new.
+
+With XPipe, you are able to manage all types of remote systems in one place while having access to the same feature set for every system. Essentially, you get the same features that you know from tools like SFTP clients and other RMM tools but without being limited to any connection protocols. You can access containers, clusters, VMs, and more all in the same way. As an added bonus, you also have access to many specific actions for certain systems, e.g., starting and stopping containers. You can also utilize your existing configurations like SSH configs, SSH agents, and more as they are all automatically integrated through the CLI-based approach.
+
+## How does the tool integration work?
+
+XPipe fully integrates with your installed shells, editors, and terminals. This means that it will automatically detect all supported installations and launch these programs when required. It does not come with its own functionality, i.e., there is no built-in terminal or editor.
+
+When connecting to a remote system in XPipe, it will automatically boot this session up in your selected terminal. When you're trying to edit a file, it will be opened in your selected editor and your saved changes will be automatically applied back.
+
+The list of supported tools is quite extensive. However, in case your preferred program is not supported out-of-the-box, you still have the option to launch any program by supplying a custom command.

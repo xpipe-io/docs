@@ -9,6 +9,7 @@
     "setup/managed-installation",
     "guide/sync",
     "guide/scripting",
+    "guide/webtop",
     "---Command-line---",
     "cli/introduction",
     "cli/daemon",

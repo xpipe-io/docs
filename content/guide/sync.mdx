@@ -5,20 +5,16 @@ description: Synchronizing connection data cross multiple systems
 
 ## About
 
-XPipe can synchronize all your connection configuration data across multiple installations. It uses your own remote git repository for that. You can sync with this repository in all XPipe application instances the same way, every change you make in one instance will be reflected in the repository. This approach means that you have full control over your data as you can freely choose how and where to host this repository.
+XPipe can synchronize all connection configuration data across multiple installations. It uses your own remote Git repository for that purpose. You can synchronize with this repository in all XPipe application instances. Every change you make in one instance will be reflected in the repository. This approach means that you have full control over your data, as you can freely choose how and where to host this repository.
 
-First of all, you need to create a remote repository with your git provider of choice. This repository has to be private.
-You can then just copy and paste the URL into the XPipe remote repository setting.
+First of all, you need to create a remote repository with your Git provider of choice. This repository must be private. Next, copy and paste the URL into the XPipe remote repository setting.
 
-
-<Callout type="warn">Make sure that your repository visibility is set to private. You don't want to leak your connection data.</Callout>
+<Callout type="warn">Ensure that your repository visibility is set to private to prevent data leakage.</Callout>
 
 ![sync](/sync.png)
 
 You also need to have a locally installed `git` client ready on your local machine. You can try running `git` in a local terminal to check.
 If you don't have one, you can visit [https://git-scm.com](https://git-scm.com/) to install git.
-
-
 
 <Callout type="info">You don't have to enter a remote repository. Just enabling git sync without one will create and maintain a local repository. This can be useful if you're looking for having a history.</Callout>
 
