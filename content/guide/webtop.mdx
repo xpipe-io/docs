@@ -132,6 +132,57 @@ If you want to have access to the system shell of the webtop container or access
 
 ![](/images/webtop-docker.png)
 
+## Updating
+
+The published images are static, versioned, and require an image update and container recreation to update it. Below are the instructions for updating containers.
+
+### docker-compose
+
+Update image:
+```bash
+docker-compose pull xpipe-webtop
+```
+
+Update container:
+
+```bash
+docker-compose up -d xpipe-webtop
+```
+
+You can also remove the old dangling images:
+
+```bash
+docker image prune
+```
+
+### docker cli
+
+Update the image:
+
+```bash
+docker pull ghcr.io/xpipe-io/xpipe-webtop:latest
+```
+
+Stop the running container:
+
+```bash
+docker stop xpipe-webtop
+```
+
+Delete the container:
+
+```bash
+docker rm xpipe-webtop
+```
+
+You can also remove the old dangling images:
+
+```bash
+docker image prune
+```
+
+You can recreate the new container with the same docker run parameters as instructed above. If mapped correctly to a host folder, your `/config` folder and settings will be preserved.
+
 ## Contributing
 
 If you want to make local modifications to these images for development purposes or just to customize the logic:
