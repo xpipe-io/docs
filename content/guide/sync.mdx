@@ -74,3 +74,21 @@ Next to every file choice is a git button that will add the file to the git repo
 These files are also encrypted when pushed.
 
 ![sync-file](/sync-file.png)
+
+## GPG signing
+
+If you have enabled GPG signing of your git commits, then this should work as expected. The only more complicated case is on Windows where you can have potentially two `gpg` executables with the git bash gpg and the native [Gpg4win](https://www.gpg4win.org/) executable. By default, XPipe will choose the gpg client which has keys configured in it, under the assumption that you only use one of the two clients. If you switch between using both gpg clients, make sure that your git GPG key is available in gpg4win, as this client will be used if both clients have keys added.
+
+## Reverting to a previous commit
+
+In case anything goes wrong are you just want to restore the vault at an earlier date, you can do so easily using the normal git reset functionality. The first step is to find the SHA of the commit you want to revert to. This will look like this: `42e2e5af9d49de268cd1fda3587788da4ace418a`. You can find the commit SHA in any web interface of git your provider or on the command line with `git log`.
+
+Once you have obtained the SHA, you can run the following commands:
+
+```bash
+cd "<User Home>/.xpipe/storage"
+git reset --hard <SHA>
+git push --force -u remote-storage HEAD
+```
+
+The push is required to overwrite the remote repository. Without the push, XPipe would just pull the changes from the remote repository again.

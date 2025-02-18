@@ -112,6 +112,10 @@ docker run -d \
 
 [Kasm Workspaces](https://kasmweb.com/docs/latest/install/single_server_install.html) provides browser-based access to on-demand containerized desktops and applications. It is essentially a system to run graphical web-based desktops like this with less setup than a manual docker setup would require. If you are using Kasm Workspaces, this image is also available in the [XPipe Kasm Registry](https://kasm.xpipe.io). You can add this registry to your registry list, which allows you to automatically retrieve XPipe Webtop in your Kasm Workspace. It is preconfigured, so it will run out-of-the-box.
 
+### Public test builds
+
+If you want to try out certain XPipe public test builds (XPipe PTB) with the webtop, you can use the image tag `ghcr.io/xpipe-io/xpipe-webtop:ptb` to deploy the PTB image instead.
+
 ## Usage
 
 You will initially start out with an empty installation of XPipe. It is therefore recommended to use the [git sync](/guide/sync) feature of XPipe to quickly transfer all your connections to the new webtop installation. All your data is stored in your user directory at `/config`, you should therefore make it a persistent docker volume to preserve this data. You can also install further applications, however, these will not be preserved on container rebuilds or upgrades as these packages are usually not installed into the user home.
@@ -182,6 +186,8 @@ docker image prune
 ```
 
 You can recreate the new container with the same docker run parameters as instructed above. If mapped correctly to a host folder, your `/config` folder and settings will be preserved.
+
+<Callout type="info">While you can technically also just update the packages and the XPipe installation in the container without having to recreate the whole container, you will miss out on many webtop enhancements if you do that. The installed package list, XPipe, and the container image are updated in a coordinated fashion to improve the workflow and synergies.</Callout>
 
 ## Contributing
 
