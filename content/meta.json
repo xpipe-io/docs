@@ -10,6 +10,7 @@
     "guide/connection-search",
     "guide/sync",
     "guide/scripting",
+    "guide/services",
     "guide/webtop",
     "---Integrations---",
     "guide/ssh",

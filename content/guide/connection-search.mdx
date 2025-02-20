@@ -5,6 +5,8 @@ description: Adding supported connections on remote systems
 
 The automatic connection search is a fundamental part of XPipe. XPipe is designed around automatic detection without any manual configuration. For this reason, many integrations will detect automatically whether a supported component is installed on a remote system, and there is no way to manually configure the integration. If you're not sure how to add a certain type of connection for an integration, the automatic connection search is usually the first place to look.
 
+## Searching
+
 You can find the connection search dialog either in the `New ...` menu:
 
 ![](/images/connection-search-menu.png)
@@ -16,6 +18,14 @@ or for any shell connection:
 Clicking on the button will automatically start the search for available and supported integrations. All detected integrations are shown with a checkbox to either select or unselect them. Integrations that were not found are greyed out:
 
 ![](/images/connection-search-dialog.png)
+
+Clicking on ok will proceed to add the selected connections. This will, depending on the integration, either add sub connections automatically or not. For some integrations, you will still have to refresh parent entry to update the list of available children. This is, for example, the case with `docker` containers.
+
+## License
+
+Any integrations that require a license are still shown in the list, but are denoted as requiring a license. You can still add these connections and interact with them somewhat without a license. Only certain actions like opening a terminal session are not supported. This way, you are able to verify whether everything is detected correctly and works before considering upgrading to a paid license plan.
+
+## Configuration
 
 Just because in integration was found does not mean that it will work and is configured correctly. XPipe mainly checks for the existence of a certain installation, e.g., the presence of a certain executable like `docker` on the system. Whether your docker system in this case is running, configured correctly, and will work upon refresh, is not certain.
 
