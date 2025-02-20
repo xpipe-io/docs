@@ -1,0 +1,10 @@
+---
+title: SSH
+description: Accessing systems via SSH
+---
+
+The SSH integration in XPipe is a core component.
+
+When establishing connections, XPipe essentially delegates any form of connection and shell handling to your existing command-line SSH client. It does not come with any remote handling capabilities of its own. Therefore, the capabilities and security of the established connection depend on your used command-line programs.
+
+If, for example, your ssh command-line program or its connections are outdated and susceptible to MITM attacks or vulnerable in any other way, there is no way for XPipe to guarantee that data can be transferred securely. It is your responsibility to use external programs that XPipe interacts with in a secure environment and keep them up to date with security patches and more. Connections established with XPipe can only be as secure as your underlying command-line tools itself.

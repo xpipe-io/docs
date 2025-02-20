@@ -1,0 +1,36 @@
+---
+title: Docker
+description: Accessing your docker containers
+---
+
+XPipe supports connecting to and managing your docker containers on any local or remote system. For that it uses the `docker` commandline tool. [Searching for available connections](/guide/connection-search) on a system should make docker containers show up if the `docker` tool is added to the PATH on that system. If you have not installed docker, you can find installation instructions [here](https://docs.docker.com/engine/install/).
+
+<Callout type="info">If you are using podman and symlinked the podman executable to docker, XPipe will ignore docker containers. You should then use the podman integration instead.</Callout>
+
+![](/images/docker.png)
+
+## Privileges
+
+Whether or not docker requires the root user to interact with the daemon depends on your individual setup. Both rootless and root variants are supported, and XPipe will prompt you for your sudo password if needed. For more information, see the docker documentation on [rootless mode](https://docs.docker.com/engine/security/rootless/).
+
+## Contexts
+
+A docker installation can have multiple [contexts](https://docs.docker.com/engine/manage-resources/contexts/). Contexts allow you to have multiple different configurations available on one system. XPipe can detect all available contexts and switch between them dynamically.
+
+![](/images/docker-contexts.png)
+
+Note that there are two separate refresh buttons. The top one is to refresh all contexts, in case you added or changed any contexts. The refresh button for each context refreshes the actual containers of that context.
+
+<Callout type="info">Interacting with multiple docker contexts is supported starting from the Homelab plan.</Callout>
+
+## Daemon
+
+The docker daemon must be running for the integration to work. If it is not running, you have to start the docker daemon service first.
+
+## Shells
+
+
+
+## Services
+
+You can automatically add available services of any docker container that has exposed ports by clicking on the `Refresh services` a button for a container.

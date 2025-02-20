@@ -1,0 +1,39 @@
+---
+title: Tailscale
+description: Accessing your tailscale systems
+---
+
+XPipe supports connecting to your systems that are added to your tailnet in Tailscale. For that it uses the `tailscale` commandline tool. [Searching for available connections](/guide/connection-search) on a system should make tailscale connections show up if the `tailscale` tool is added to the PATH on that system. If you have not installed the `tailscale` tool, you can find installation instructions [here](https://tailscale.com/kb/1080/cli).
+
+<Callout type="info">On macOS, it technically doesn't have to be added to the PATH as XPipe also supports Tailscale installations from the app store. These do not add anything to the PATH.</Callout>
+
+You will likely only add tailscale connections from your local machine. However, these connections are supported on any remote system as well and support gateways. So you can search for available tailscale connections on any system that you have added a shell connection for.
+
+![](/images/tailscale.png)
+
+## Tailscale SSH
+
+For reference, the tailscale integration of XPipe concerns the [Tailscale SSH feature](https://tailscale.com/kb/1193/tailscale-ssh). Tailscale SSH is a feature where the tailscale daemon also handles authentication and authorization of SSH on your systems. It is a step-up compared to the normal VPN functionality. Any systems that should use this functionality must be added to the tailnet via `tailscale up --ssh`. They will show up with the SSH tag if added correctly:
+
+![](/images/tailscale-ssh.png)
+
+The reason the integration only supports Tailscale SSH is that you can just add systems via SSH normally to XPipe if Tailscale is handling the networking in the background. Just entering the hostname of the system in Tailscale as a normal [SSH connection](/guide/ssh) will make it work as well.
+
+## Tailnets and accounts
+
+You can add multiple accounts to your tailscale client at the same time without having to log out of one. Every account represents a different tailnet and set of connections. You can find instructions for that [here](https://tailscale.com/kb/1225/fast-user-switching#adding-an-account-to-a-device). XPipe will detect all available accounts and tailnets on the system automatically. It will automatically switch the active tailnet when you establish a connection to a certain tailnet.
+
+![](/images/tailscale-accounts.png)
+
+<Callout type="info">Interacting with multiple tailnets requires a Professional license. Such a setup is typically used for switching between personal and work VPN connections.</Callout>
+
+## Daemon
+
+The local tailscale daemon application must be running for the integration to work. If it is running, it will typically show up in the system tray. If it is not running, you can quickly start the Tailscale application, that will also start the daemon.
+
+## Refreshing connections
+
+XPipe can automatically refresh all available connections by clicking on the refresh button. This is useful if you recently added or removed systems from the tailnet. For the refresh to succeed, you need to be logged in into your tailnet and your login must not be expired. If you are not logged incorrectly, you will get an error message about that or a login window will popup automatically.
+
+<Callout type="info">On a Linux system, tailscale requires root permissions to access all tailnets and accounts. XPipe will prompt you for your sudo password if needed.</Callout>
+
