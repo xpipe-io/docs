@@ -38,7 +38,7 @@ export default {
         ring: '170 100% 85%',
         card: '170 0% 10%',
         muted: '170 0% 10%',
-        'muted-foreground': '170 0% 65%',
+        'muted-foreground': '170 0% 75%',
         'accent-foreground': '170 80% 90%',
         popover: '220 0% 10%',
         'popover-foreground': '170 0% 65%',
@@ -47,7 +47,7 @@ export default {
         background: '0 0 0',
         foreground: '220 60% 94.5%',
         primary: '170 65% 50%',
-        border: '205 0% 10%',
+        border: '205 0% 25%',
       },
     }
   })],

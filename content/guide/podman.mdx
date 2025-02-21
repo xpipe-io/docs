@@ -1,4 +1,14 @@
 ---
-title: TODO
-description: TODO
+title: Podman
+description: Accessing your podman containers
 ---
+
+XPipe supports connecting to and managing your podman containers on any local or remote system. For that it uses the `podman` commandline tool. [Searching for available connections](/guide/connection-search) on a system should make podman containers show up if the `podman` tool is added to the PATH on that system.
+
+<Callout type="info">If you are using podman and symlinked the podman executable to docker, XPipe will ignore docker containers as it has the dedicated podman integration for that.</Callout>
+
+![](/images/docker.png)
+
+## Daemon
+
+The podman daemon must be running for the integration to work. If it is not running, you have to start the podman daemon service first.

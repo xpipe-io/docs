@@ -27,7 +27,7 @@ body {
 }
 
 #nd-sidebar {
-    @apply bg-[#fffb] dark:bg-[#111a];
+    @apply bg-[#fffb] dark:bg-[#151a22cc];
 }
 
 #nd-page {
