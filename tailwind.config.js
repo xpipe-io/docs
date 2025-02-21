@@ -9,6 +9,7 @@ export default {
     './content/**/*.{md,mdx}',
     './mdx-components.{ts,tsx}',
     './node_modules/fumadocs-ui/dist/**/*.js',
+    '../node_modules/fumadocs-openapi/dist/**/*.js'
   ],
   presets: [createPreset({
     preset: {
@@ -17,7 +18,7 @@ export default {
         background: '0 0% 98%',
         foreground: '0 0% 3.9%',
         muted: '220 0% 96.1%',
-        'muted-foreground': '0 0% 30.1%',
+        'muted-foreground': '0 0% 20.1%',
         popover: '0 0% 98%',
         'popover-foreground': '0 0% 15.1%',
         card: '220 0% 100%',

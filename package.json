@@ -12,10 +12,12 @@
     "@vercel/analytics": "^1.4.1",
     "fumadocs-core": "14.7.7",
     "fumadocs-mdx": "11.3.1",
+    "fumadocs-openapi": "^6.0.11",
     "fumadocs-ui": "14.7.7",
     "next": "15.1.5",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "shiki": "^3.0.0"
   },
   "devDependencies": {
     "@types/mdx": "^2.0.13",
