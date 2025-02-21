@@ -16,3 +16,24 @@
     width: 100%;
     height: 100%;
 }
+
+body {
+    @apply bg-white dark:bg-black;
+    @apply bg-[url('/images/background-right.png')] bg-[position:right] bg-no-repeat bg-repeat-y md:bg-[url('/images/background-left.png'),_url('/images/background-right.png')] md:bg-[position:left,_right];
+}
+
+#nd-docs-layout {
+    @apply bg-[#3331] dark:bg-[#4572];
+}
+
+#nd-sidebar {
+    @apply bg-[#fffb] dark:bg-[#111a];
+}
+
+#nd-page {
+}
+
+h1, h2, h3, h4, h5, h6 {
+
+    @apply text-teal-700 dark:text-teal-400 !important;
+}
