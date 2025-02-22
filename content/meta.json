@@ -23,6 +23,8 @@
     "guide/tailscale",
     "guide/teleport",
     "guide/vmware",
+    "---API---",
+    "api/",
     "---Command-line---",
     "cli/introduction",
     "cli/daemon",

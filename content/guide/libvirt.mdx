@@ -1,4 +1,77 @@
 ---
-title: TODO
-description: TODO
+title: KVM
+description: Accessing your KVM domains using libvirt
 ---
+
+## About
+
+XPipe supports connecting to and managing your KVM VMs, also called domains, on any system. For that it uses the `virsh` command-line tool of libvirt. Adding the KVM host system as a connection to XPipe, usually via SSH, and then [searching for available connections](/guide/connection-search) on the added system will make the libvirt integration show up.
+
+![](/images/kvm.png)
+
+By default, interaction with the virsh command-line tools requires either root permissions or the user has to be member of the `libvirt` group. If XPipe fails to authenticate to the libvirt daemon, you should check whether your user is indeed a member of `libvirt`.
+
+The libvirt daemon must be running for the integration to work. If it is not running, you have to start the libvirt daemon service on the system first.
+
+<Callout type="info">Interacting with KVM systems requires at least the Homelab plan.</Callout>
+
+## Scope
+
+As libvirt adds another layer of abstraction, you can connect to multiple types of hypervisors through libvirt by specifying a hypervisor URL. By default, XPipe will add the `qemu:///system` and `qemu:///session` instances on a system if they exist. These are the default KVM instances, for system-wide and per-user VMs respectively. You can add URLs for additional hypervisor instances for KVM by clicking on the add hypervisor button:
+
+![](/images/kvm-add.png)
+
+In theory, the support for libvirt makes this integration independent of the actual hypervisor used as libvirt lists many hypervisors as compatible with `virsh`. In practice, libvirt only really works with KVM as most other libvirt integrations are incomplete.
+
+## Connecting to VMs
+
+To successfully establish a shell connection to a KVM VM/domain, two main things need to be working:
+- The VM has to be able to advertise its IP via the QEMU guest agent
+- An SSH server must be available on the system as XPipe uses SSH to connect to the VM
+
+### Guest agent
+
+The [QEMU guest agent](https://wiki.libvirt.org/Qemu_guest_agent.html) is a daemon that should be installed in the guest VM to allow an outside hypervisor, in this case KVM, to exchange information with the guest VM. Without it, the hypervisor has no access to the current state of the VM. Having this state access is necessary to determine the IP address to use for SSH and to run shell commands from the outside within the guest VM.
+
+You should make sure that the guest agent is installed and running on a system. For installation instructions, see [here](https://wiki.libvirt.org/Qemu_guest_agent.html). The guest agent daemon takes a few seconds to start up and initialize, so you might have to wait a few seconds after a VM is started before you can successfully connect to it in XPipe.
+
+If the agent is not running or not fully initialized yet, you will get the following error message:
+
+```
+Process returned exit code 1:
+error: Guest agent is not responding: QEMU guest agent is not connected
+```
+
+### Networking
+
+The same applies to the networking stack, it takes a few seconds to initialize all the network interfaces and to obtain an IP. If the libvirt daemon is unable to tell the guest VM IP address, the networking is not initialized yet, or you are running some kind of custom networking or firewall setup. See the [custom networking section](#custom-networking) for handling this configuration.
+
+### SSH server
+
+The actual shell connections to a guest VM are then established using SSH. This means that you need to have an SSH server installed and configured in the guest so that you can log in as your user with whatever authentication method you prefer. XPipe uses the Proxmox host as an SSH gateway, meaning that your guest VM does not have to be reachable from the outside on the SSH port. It will fully work only using internal networking.
+
+The SSH server in the guest does not have to be running, XPipe is able to start it automatically from the outside using the guest agent exec functionality. It should, however, be properly configured to allow for a login.
+
+For a proper setup of an SSH server to be used with XPipe, including on systems like Windows guests, see []().
+
+### Custom networking
+
+To have increased control over the networking of the host and guest systems and to increase security, you can configure a more custom networking setup for the Proxmox host. This might be something like using an additional firewall like pfSense or opnSense. In these cases, the automatic detection of the guest VM IP address via the guest agent might not always work out and the connection will fail as XPipe is using the wrong IP.
+
+You can figure out which IP XPipe has determined for the VM at any time with the `Copy IP` action in the connection context menu:
+
+![](/images/kvm-actions.png)
+
+For advanced cases like this, XPipe gives you the option to specify a custom IP address for a VM entry. That way, no automatic IP detection is run, and only that fixed IP address is used for the SSH connection. This IP address should be the one that can be used to reach the VM from within the Proxmox PVE host system.
+
+![](/images/proxmox-advanced.png)
+
+This should fix any connection issues, assuming that everything else is properly configured.
+
+## Serial access
+
+KVM VMs can also be accessed via a serial console instead of SSH. This is useful if SSH is not working or not available. This requires a primary serial console to be configured on the guest system.
+
+Once set up, you can enter this serial console in the connection context menu for the VM:
+
+![](/images/kvm-actions.png)

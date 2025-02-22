@@ -1,4 +1,102 @@
 ---
-title: TODO
-description: TODO
+title: Proxmox
+description: Accessing your Proxmox VMs
 ---
+
+## About
+
+XPipe supports connecting to and managing your Proxmox VMs and containers on any system. For that it uses the `qm` and `pct` commandline tools of Proxmox. Adding the Proxmox PVE host system as a connection to XPipe, usually via SSH, and then [searching for available connections](/guide/connection-search) on the added PVE system will make VMs and containers show up.
+
+![](/images/proxmox.png)
+
+By default, interaction with the PVE command-line tools requires root permissions. If you log in as the default root user to the PVE system, this will work fine. If you are logging in as a different user, you will probably have to enter your sudo password upon the first call to PVE.
+
+<Callout type="info">This integration also works on systems that are not a PVE distro as long as all required tools like `qm` and `pct` are present. This is useful for cases where Proxmox was manually installed onto an existing system of another distro.</Callout>
+
+<Callout type="info">Interacting with more than one PVE system, e.g. a cluster of multiple PVE systems, requires at least the Homelab plan.</Callout>
+
+## Connecting to VMs
+
+To successfully establish a shell connection to a Proxmox VM, two main things need to be working:
+- The VM has to be able to advertise its IP via the QEMU guest agent
+- An SSH server must be available on the system as XPipe uses SSH to connect to the VM
+
+### Guest agent
+
+The [QEMU guest agent](https://pve.proxmox.com/wiki/Qemu-guest-agent) is a daemon that should be installed in the guest VM to allow an outside hypervisor, in this case Proxmox, to exchange information with the guest VM. Without it, the hypervisor has no access to the current state of the VM. Having this state access is necessary to determine the IP address to use for SSH and to run shell commands from the outside within the guest VM.
+
+You should make sure that the guest agent is installed and running on a system. For installation instructions, see [here](https://pve.proxmox.com/wiki/Qemu-guest-agent). The guest agent daemon takes a few seconds to start up and initialize, so you might have to wait a few seconds after a VM is started before you can successfully connect to it in XPipe.
+
+If the agent is not running or not fully initialized yet, you will get the following error message:
+
+```
+Process returned exit code 255:
+QEMU guest agent is not running
+
+Is the VM fully started up yet?
+```
+
+### Networking
+
+The same applies to the networking stack, it takes a few seconds to initialize all the network interfaces and to obtain an IP. If Proxmox is unable to tell the guest VM IP address, you will receive the following error message:
+
+```
+Process returned exit code 255:
+Unable to determine external IP address for vmid <vmid> via network-get-interfaces
+```
+
+In this case, the networking is not initialized yet, the network interface is buggy, or you are running some kind of custom networking or firewall setup.
+
+The network interface can become bugged after pausing and resuming a guest VMs, that is a known occasional Proxmox bug. In this case, restarting the VM should fix it.
+
+If you are using a custom networking setup or firewall, the automatic IP detection might fail. See the [custom networking section](#custom-networking) for handling this configuration.
+
+### SSH server
+
+The actual shell connections to a guest VM are then established using SSH. This means that you need to have an SSH server installed and configured in the guest so that you can log in as your user with whatever authentication method you prefer. XPipe uses the Proxmox host as an SSH gateway, meaning that your guest VM does not have to be reachable from the outside on the SSH port. It will fully work only using internal networking.
+
+The SSH server in the guest does not have to be running, XPipe is able to start it automatically from the outside using the guest agent exec functionality. It should, however, be properly configured to allow for a login.
+
+For a proper setup of an SSH server to be used with XPipe, including on systems like Windows guests, see []().
+
+### Custom networking
+
+To have increased control over the networking of the host and guest systems and to increase security, you can configure a more custom networking setup for the Proxmox host. This might be something like using an additional firewall like pfSense or opnSense. In these cases, the automatic detection of the guest VM IP address via the guest agent might not always work out and the connection will fail as XPipe is using the wrong IP.
+
+You can figure out which IP XPipe has determined for the VM at any time with the `Copy IP` action in the connection context menu:
+
+![](/images/proxmox-actions.png)
+
+For advanced cases like this, XPipe gives you the option to specify a custom IP address for a VM entry. That way, no automatic IP detection is run, and only that fixed IP address is used for the SSH connection. This IP address should be the one that can be used to reach the VM from within the Proxmox PVE host system.
+
+![](/images/proxmox-advanced.png)
+
+This should fix any connection issues, assuming that everything else is properly configured.
+
+## Dashboard access
+
+You also have access to the Proxmox dashboard via the built-in service that is automatically added for a Proxmox system. This is a normal service tunnel that comes with all the usual features of [services in XPipe](/guide/services). This service tunnel is established to your Proxmox host system and allows you to access the dashboard without needing to expose it to the public.
+
+![](/images/proxmox-dashboard.png)
+
+## VNC access
+
+Proxmox offers the option to access VM displays via an external VNC client in addition to the built-in noVNC web-based interface in the Proxmox dashboard. XPipe can use this functionality automatically via the `Enable VNC access` action in the connection context menu:
+
+![](/images/proxmox-actions.png)
+
+This action will, upon confirmation, perform the same setup as you would have to do manually when using this external VNC client access. You can find the manual steps in the official [Proxmox documentation](https://pve.proxmox.com/wiki/VNC_Client_Access). A VNC connection entry will then be added for the VM:
+
+![](/images/proxmox-vnc.png)
+
+<Callout type="warn">This action will restart your VM if it is running. This is necessary as the external VNC access is only functional after a VM restart. So make sure to prepare your VM for a shutdown or shut it down yourself beforehand.</Callout>
+
+The VNC connection will only listen on the localhost interface and is tunneled over SSH, meaning there is no need you configure any kind of authentication for the VNC connection as it is fully private and encrypted.
+
+## Serial access
+
+Proxmox VMs can also be accessed via a serial console instead of SSH. This is useful if SSH is not working or not available. This requires a configuration both on the host and guest system. You can find the setup instructions [here](https://pve.proxmox.com/wiki/Serial_Terminal).
+
+Once set up, you can enter this serial console in the connection context menu for the VM:
+
+![](/images/proxmox-actions.png)
