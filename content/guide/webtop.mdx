@@ -5,15 +5,15 @@ description: Accessing XPipe remotely from your browser
 
 ## Introduction
 
-XPipe is a desktop application first and foremost. It requires a full desktop environment to function with various installed applications such as terminals, editors, shells, CLI tools, and more. So there is no pure web-based interface for XPipe.
+XPipe is a desktop application first and foremost. It requires a full desktop environment with various installed applications such as terminals, editors, shells, CLI tools, and more to function. So there is not the possibility of creating a pure web-based interface for XPipe that comes with all features built into XPipe itself.
 
-Since it might make sense however to access your XPipe environment from the web, there is also the so-called webtop docker container image for XPipe available. XPipe Webtop is a web-based desktop environment that can be run in a container and accessed from a browser via KasmVNC. The desktop environment comes with XPipe and various terminals and editors preinstalled and configured.
+Since it makes sense to access your XPipe environment from the web, there is the so-called XPipe Webtop docker container image available. XPipe Webtop is a web-based desktop environment that can be run in a container and accessed from a browser via KasmVNC. The desktop environment comes with XPipe and various terminals, editors, and more tools preinstalled and configured.
 
 ![](/images/webtop.png)
 
 ## Setup
 
-The webtop has the default ports to access the web interface at:
+The webtop image can be found at `ghcr.io/xpipe-io/xpipe-webtop:latest`. All images can be found in the [webtop container registry](https://github.com/xpipe-io/xpipe-webtop/pkgs/container/xpipe-webtop). The webtop has the default ports to access the web interface at:
 
 * http://localhost:3000/
 * https://localhost:3001/
@@ -40,17 +40,17 @@ This can be your own VPN, where the webtop is only available within. Alternative
 
 ### Language Support
 
-The environment variable `LC_ALL` can be used to start this image in a different language than English simply pass for example to launch the Desktop session in French `LC_ALL=fr_FR.UTF-8`.
-
-For example, to switch to the chinese locale, you can pass this additional environment variable:
+The environment variable `LC_ALL` can be used to start this image in a different language. For example, to switch to the chinese locale, you can pass this additional environment variable:
 
 ```
 -e LC_ALL=zh_CN.UTF-8
 ```
 
-The web interface has the option for "IME Input Mode" in Settings which will allow non english characters to be used from a non en_US keyboard on the client. Once enabled it will perform the same as a local Linux installation set to your locale.
+The web interface has the option for "IME Input Mode" in the settings, which will allow non english characters to be used from a non en_US keyboard on the client. Once enabled, it will perform the same as a local Linux installation set to your locale.
 
 ### DRI3 GPU Acceleration
+
+The webtop performance is decent even without any hardware acceleration. However, if you are looking for the maximum performance, utilizing hardware acceleration is a possibility.
 
 Render devices can be mounted into the container and leveraged by applications using:
 
@@ -69,7 +69,7 @@ Up to date information can be found [here](https://www.kasmweb.com/kasmvnc/docs/
 
 ### Installation commands
 
-To help you get started creating a container from this image you can either use docker-compose or the docker cli.
+To help you get started creating a container from this image, you can either use docker-compose or the docker cli.
 
 <Callout type="info">The webtop image is available for both `linux/amd64` and `linux/arm64` platforms.</Callout>
 
@@ -112,10 +112,6 @@ docker run -d \
 
 [Kasm Workspaces](https://kasmweb.com/docs/latest/install/single_server_install.html) provides browser-based access to on-demand containerized desktops and applications. It is essentially a system to run graphical web-based desktops like this with less setup than a manual docker setup would require. If you are using Kasm Workspaces, this image is also available in the [XPipe Kasm Registry](https://kasm.xpipe.io). You can add this registry to your registry list, which allows you to automatically retrieve XPipe Webtop in your Kasm Workspace. It is preconfigured, so it will run out-of-the-box.
 
-### Public test builds
-
-If you want to try out certain XPipe public test builds (XPipe PTB) with the webtop, you can use the image tag `ghcr.io/xpipe-io/xpipe-webtop:ptb` to deploy the PTB image instead.
-
 ## Usage
 
 You will initially start out with an empty installation of XPipe. It is therefore recommended to use the [git sync](/guide/sync) feature of XPipe to quickly transfer all your connections to the new webtop installation. All your data is stored in your user directory at `/config`, you should therefore make it a persistent docker volume to preserve this data. You can also install further applications, however, these will not be preserved on container rebuilds or upgrades as these packages are usually not installed into the user home.
@@ -128,11 +124,13 @@ To perform various VNC actions, such as simulating special key presses, changing
 
 ### Clipboard
 
-The clipboard handling is dependent on how well your current browser supports it. It is recommended that you use chrome, that way you will have the seamless clipboard where changes on both sides are instantly reflected. If you are using another browser like firefox, the clipboard is not as seamless and you have to manually set it each time. You can do that in the sidebar that you can expand on the left in the clipboard section. On firefox, you also sometimes get a paste button when focusing the webtop. This is a firefox-specific issue and will disappear if you use another browser.
+The clipboard handling is dependent on how well your current browser supports it. It is recommended that you use chrome, that way you will have the seamless clipboard where changes on both sides are instantly reflected.
+
+If you are using another browser like firefox, the clipboard is not as seamless and you have to manually set it each time. You can do that in the sidebar that you can expand on the left in the clipboard section. On firefox, you also sometimes get a paste button when focusing the webtop. This is a firefox-specific issue and will disappear if you use another browser.
 
 ### External access
 
-If you want to have access to the system shell of the webtop container or access the file system directly from the outside, you can use XPipe as normal from your normal desktop setup. The webtop container is just another Docker container in the eyes of XPipe, so you will have easy access to it if you have access to the docker context of the host.
+If you want to have access to the system shell of the webtop container or access the file system from the outside, you can use XPipe as normal from your desktop. The webtop container is just another Docker container in the eyes of XPipe, so you will have easy access to it if you have access to the docker context of the host.
 
 ![](/images/webtop-docker.png)
 

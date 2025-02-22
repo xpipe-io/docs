@@ -7,8 +7,6 @@ XPipe can be installed in many different ways on all operating systems. Which in
 
 <Callout type="info">If you are looking for deploying XPipe in your organization and want to automate the installation and upgrade process across multiple systems, check out the managed installation guide instead.</Callout>
 
-<InlineTOC items={toc} defaultOpen={true}/>
-
 <Callout type="info">Note that this is a desktop application that should be run on your local desktop workstation, not on any server or containers. You don't need to set up anything on any servers with XPipe. All commands you see here should be run on your desktop system.</Callout>
 
 ## Windows
@@ -44,12 +42,14 @@ Alternatively, you can also use the official [homebrew tab](https://github.com/x
 
 ## Linux
 
-You can install XPipe the fastest by pasting the [installation command](https://github.com/xpipe-io/xpipe/blob/master/get-xpipe.sh) into your terminal. This will perform the setup automatically.
+You can install XPipe the fastest by pasting the installation command into your terminal. This will perform the setup automatically.
 The script supports installation via `apt`, `dnf`, `yum`, `zypper`, `rpm`, and `pacman` on Linux:
 
 ```
 bash <(curl -sL https://github.com/xpipe-io/xpipe/raw/master/get-xpipe.sh)
 ```
+
+You can find the source of the script [here](https://github.com/xpipe-io/xpipe/blob/master/get-xpipe.sh).
 
 Of course, there are also manual installation methods for each distro available.
 
@@ -60,8 +60,8 @@ The following debian installers are available:
 - [Linux .deb Installer (x86-64)](https://github.com/xpipe-io/xpipe/releases/latest/download/xpipe-installer-linux-x86_64.deb)
 - [Linux .deb Installer (ARM 64)](https://github.com/xpipe-io/xpipe/releases/latest/download/xpipe-installer-linux-arm64.deb)
 
-Note that you should use apt to install the package with `sudo apt install xpipe-installer-linux-*.deb` as other package managers, for example dpkg,
-are not able to resolve and install any dependency packages.
+<Callout type="info">You should use apt to install the package with `sudo apt install xpipe-installer-linux-*.deb` as other package managers, for example dpkg,
+    are not able to resolve and install any dependency packages.</Callout>
 
 There also exists an apt repository that you can add as an additional source to apt. This will allow you to install and upgrade XPipe through apt itself without having to download any installer files. For instructions on how to use it, see the [managed installation guide](/guide/managed-installation#debian-based-distros).
 
@@ -74,8 +74,6 @@ The following rpm installers are available:
 
 - [Linux .rpm Installer (x86-64)](https://github.com/xpipe-io/xpipe/releases/latest/download/xpipe-installer-linux-x86_64.rpm)
 - [Linux .rpm Installer (ARM 64)](https://github.com/xpipe-io/xpipe/releases/latest/download/xpipe-installer-linux-arm64.rpm)
-
-The same applies here, you should use a package manager that supports resolving and installing required dependencies if needed.
 
 There also exists an rpm repository that you can add as an additional source to yum/dnf/etc. This will allow you to install and upgrade XPipe through your package manager itself without having to download any installer files. For instructions on how to use it, see the [managed installation guide](/guide/managed-installation#rhel-based-distros).
 
@@ -102,17 +100,23 @@ There's an official [xpipe nixpkg](https://search.nixos.org/packages?channel=uns
 There is also a custom repository that contains the latest up-to-date releases: https://github.com/xpipe-io/nixpkg.
 You can install XPipe by following the instructions in the linked repository.
 
-### Portable
+### Tarball
 
-In case you prefer to use an archive version that you can extract anywhere, you can use these:
+In case you prefer to use an archive that you can extract anywhere, you can use these:
 
 - [Linux .tar.gz Portable (x86-64)](https://github.com/xpipe-io/xpipe/releases/latest/download/xpipe-portable-linux-x86_64.tar.gz)
 - [Linux .tar.gz Portable (ARM 64)](https://github.com/xpipe-io/xpipe/releases/latest/download/xpipe-portable-linux-arm64.tar.gz)
+
+<Callout type="info">This portable version assumes that you have some basic packages for graphical systems already installed
+    as it is not a perfect standalone version. It should however run on most systems.</Callout>
+
+### AppImage
 
 Alternatively, there are also AppImages available:
 
 - [Linux .AppImage Portable (x86-64)](https://github.com/xpipe-io/xpipe/releases/latest/download/xpipe-portable-linux-x86_64.AppImage)
 - [Linux .AppImage Portable (ARM 64)](https://github.com/xpipe-io/xpipe/releases/latest/download/xpipe-portable-linux-arm64.AppImage)
 
-Note that the portable version assumes that you have some basic packages for graphical systems already installed
-as it is not a perfect standalone version. It should however run on most systems.
+<Callout type="info">This portable version assumes that you have some basic packages for graphical systems already installed
+    as it is not a perfect standalone version. It should however run on most systems.</Callout>
+

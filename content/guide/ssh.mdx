@@ -1,10 +1,60 @@
 ---
 title: SSH
 description: Accessing systems via SSH
+icon: Globe
 ---
 
 The SSH integration in XPipe is a core component.
 
-When establishing connections, XPipe essentially delegates any form of connection and shell handling to your existing command-line SSH client. It does not come with any remote handling capabilities of its own. Therefore, the capabilities and security of the established connection depend on your used command-line programs.
+![](/images/ssh.png)
 
-If, for example, your ssh command-line program or its connections are outdated and susceptible to MITM attacks or vulnerable in any other way, there is no way for XPipe to guarantee that data can be transferred securely. It is your responsibility to use external programs that XPipe interacts with in a secure environment and keep them up to date with security patches and more. Connections established with XPipe can only be as secure as your underlying command-line tools itself.
+## Your SSH client
+
+When establishing connections, XPipe delegates any form of connection and shell handling to your existing command-line SSH client available in the `PATH`. XPipe does not come with any remote handling capabilities of its own. Therefore, the capabilities and security of the established SSH connection depend on your installed SSH client.
+
+If, for example, your ssh command-line client is outdated and does not support certain features, then XPipe can't support these as well. This can concern newly introduced SSH config options or new key exchange methods that are only available in the latest SSH versions. If you want to make use of such features, make sure to upgrade your installed OpenSSH client.
+
+If your client is outdated and susceptible to newly discovered exploits or vulnerable in any other way, there is no way for XPipe to guarantee that data can be transferred securely. It is your responsibility to use external programs that XPipe interacts with in a secure environment and keep them up to date with security patches and more. Connections established with XPipe can only be as secure as your underlying command-line SSH client itself. Always make sure to upgrade your installed packages.
+
+## SSH configs
+
+XPipe fully supports using connections defined in SSH config files. In contrast to many other tools, this is not an import functionality were the config data is converted to internal data. Instead, the config file stays the backing store of the connection information. Any changes you make later on will be reflected in XPipe upon refresh.
+
+![](/images/ssh-config.png)
+
+[Searching for available connections](/guide/connection-search) on a system will automatically add the default SSH config file at `~/.ssh/config` if it exists. You can also add configs from other locations at `New -> Remote Host -> SSH config file`. XPipe supports wildcard definitions and include statements of other files as well, meaning that you will get a one-to-one application of your entire config in XPipe. It is exactly applied as it would if you use the `ssh` command-line client.
+
+Note that your local SSH configs apply to all SSH connections in XPipe, even if your config file is not added to XPipe or you created SSH connections within XPipe itself. This is important to keep in mind in case any wildcard options defined in your local config file affect other unrelated SSH connections in XPipe.
+
+## Custom SSH connections
+
+If you want to create a fully customized SSH connection with more options than you can find in the simple SSH connection creation dialog, you can take a look at customized SSH connections. These allow you to specify an SSH connection in-place using the SSH config syntax you know. It is essentially a way to create SSH config connections without having to go through dealing with creating config files. This is recommended if you are an advanced user and know what you're doing.
+
+## SSH Tunnels
+
+You also have full access to SSH tunnel and capabilities in XPipe. You are able to create local, remote, and dynamic tunnels that can be toggled on/off at any time.
+
+![](/images/ssh-tunnels.png)
+
+<Callout type="info">If you are looking for more economic tunnels of remote services using local SSH tunnels instead of raw SSH tunnels, check out the [services](/guide/services) functionality.</Callout>
+
+## VSCode SSH
+
+If you have VSCode installed on your system, you can also use XPipe to launch the SSH remote development feature of VSCode from XPipe.
+
+![](/images/ssh-menu.png)
+
+This option will show up if VSCode is installed and the SSH connection can be launched with VSCode. All SSH config connections can be launched in VSCode. For other connections defined in XPipe itself, the VSCode feature only supports password authentication. If you are using normal SSH connections with key-based authentication, this option will not show up by default. As a workaround, you can define the connection in your local SSH config and then add that config to XPipe.
+
+## Windows SSH servers
+
+Since Windows 10, Microsoft has been shipping an OpenSSH client and server with Windows that you can use. You just have to enable the OpenSSH server feature for your Windows installation as shown [here](https://learn.microsoft.com/en-us/windows-server/administration/openssh/openssh_install_firstuse?tabs=gui&pivots=windows-server-2022).
+
+### Versions
+
+With older installations, Microsoft ships an old version of SSH as well. This server version, however, has a few bugs which commonly cause issues with SSH clients in general, so also with XPipe. If you are planning on setting up an SSH server on Windows, make sure that your SSH version is relatively recent. Any SSH version of `v9.x` should work fine. If you have an older version installed, you can install the latest version from [here](https://github.com/PowerShell/Win32-OpenSSH/wiki/Install-Win32-OpenSSH). Otherwise, you might run into errors like `client_loop: send disconnect: Connection reset` when establishing a connection.
+
+### Keys
+
+If you are planning on configuring key-based authentication for your SSH server instead of just password authentication, note that Windows SSHD has an additional layer of complexity involved when adding authorized keys for users which have administrator privileges. You have to add public keys for these users into a separate `administrators_authorized_keys` file as explained [here](https://learn.microsoft.com/en-us/windows-server/administration/openssh/openssh_keymanagement#administrative-user).
+
