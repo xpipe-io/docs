@@ -9,6 +9,8 @@ The LXC integration is essentially an integration for [LXD](https://canonical.co
 
 For that it uses the `incus` and `lxc` commandline tools. [Searching for available connections](/guide/connection-search) on a system should make LXD and incus connections show up if they are installed on that system. Both simple containers and VMs are supported, and XPipe does not differentiate between these two types in any way.
 
+![](/images/lxc.png)
+
 ## Privileges
 
 Whether or not the integration requires the root user to interact with the respective daemon depends on your individual setup, in most cases, whether your user is added to the authorized `lxd` / `incus-admin` groups or not. If your user is not a member of that group, root is required. Both rootless and root variants are supported, and XPipe will prompt you for your sudo password if needed. For more information, see the incus documentation on [access to the daemon](https://linuxcontainers.org/incus/docs/main/explanation/security/#local-access-to-the-incus-daemon).

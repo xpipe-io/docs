@@ -1,9 +1,13 @@
 ---
-title: Services
+title: Service tunnels
 description: Tunneling remote services to your local machine
 ---
 
+## Introduction
+
 The service integration is a core component of XPipe. It is essentially a way to securely tunnel any kind of remote ports to your local machine over an existing shell connection. In most cases, these shell connections are SSH-based, so XPipe will use the tunneling features of SSH to establish these tunnels. In some other cases, it tries to do the same using other tools if they support it.
+
+![](/images/service.png)
 
 <Callout type="info">Not every type of shell connection supports tunneling features. One example are PowerShell remote sessions.</Callout>
 

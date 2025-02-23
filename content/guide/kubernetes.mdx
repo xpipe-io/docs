@@ -1,4 +1,18 @@
 ---
-title: TODO
-description: TODO
+title: Kubernetes
+description: Accessing your kubernetes clusters
 ---
+
+## Introduction
+
+XPipe supports connecting to and managing containers and pods of Kubernetes clusters on any local or remote system. For that it uses the `kubectl` commandline tool. [Searching for available connections](/guide/connection-search) on a system should make Kubernetes clusters show up if the `kubectl` tool is added to the PATH on that system.
+
+![](/images/kubernetes.png)
+
+## Adding clusters
+
+By default, XPipe will only look in the default kubeconfig file, use the default context, and use the default namespace when searching for connections. If you use other kubeconfigs, contexts, or namespaces as well, you can manually add to those via the add cluster button:
+
+![](/images/kubernetes-add.png)
+
+You have to add those manually as it is surprisingly difficult to automatically detect all valid namespace/context combinations that are used.

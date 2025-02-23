@@ -3,20 +3,21 @@ title: Synchronization
 description: Synchronizing connection data cross multiple systems
 ---
 
-## About
+## Introduction
 
 XPipe can synchronize all connection configuration data across multiple installations. It uses your own remote Git repository for that purpose. You can synchronize with this repository in all XPipe application instances. Every change you make in one instance will be reflected in the repository. This approach means that you have full control over your data, as you can freely choose how and where to host this repository.
 
 First of all, you need to create a remote repository with your Git provider of choice. This repository must be private. Next, copy and paste the URL into the XPipe remote repository setting.
 
-<Callout type="warn">Ensure that your repository visibility is set to private to prevent data leakage.</Callout>
-
 ![sync](/sync.png)
 
-You also need to have a locally installed `git` client ready on your local machine. You can try running `git` in a local terminal to check.
+<Callout type="warn">Ensure that your repository visibility is set to private to prevent data leakage.</Callout>
+
+<Callout type="info">You don't have to link a remote repository. Just enabling git sync without one will create and maintain a local repository. This can be useful if you're looking for having a local history.</Callout>
+
+You also need to have a locally installed `git` client ready on your local machine. You can try running `git --help` in a local terminal to check.
 If you don't have one, you can visit [https://git-scm.com](https://git-scm.com/) to install git.
 
-<Callout type="info">You don't have to enter a remote repository. Just enabling git sync without one will create and maintain a local repository. This can be useful if you're looking for having a history.</Callout>
 
 
 ## Authentication
@@ -28,7 +29,7 @@ If you use an SSH URL for git, you probably know how to configure it, so this se
 You need to set up your git CLI to be able to authenticate with your remote git repository via HTTPS. There are multiple ways to do that.
 You can check if that is already done by clicking on the `Test` button below the remote repository URL in XPipe.
 
-Many special tools like this [GitHub CLI](https://cli.github.com/) handle the whole authentication automatically for you when installed.
+Many special tools like the [GitHub CLI](https://cli.github.com/) handle the whole authentication automatically for you when installed.
 Some newer git client versions can also authenticate via special web services where you just have to log in into your account in your browser.
 
 There are also manual ways to authenticate via a username and token.
@@ -38,13 +39,13 @@ You can find common (PAT) pages here:
 - **GitLab**: [Personal access token](https://docs.gitlab.com/ee/user/profile/personal_access_tokens.html)
 - **BitBucket**: [Personal access token](https://support.atlassian.com/bitbucket-cloud/docs/access-tokens/)
 - **Gitea**: `Settings -> Applications -> Manage Access Tokens section`
-Set the token permission for repository to Read and Write. The rest of the token permissions can be set as Read.
+Set the token permission for repository to Read and Write. The rest of the token permissions can be set as Read. XPipe just needs enough permissions to commit changes to the private vault repository.
 
 If XPipe asks you for your git login credentials every time, you need to configure your command-line git client if you don't want to enter them every time.
 You can use any git credentials manager for that.
 For more information, see for example:
-- [https://git-scm.com/doc/credential-helpers](https://git-scm.com/doc/credential-helpers)
-- [https://docs.github.com/en/get-started/getting-started-with-git/caching-your-github-credentials-in-git](https://docs.github.com/en/get-started/getting-started-with-git/caching-your-github-credentials-in-git)
+- [git credential helpers](https://git-scm.com/doc/credential-helpers)
+- [GitHub credential manager](https://docs.github.com/en/get-started/getting-started-with-git/caching-your-github-credentials-in-git)
 
 If everything works out, XPipe should push a commit to your remote repository.
 
