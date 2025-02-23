@@ -3,20 +3,20 @@ title: Teleport
 description: Accessing your teleport systems
 ---
 
+## Introduction
+
 XPipe supports connecting to your systems that are joined to your teleport cluster. For that it uses the `tsh` commandline tool. [Searching for available connections](/guide/connection-search) on a system should make teleport tsh connections show up if the `tsh` tool is added to the PATH on that system. If you have not installed the `tsh` tool, you can find installation instructions [here](https://goteleport.com/docs/installation/).
 
 You will likely only add tsh connections from your local machine. However, these connections are supported on any remote system as well and support gateways. So you can search for available teleport tsh connections on any system that you have added a shell connection for.
 
 ![](/images/teleport.png)
 
+You need to be logged in into your cluster with tsh and your login must not be expired. If you are not logged incorrectly, you will get an error message about that. To log in, simply run `tsh login` in a terminal and authenticate to the cluster.
+
 ## SSH config
 
-The tsh offers the functionality to automatically add available connections to your local SSH config. Since XPipe's teleport integration works separately, these SSH config entries are not needed and are automatically ignored by XPipe when adding available SSH config connections.
-
-## Refreshing connections
-
-XPipe can automatically refresh all available connections by clicking on the refresh button. This is useful if you recently added or removed systems from the cluster. For the refresh to succeed, you need to be logged in into your cluster with tsh and your login must not be expired. If you are not logged incorrectly, you will get an error message about that. To log in, simply run `tsh login` in a terminal and authenticate to the cluster.
+The tsh tool offers the functionality to automatically add available connections to your local SSH config. Since XPipe's teleport integration works separately, these SSH config entries are not needed and are automatically ignored by XPipe when adding available SSH config connections.
 
 ## SSH comparison
 
-The teleport integration uses the `tsh ssh` tool to open remote shell connections. This tool works fine in most cases, however, it is not a true replacement for the OpenSSH executable. If you encounter weird connection issues, it might make sense to try to establish a normal SSH connection to the system to rule out any `tsh` issues. It supports all features compared to SSH, including tunnels, so you are not missing out on any features in the teleport integration.
+The teleport integration uses the `tsh ssh` tool to open remote shell connections. This tool works fine in most cases, however, it is not a true replacement for the OpenSSH executable. If you encounter weird connection issues, it might make sense to try to establish a normal SSH connection to the system to rule out any `tsh` issues.

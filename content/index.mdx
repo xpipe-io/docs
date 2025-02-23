@@ -3,32 +3,78 @@ title: Introduction
 description: Getting Started with XPipe
 ---
 
-XPipe is a new type of shell connection hub and remote file manager that allows you to access your entire server infrastructure from your local machine. It works on top of your installed command-line programs and does not require any setup on your remote systems.
+## About
 
-To get started, check out the [installation instructions](/guide/installation).
+XPipe is a new type of connection hub that allows you to manage your entire server infrastructure from your local machine. It works on top of your installed command-line programs and does not require any setup on your remote systems. It comes with many integrations and currently supports:
 
-This documentation site is work in progress. More content will be added over time.
+- [SSH](/guide/ssh) connections, config files, and tunnels
+- [Docker](/guide/docker), [Podman](/guide/podman), [LXD](/guide/lxc), and [incus](/guide/lxc) containers
+- [Proxmox PVE](/guide/proxmox) virtual machines and containers
+- [Hyper-V](/guide/hyperv), [KVM](/guide/kvm), [VMware Player/Workstation/Fusion](/guide/vmware) virtual machines
+- [Kubernetes](/guide/kubernetes) clusters, pods, and containers
+- [Teleport](/guide/teleport) and [Tailscale](/guide/tailscale) connections
+- Windows Subsystem for Linux, Cygwin, and MSYS2 instances
+- Powershell Remote Sessions
 
-## What's new about XPipe?
+Each integration works together with all the others, allowing you an almost infinite number of connection combinations. You want to manage a docker container running on a private VM running on a server that you can only reach from the outside through a bastion host? You can do that with XPipe.
+
+You can access containers, clusters, VMs, and more all in the same way. As an added bonus, you also have access to many specific actions for certain systems, e.g., starting and stopping containers. You can also utilize your existing configurations like SSH configs, SSH agents, and more as they are all automatically integrated.
+
+![](/images/banner.png)
+
+When you are dealing with many remote shells daily, whether these might be SSH connections or shells into containers and VMs, things will get tedious to manage at some point. Between keeping an overview over all available systems, monitoring states of individual services running on them, and springing into action when something is not working as it should, you will spend a lot of time on mundane and repetitive tasks. XPipe tries to minimize that time spent so that you can focus on more important tasks at hand.
+
+Overall, XPipe tries to break with existing concepts and attempts to create something new. It might take a while to get accommodated with XPipe's workflow, but it will be worth it!
+
+## The desktop multiverse
+
+Most other clients try to create a single application for everything. However, such an approach will always fall short of alternatives that take a more open approach, because you'll never beat a dedicated tool for a smaller task. In the end, you end up with an application that does everything but is mediocre.
+
+Instead, the vision behind XPipe is to create a lean connection hub that brings applications together, not an application that does everything. As a connection hub, XPipe sees its role as connecting your various tools and applications together, abstracting this task away from you. This can cover many scenarios:
+
+- Do you only have terminal-based editors installed on your server? XPipe will dynamically propagate changes from your local desktop editor to your remote server, allowing you to use any graphical editor you like.
+- Open a remote web service in your browser without exposing ports? XPipe tunnels your service to your local machine automatically and opens it in your browser.
+- Use a password manager without integration with your SSH client/agent? XPipe will connect your SSH client to your password manager to retrieve passwords on demand.
+- Using a text editor without remote capabilities? XPipe will make it remote compatible.
+- Use RDP without exposing the RDP port? XPipe can tunnel the RDP connection through your SSH client and open it in your local RDP client.
+- Using a VNC client without built-in support for SSH tunnels? Just connect through XPipe and let it do the tunneling for you.
+- Need a Windows X11 display server for SSH X11 forwarding? Use XPipe to connect the native WSL X11 display server to the SSH X11 channel.
+- Using a terminal without built-in SSH connection management? XPipe will manage your connection data while your terminal emulator can open it.
+
+All of this works without having to install or setup anything on your servers at all. XPipe will use only the local and remote applications that are available, dynamically adapting based on what's available.
+
+## The desktop on the web
+
+A desktop environment with all its applications can't be replaced by a single application, at least not if you want a good user experience. But what about scenarios where you are not at your local workstation?
+
+To take the desktop wherever you need it, XPipe offers the [Webtop docker image](/guide/webtop). This image is a full desktop environment that you can run in a docker container and access from your browser. You can host it wherever you want, put it behind some form of authentication layer, and access it from wherever you are. With the [git sync](/guide/sync), you also have access to all your connection data.
+
+## Flexible file management
+
+Most other graphical clients use protocols like SFTP and SCP for file management. After all, they are based on SSH and have a (somewhat) defined interface that both clients and servers can work with. However, these protocols have a few showstoppers that make life more complicated than it needs to be.
+
+First, you need a working SSH/SFTP server in the first place on the system. While that seems obvious, this limits its usage on systems such as containers, VMs, and many other types of systems and environments. You simply can't or don't want to set up a full SSH server on many systems and instead use different methods of shell-based access.
+
+Second, you are bound by the protocol limitations. For example, you can't switch users in a session. Meaning that if you edit a file but don't have permission to save it when it requires root, you have to fumble the edited content into a separate terminal session and write with sudo there. Allowing a root login is a bad solution to this problem and shouldn't be done. XPipe can elevate operations dynamically within a session.
+
+The only thing XPipe needs to realize a fully functional file browser on any remote system is a working shell and some basic tools like `dd`, `find`, and `stat`. That's all, at least for Linux and macOS. On Windows, the only tool required is PowerShell. You have full access to the file structure, can edit remote files with your local text editor and open a terminal session in your current directory in your local terminal.
+
+If you have more tools than that available on the remote system, then XPipe can expand its feature set. If you have sudo installed, XPipe can dynamically elevate your session or file write operation to root in place without requiring another connection. If you have archive tools like `tar` or `zip`/`unzip`, XPipe can offer additional functionality to create or open archives on these systems. For more functionality, you can [create your own scripts](/guide/scripting) in XPipe to be run on selected files in the browser.
+
+## User data sync
+
+Importing and exporting your user data is a feature that almost all other comparable tools have. This allows you to back up your data in case something goes wrong or share it across installations on multiple systems. XPipe, however, doesn't have a button or menu for importing or exporting your configuration data that way.
+
+Instead, XPipe focuses exclusively on using git for this. Essentially, XPipe can initialize and update a local repository of your user data and commit any changes you make in the app. That way, you already get a fully versioned storage of your user data. In addition, you can link this local repository to a remote repository within XPipe, allowing for it to pull and push changes from and to the remote. This remote repository can be hosted anywhere you want and can be accessed with any supported git protocol like HTTPS or also SSH. You can use the full functionality of XPipe's SSH connectivity for that as well.
+
+This XPipe vault git repository can be shared with other team members and linked to other XPipe installations to guarantee that everyone always has a fully up-to-date version of all connection data, on any system they currently are on. And this in a manner that is self-hosted as you have full control over how and where you host this git repository. XPipe's sync does not involve any services outside your control.
+
+## Shell-based connections
 
 In contrast to other tools, XPipe utilizes a shell-based approach that works on top of command-line programs to connect to remote systems. For that, it exclusively interacts with your installed command-line programs via their stdout, stderr, and stdin to handle local and remote shell connections. This approach makes it much more flexible as it doesn't have to deal with any file system APIs, remote file handling protocols, or libraries at all as that part is delegated to your existing programs.
 
-Let's use the example of SSH. Other protocol-based programs come with an included SSH library that allows them to interact with a remote system via SSH. XPipe does not ship with any sort of SSH library or similar. Instead, XPipe starts a new process using your local ssh executable, which is usually the OpenSSH client. I.e. it launches the process ``ssh user@host`` in the background and communicates with the opened remote shell through the stdout, stderr, stdin of the process. From there, it detects what kind of server and environment, e.g., shell type, os, etc. you have logged into with that shell connection, and adjusts how it talks to the remote system from there. It effectively delegates everything protocol and connection related to your external programs.
+With SSH, for example, other protocol-based tools come with an included SSH library that allows them to interact with a remote system via SSH. XPipe does not ship with any sort of SSH library or similar. Instead, XPipe starts a new process using your local ssh executable, which is usually the OpenSSH client. I.e., it launches the process ``ssh user@host`` in the background and communicates with the opened remote shell through the stdout, stderr, stdin of the process. From there, it detects what kind of server and environment, e.g., shell type, os, etc. you have logged into with that shell connection, and adjusts how it talks to the remote system from there. It effectively delegates everything protocol and connection related to your external programs.
 
 As a result of this approach, you can do stuff with XPipe that you can't do with other tools. One example would be connecting and accessing files on a docker container as there's no real protocol to formally connect here by default. XPipe can simply execute ``docker exec -i container sh`` to open a shell into the container and handle the file management through this opened shell by sending commands like ls, touch, and more.
 
 More broadly, XPipe can work on any shell connection, regardless of how it is established. From its perspective, there's no visible difference between a remote ssh connection, a shell in a docker container, or your local system shell.
-
-## How will this make my life easier?
-
-If you are dealing with many remote shells daily, whether these might be SSH connections or shells into containers or VMs, things will get tedious to manage at some point. There are already many tools to help you with this task such as graphical SFTP clients and terminals with built-in connection managers, so this is nothing new.
-
-With XPipe, you are able to manage all types of remote systems in one place while having access to the same feature set for every system. Essentially, you get the same features that you know from tools like SFTP clients and other RMM tools but without being limited to any connection protocols. You can access containers, clusters, VMs, and more all in the same way. As an added bonus, you also have access to many specific actions for certain systems, e.g., starting and stopping containers. You can also utilize your existing configurations like SSH configs, SSH agents, and more as they are all automatically integrated through the CLI-based approach.
-
-## How does the tool integration work?
-
-XPipe fully integrates with your installed shells, editors, and terminals. This means that it will automatically detect all supported installations and launch these programs when required. It does not come with its own functionality, i.e., there is no built-in terminal or editor.
-
-When connecting to a remote system in XPipe, it will automatically boot this session up in your selected terminal. When you're trying to edit a file, it will be opened in your selected editor and your saved changes will be automatically applied back.
-
-The list of supported tools is quite extensive. However, in case your preferred program is not supported out-of-the-box, you still have the option to launch any program by supplying a custom command.

@@ -3,6 +3,8 @@ title: Tailscale
 description: Accessing your tailscale systems
 ---
 
+## Introduction
+
 XPipe supports connecting to your systems that are added to your tailnet in Tailscale. For that it uses the `tailscale` commandline tool. [Searching for available connections](/guide/connection-search) on a system should make tailscale connections show up if the `tailscale` tool is added to the PATH on that system. If you have not installed the `tailscale` tool, you can find installation instructions [here](https://tailscale.com/kb/1080/cli).
 
 <Callout type="info">On macOS, it technically doesn't have to be added to the PATH as XPipe also supports Tailscale installations from the app store. These do not add anything to the PATH.</Callout>
@@ -17,7 +19,7 @@ For reference, the tailscale integration of XPipe concerns the [Tailscale SSH fe
 
 ![](/images/tailscale-ssh.png)
 
-The reason the integration only supports Tailscale SSH is that you can just add systems via SSH normally to XPipe if Tailscale is handling the networking in the background. Just entering the hostname of the system in Tailscale as a normal [SSH connection](/guide/ssh) will make it work as well.
+The reason the integration only supports Tailscale SSH is that you can just add systems via SSH normally to XPipe if Tailscale is only handling the networking in the background and not the authentication as well. Just entering the hostname of the system in Tailscale as a normal [SSH connection](/guide/ssh) will make it work as well.
 
 ## Tailnets and accounts
 
