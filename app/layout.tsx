@@ -15,8 +15,8 @@ const inter = Inter({
 
 export const metadata = createMetadata({
     title: {
-        template: '%s | XPipe',
-        default: 'XPipe',
+        template: '%s | XPipe Docs',
+        default: 'XPipe Docs',
     },
     description: 'Your entire server infrastructure at your fingertips',
     metadataBase: baseUrl,
