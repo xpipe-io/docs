@@ -24,7 +24,7 @@ export const baseOptions: BaseLayoutProps = {
         </span>
           </>
       ),
-    enabled: false
+    enabled: true
   },
   githubUrl: 'https://github.com/xpipe-io/docs',
 };
