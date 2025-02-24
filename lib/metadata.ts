@@ -7,8 +7,8 @@ export function createMetadata(override: Metadata): Metadata {
             title: override.title ?? undefined,
             description: override.description ?? undefined,
             url: 'https://docs.xpipe.io',
-            images: '/images/social.png',
-            siteName: 'Fumadocs',
+            images: 'https://docs.xpipe.io/images/social.png',
+            siteName: 'XPipe Docs',
             ...override.openGraph,
         },
         twitter: {
@@ -16,7 +16,7 @@ export function createMetadata(override: Metadata): Metadata {
             creator: '@money_is_shark',
             title: override.title ?? undefined,
             description: override.description ?? undefined,
-            images: '/images/social.png',
+            images: 'https://docs.xpipe.io/images/social.png',
             ...override.twitter,
         },
     };
