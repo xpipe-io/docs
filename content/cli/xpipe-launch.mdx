@@ -1,0 +1,22 @@
+---
+title: xpipe-launch(1)
+description: Launch a shell connection from within a terminal
+---
+
+## Synopsis
+
+**xpipe launch** [**--port**=_&lt;port>_] _&lt;connection>_ [_&lt;arguments>_...]
+
+## Options
+
+**--port**=_&lt;port>_::
+  The HTTP server port
+
+
+## Arguments
+
+_&lt;connection>_:
+  The connection name. XPipe will try to find the best match, even for partial connection names. If the connection you want to launch is a sub connection of another one, you can specify the full name separated with /, for example top/parent/child. Supports globs
+
+[_&lt;arguments>_...]:
+  Optional command to run in the shell session
