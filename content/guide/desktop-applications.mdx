@@ -1,0 +1,96 @@
+---
+title: Desktop applications
+description: Run remote graphical applications from XPipe and embed them into your local desktop
+---
+
+## Introduction
+
+For graphical system interfaces separate from shell connections, XPipe implements a concept called coherent desktops. Essentially, you can launch desktop applications directly from XPipe, regardless of the underlying connection implementation. In combination with the tunneling and background shell session support, you can launch graphical remote applications with one click in the same unified way for:
+
+- RDP connections (via the [RemoteApp](https://www.anyviewer.com/how-to/remoteapp-vs-rdp-2578.html) feature)
+- X11-forwarded SSH connections (via your local X11 server)
+- VNC connections (via VNC service tunnels)
+
+These desktop applications are then either dynamically embedded into your local desktop or shown in the browser.
+
+![](/images/desktop.png)
+
+You can create desktop application connections in the creation menu:
+
+![](/images/desktop-create.png)
+
+There you can specify the path to the executable to run and optional command-line arguments to append:
+
+![](/images/desktop-browser.png)
+
+A desktop application entry can be created for:
+- RDP connections
+- VNC tunnel connections
+- SSH connections with X11 forwarding enabled
+
+## SSH X11
+
+The X11 forwarding desktop implementation will use a locally installed X11 display server to show the remote desktop application content in a coherent window.
+
+On Linux systems, you will have easy access to an X11 display server so this should work out of the box.
+
+On macOS, you need an X11 server like [XQuartz](https://www.xquartz.org/) to be running on your local machine.
+
+On Windows, you need a [WSL2](https://learn.microsoft.com/en-us/windows/wsl/install) distribution installed on your local system. XPipe will use [WSL2g](https://learn.microsoft.com/en-us/windows/wsl/tutorials/gui-apps) to display X11 applications natively and will automatically choose a compatible installed distribution if possible, but you can also use another one in the settings menu. This means that you don't need to install a separate X11 server on Windows. However, if you are using one anyway, XPipe will detect that and use the currently running X11 server.
+
+Here is how running XPipe on a remote graphical systems looks like when the remote desktop application is forwarded via SSH X11 and rendered through WSL:
+
+![](/images/desktop-x11.png)
+
+## RDP
+
+For RDP connections, desktop applications are run with the RemoteApp functionality of RDP.
+
+![](/images/desktop-explorer.png)
+
+Instead of opening the full RDP session, it is kept in the background and only the application window is displayed. That way, the remote application blends in with your local desktop, and you are not bound to the full RDP client window. Launching a desktop application for an RDP connection in XPipe will first initialize the RDP connection:
+
+![](/images/desktop-load.png)
+
+Here is how a remote file explorer looks like next to a locally running one:
+
+![](/images/desktop-rdp.png)
+
+<Callout type="info">
+    The RemoteApp feature is only available for Windows RDP servers.
+</Callout>
+
+### Allow lists
+
+An RDP server uses the concept of allow lists to handle application launches. This essentially means that unless the allow list is disabled or specific applications have been explicitly added the allow list, launching any remote applications directly will fail.
+
+You can find the allow list settings in the registry of your server at `HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Terminal Server\TSAppAllowList`.
+
+#### Allowing on-demand
+
+For RDP tunnel connections, XPipe can automatically add applications to the allow list only when needed. This is the most straightforward option where you don't have to perform any manual configuration.
+
+#### Allowing all applications
+
+You can disable the allow list to allow all remote applications to be started directly from XPipe. For this, you can run the following command on your server in PowerShell: `Set-ItemProperty -Path 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Terminal Server\TSAppAllowList' -Name "fDisabledAllowList" -Value 1`.
+
+#### Adding allowed applications
+
+Alternatively, you can also add individual remote applications to the list. This will then allow you to launch the listed applications directly from XPipe.
+
+Under the `Applications` key of `TSAppAllowList`, create a new key with some arbitrary name. The only requirement for the name is that it is unique within the children of the “Applications” key. This new key, must have these values in it: `Name`, `Path` and `CommandLineSetting`. You can do this in PowerShell with the following commands:
+
+```
+$appName="Notepad"
+$appPath="C:\Windows\System32\notepad.exe"
+
+$regKey="HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Terminal Server\TSAppAllowList\Applications"
+New-item -Path "$regKey\$appName"
+New-ItemProperty -Path "$regKey\$appName" -Name "Name" -Value "$appName" -Force
+New-ItemProperty -Path "$regKey\$appName" -Name "Path" -Value "$appPath" -Force
+New-ItemProperty -Path "$regKey\$appName" -Name "CommandLineSetting" -Value "1" -PropertyType DWord -Force
+```
+
+### Security considerations
+
+This does not make your server insecure in any way, as you can always run the same applications manually when launching an RDP connection. Allow lists are more intended to prevent clients from instantly running any application without user input. At the end of the day, it is up to you whether you trust XPipe to do this. You can launch this connection just fine out of the box, this is only useful if you want to use any of the advanced desktop integration features in XPipe.

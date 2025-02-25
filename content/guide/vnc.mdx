@@ -3,20 +3,37 @@ title: VNC
 description: Accessing your systems with VNC
 ---
 
-VNC is commonly used in server administration to access servers in a graphical manner. While it is an outdated protocol, it still is solid enough to fulfill its task.
+## Introduction
 
-### Using other VNC clients
+VNC is commonly used in server administration to access servers in a graphical manner. While it is an outdated protocol, it still is solid enough to fulfill its task. XPipe comes with its own integration for VNC because the existing landscape of external VNC clients is difficult to provide integrations for.
 
-While XPipe has its own built-in VNC support, it is not as comprehensive as other dedicated VNC clients. If you're missing certain features, you can also use your own VNC client in combination with XPipe and its tunneling capabilities.
+![](/images/vnc-connection.png)
 
-The way to do this is via custom service commands. A service connection in XPipe can be used to tunnel any remote port over SSH to your local desktop. This port it doesn't have to be publicly exposed at all. For VNC,
+VNC sessions are opened in a browser tab:
 
-If the VNC server port is not publicly exposed, you also don't have to worry about setting up authentication and VNC encryption for it as that is done automatically by XPipe with SSH.
+![](/images/vnc.png)
 
-### RealVNC server
+The usage of the built-in VNC client is straightforward. The only two noteworthy points are:
 
-A common issue is that connections to systems running RealVNC server fail. This is in most cases due to the fact that RealVNC's server implementation is a proprietary development and does not adhere to public VNC standards. The only way to make RealVNC server work with other external VNC clients, including XPipe, is to configure the protocol version to be equal or below v3.8. You can do that in the RealVNC settings.
+1. You can drop files, either from another file browser tab or from your local desktop environment, into the VNC session window to transfer them to the target system
+2. You can input the special key combination `CTRL+ALT+DEL` via `SHIFT+CTRL+ALT+DEL` to prevent your local desktop environment from catching the key combination
 
-img
+## Custom VNC clients
 
+While XPipe has its own built-in VNC support, it is not as extensive as other dedicated VNC clients. If you're missing certain features or authentication methods, you can also use your own VNC client in combination with XPipe and its tunneling capabilities.
 
+The way to do this is via [service tunnels](http://localhost:3000/guide/services#tunnels) and a custom command. These service connections can be used to tunnel any remote port over SSH to your local desktop. This port doesn't have to be publicly exposed at all. For VNC, the port to tunnel is usually `5900 + <display number>`.
+
+![](/images/vnc-custom.png)
+
+You can provide any command you want to launch your VNC client of choice with the correct options.
+
+As the VNC server port does not have to be publicly exposed, you also don't have to worry about setting up authentication and VNC encryption for it as that is done automatically by XPipe with SSH. Having a VNC server listening on localhost with no authentication and encryption configured will still be secure when tunneled with XPipe.
+
+## RealVNC server
+
+A common issue is that connections to systems running RealVNC server fail. This is in most cases due to the fact that RealVNC's server implementation is a proprietary development and does not adhere to public VNC standards.
+
+The only way to make RealVNC server work with other external VNC clients, including XPipe, is to configure the protocol version to be equal or below v3.8. You can do that in the RealVNC expert settings. You might also have to enable the RealVNC server setting to allow so-called "legacy" VNC clients to connect to it.
+
+An easier solution would be to just install another VNC server that uses open and standardized protocol versions instead of proprietary ones.

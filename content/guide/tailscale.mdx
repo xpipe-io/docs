@@ -7,8 +7,6 @@ description: Accessing your tailscale systems
 
 XPipe supports connecting to your systems that are added to your tailnet in Tailscale. For that it uses the `tailscale` commandline tool. [Searching for available connections](/guide/connection-search) on a system should make tailscale connections show up if the `tailscale` tool is added to the PATH on that system. If you have not installed the `tailscale` tool, you can find installation instructions [here](https://tailscale.com/kb/1080/cli).
 
-<Callout type="info">On macOS, it technically doesn't have to be added to the PATH as XPipe also supports Tailscale installations from the app store. These do not add anything to the PATH.</Callout>
-
 You will likely only add tailscale connections from your local machine. However, these connections are supported on any remote system as well and support gateways. So you can search for available tailscale connections on any system that you have added a shell connection for.
 
 ![](/images/tailscale.png)
