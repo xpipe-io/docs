@@ -10,6 +10,7 @@
     "guide/webtop",
     "---Guide---",
     "guide/connection-search",
+    "guide/connection-launch",
     "guide/services",
     "guide/sync",
     "guide/scripting",
@@ -34,6 +35,7 @@
     "reference/security",
     "reference/directories",
     "api/",
+    "guide/python-api",
     "cli/",
     "legal"
   ]

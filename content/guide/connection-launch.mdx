@@ -1,0 +1,138 @@
+---
+title: Connection launches
+description: Launching shell connections in various different scenarios
+---
+
+## From the hub
+
+Any shell connection added to XPipe will show up in the connection hub interface. From there, you can just click on it to establish a shell connection in your terminal:
+
+![](/images/launch-hub.png)
+
+By default, this action is triggered by a single click. If you prefer having to double-click a connection entry to launch it, you can enable this behavior in the connection settings menu:
+
+![](/images/launch-settings.png)
+
+## From desktop shortcuts
+
+For frequently launched connections, it might make sense to make them available in your desktop environment itself instead of having to go through the XPipe GUI to launch it.
+
+You can find the option to create a shortcut in the submenu for the launch action:
+
+![](/images/launch-menu.png)
+
+This will create a shortcut on your desktop:
+
+![](/images/launch-shortcut.png)
+
+This is supported on all operating systems, each shortcut is adapted to fit in with the operating system and desktop environment. This means that you can use these shortcuts in many different contexts like the start menu, taskbar, dock, and more:
+
+![](/images/launch-start-menu.png)
+
+
+<Callout type="info">Creating shortcuts is supported for many different actions in XPipe, not just shell launches itself.</Callout>
+
+
+## From the terminal
+
+If you are frequently using the terminal, it might be easier to launch a shell connections directly from within that existing local terminal instead of navigating to the GUI and launching the connections manually from there.
+
+XPipe supports this with the `xpipe launch` command. The basic syntax is
+
+```bash
+xpipe launch <connection name>
+```
+
+to open a new shell session and
+
+```bash
+xpipe launch <connection name> -- <arg1> ... <argn>
+```
+
+to directly run a command in that remote shell and return.
+
+The connection name can be specified either using the full name of the connection or only a partial name as long as it is unambiguous. It also supports globs, meaning that you don't have to type out full connection names and hierarchies in case it is a sub connection. Standard glob options like `*`, `**`, `[]`, `?` work the same way as they do for files.
+
+For example, in the following scenario
+
+![](/images/launch-ambiguous.png)
+
+you can launch the WSL Ubuntu-24.04 instance with the following commands:
+
+```bash
+xpipe launch "local machine/wsl distributions/ubuntu-24.04"
+xpipe launch "*/wsl distributions/ubuntu-24.04"
+xpipe launch "*/wsl*/ubuntu-24.04"
+xpipe launch "*/*/ubuntu-24.04"
+xpipe launch "**/ubuntu-24.04"
+xpipe launch "ubuntu-24.04"
+xpipe launch "ubuntu-*"
+xpipe launch "ubuntu-"
+```
+
+As long as it is unambiguous, everything works fine. However, the following command will not work due to there being multiple systems with a similar name:
+
+```bash
+xpipe launch "ubuntu"
+```
+
+In the end, it is the easiest option to just have distinct names for every system.
+
+## From a script
+
+Using the XPipe [HTTP API](/api), you can instruct XPipe to launch shell connections either in the background or also in a new terminal window/tab. As an example, using the [Python API](/guide/python-api), you can start a shell connection and run commands like this:
+
+```python
+from xpipe_api import Client
+import re
+
+client = Client()
+
+connection = "f0ec68aa-63f5-405c-b178-9a4454556d6b"
+
+# This will start a shell session for the connection
+# Note that this session is non-interactive, meaning that password prompts are not supported
+shell_info = client.shell_start(connection)
+
+# The shell dialect of the shell. For example cmd, powershell, bash, etc.
+dialect = shell_info["shellDialect"]
+# The operating system type of the system. For example, windows, linux, macos, bsd, solaris
+osType = shell_info["osType"]
+# The display name of the operating system. For example Windows 10 Home 22H2
+osName = shell_info["osName"]
+
+# Prints {'exitCode': 0, 'stdout': 'hello world', 'stderr': ''}
+print(client.shell_exec(connection, "echo hello world"))
+
+# Prints {'exitCode': 0, 'stdout': '<user>', 'stderr': ''}
+print(client.shell_exec(connection, "echo $USER"))
+
+# Prints {'exitCode': 127, 'stdout': 'invalid: command not found', 'stderr': ''}
+print(client.shell_exec(connection, "invalid"))
+
+# Extract ssh version from system
+version_format = re.compile(r'[0-9.]+')
+ret = client.shell_exec(connection, "ssh -V")
+ssh_version = version_format.findall(ret["stderr"])[0]
+
+# Clean up after ourselves by stopping the shell session
+client.shell_stop(connection)
+```
+
+If you want to open the shell connection in a new terminal session instead, you can do it like this:
+
+```python
+from xpipe_api import Client
+
+client = Client()
+
+connection = "f0ec68aa-63f5-405c-b178-9a4454556d6b"
+
+# Opens the file browser in a specified starting directory for a connection
+client.connection_browse(connection, "/etc")
+
+# Opens a terminal session in a specified starting directory for a connection
+client.connection_terminal(connection, "/etc")
+```
+
+For more information on how to work with the Python API, how to obtain connection UUIDs, and more, take a look at the [Python API page](/guide/python-api).
