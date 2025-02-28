@@ -11,29 +11,20 @@ info:
     Note that this server is HTTP-only for now as it runs only on localhost. HTTPS requests are not accepted.
     
     You can either call the API directly or using the official [XPipe Python API](https://github.com/xpipe-io/xpipe-python-api).
-    
-    To start off with the API, you can query connections based on various filters.
-    With the matched connections, you can start remote shell sessions for each one and run arbitrary commands in them.
-    You get the command exit code and output as a response, allowing you to adapt your control flow based on command outputs.
-    Any kind of passwords and other secrets are automatically provided by XPipe when establishing a shell connection.
-    If a required password is not stored and is set to be dynamically prompted, the running XPipe application will ask you to enter any required passwords.
-    
+
     See the authentication handshake below on how to authenticate prior to sending requests.
     For development, you can also skip the authentication step by disabling it in the settings menu.
   contact:
     name: XPipe - Contact us
     url: mailto:hello@xpipe.io
-  version: "14.0"
-externalDocs:
-  description: XPipe - Plans and pricing
-  url: https://xpipe.io/pricing
+  version: "15.2"
 servers:
   - url: http://localhost:21721
     description: XPipe Daemon API
 paths:
   /handshake:
     post:
-      summary: Establish a new API session
+      summary: Establish session
       description: |
         Prior to sending requests to the API, you first have to establish a new API session via the handshake endpoint.
         In the response you will receive a session token that you can use to authenticate during this session.
@@ -43,6 +34,9 @@ paths:
         If your client does not have file system access, e.g. if it is running remotely, then you have to use an API key.
         
         Note that for development you can also turn off the required authentication in the XPipe settings menu, allowing you to send unauthenticated requests.
+        
+        Certain connection IDs are hardcoded, e.g. the ID of the local machine connection. This makes it easier to perform actions on it across systems.
+        The local machine connection ID is "f0ec68aa-63f5-405c-b178-9a4454556d6b". This one will be used in many of these samples.
       operationId: handshake
       security: [ ]
       requestBody:
@@ -52,15 +46,15 @@ paths:
             schema:
               $ref: '#/components/schemas/HandshakeRequest'
             examples:
-              standard:
-                summary: API key handshake
-                value: { "auth": { "type": "ApiKey", "key": "<API key>" }, "client": { "type": "Api", "name": "My client name" } }
               local:
                 summary: Local application handshake
                 value: { "auth": { "type": "Local", "authFileContent": "<Contents of the local file <temp dir>/xpipe_auth>" }, "client": { "type": "Api", "name": "My client name" } }
               local-ptb:
                 summary: Local PTB application handshake
                 value: { "auth": { "type": "Local", "authFileContent": "<Contents of the local file <temp dir>/xpipe_ptb_auth>" }, "client": { "type": "Api", "name": "My client name" } }
+              remote:
+                summary: API key handshake
+                value: { "auth": { "type": "ApiKey", "key": "<API key>" }, "client": { "type": "Api", "name": "My client name" } }
       responses:
         '200':
           description: The handshake was successful. The returned token can be used for authentication in this session. The token is valid as long as XPipe is running.
@@ -90,13 +84,13 @@ paths:
             examples:
               all:
                 summary: All
-                value: { "categoryFilter": "*", "connectionFilter": "*", "typeFilter": "*" }
+                value: { "categoryFilter": "**", "connectionFilter": "**", "typeFilter": "*" }
               simple:
-                summary: Simple filter
+                summary: Local machine
                 value: { "categoryFilter": "default", "connectionFilter": "local machine", "typeFilter": "*" }
               globs:
-                summary: Globs
-                value: { "categoryFilter": "*", "connectionFilter": "*/podman/*", "typeFilter": "*" }
+                summary: Podman containers with globs
+                value: { "categoryFilter": "**", "connectionFilter": "**/podman/*", "typeFilter": "*" }
       responses:
         '200':
           description: The query was successful. The body contains all matched connections.
@@ -118,7 +112,7 @@ paths:
           $ref: '#/components/responses/InternalServerError'
   /connection/info:
     post:
-      summary: Connection information
+      summary: Get connection info
       description: |
         Queries detailed information about a connection.
       operationId: connectionInfo
@@ -130,7 +124,7 @@ paths:
               $ref: '#/components/schemas/ConnectionInfoRequest'
             examples:
               simple:
-                summary: Standard
+                summary: Single connection
                 value: { "connections": [ "f0ec68aa-63f5-405c-b178-9a4454556d6b" ] }
       responses:
         '200':
@@ -141,7 +135,7 @@ paths:
                 $ref: '#/components/schemas/ConnectionInfoResponse'
               examples:
                 standard:
-                  summary: Connection information
+                  summary: Single connection information
                   value: { "infos": [ { "connection": "f0ec68aa-63f5-405c-b178-9a4454556d6b", "category": [ "default" ] ,
                                         "name": [ "local machine" ], "type": "local", "rawData": { }, "usageCategory": "shell",
                                         "lastUsed": "2024-05-31T11:53:02.408504600Z", "lastModified": "2024-06-23T21:15:25.608097Z",
@@ -156,7 +150,7 @@ paths:
           $ref: '#/components/responses/InternalServerError'
   /connection/add:
     post:
-      summary: Add new connection
+      summary: Add connection
       description: |
         Creates the new connection in the xpipe vault from raw json data.
         This can also perform an optional validation first to make sure that the connection can be established.
@@ -171,7 +165,7 @@ paths:
               $ref: '#/components/schemas/ConnectionAddRequest'
             examples:
               simple:
-                summary: Add new pwsh shell environment
+                summary: Add new pwsh environment
                 value: { "name": "my connection", "validate": true, "category": "97458c07-75c0-4f9d-a06e-92d8cdf67c40", "data":
                   {
                     "type": "shellEnvironment",
@@ -192,7 +186,7 @@ paths:
                 $ref: '#/components/schemas/ConnectionAddResponse'
               examples:
                 standard:
-                  summary: Connection information
+                  summary: Returned connection
                   value: { "connection": "36ad9716-a209-4f7f-9814-078d3349280c" }
         '400':
           $ref: '#/components/responses/BadRequest'
@@ -204,7 +198,7 @@ paths:
           $ref: '#/components/responses/InternalServerError'
   /category/add:
     post:
-      summary: Add new category
+      summary: Add category
       description: |
         Creates a new empty category in the vault.
         
@@ -243,7 +237,7 @@ paths:
     post:
       summary: Remove connection
       description: |
-        Removes a set of connection. This includes any possible children associated with the connection.
+        Removes a set of connections. This includes any possible children associated with the connection.
         
         Some connections, for example the local machine, can not be removed.
       operationId: connectionRemove
@@ -297,7 +291,7 @@ paths:
           $ref: '#/components/responses/InternalServerError'
   /connection/terminal:
     post:
-      summary: Open terminal for shell connection
+      summary: Open connection in terminal
       description: |
         Launches a new terminal session for a connection with an optional specified working directory.
       operationId: connectionTerminal
@@ -324,7 +318,7 @@ paths:
           $ref: '#/components/responses/InternalServerError'
   /connection/toggle:
     post:
-      summary: Toggle state of a connection
+      summary: Toggle connection
       description: |
         Updates the state of a connection to either start or stop a session.
         
@@ -353,7 +347,7 @@ paths:
           $ref: '#/components/responses/InternalServerError'
   /connection/refresh:
     post:
-      summary: Refresh state of a connection
+      summary: Refresh connection
       description: |
         Performs a refresh on the specified connection.
         
@@ -446,7 +440,7 @@ paths:
           $ref: '#/components/responses/InternalServerError'
   /shell/exec:
     post:
-      summary: Execute command in a shell session
+      summary: Run command in shell session
       description: |
         Runs a command in an active shell session and waits for it to finish. The exit code and output will be returned in the response.
         
@@ -491,7 +485,7 @@ paths:
           $ref: '#/components/responses/InternalServerError'
   /fs/blob:
     post:
-      summary: Store a raw blob to be used later
+      summary: Store raw file blob
       description: |
         Stores arbitrary binary data in a blob such that it can be used later on to for example write to a remote file.
         
@@ -526,7 +520,7 @@ paths:
           $ref: '#/components/responses/InternalServerError'
   /fs/read:
     post:
-      summary: Read the content of a remote file
+      summary: Read a remote file
       description: |
         Reads the entire content of a remote file through an active shell session.
       operationId: fsRead
@@ -558,7 +552,7 @@ paths:
           $ref: '#/components/responses/InternalServerError'
   /fs/write:
     post:
-      summary: Write a blob to a remote file
+      summary: Write blob to a remote file
       description: |
         Writes blob data to a file through an active shell session.
       operationId: fsWrite
@@ -585,7 +579,7 @@ paths:
           $ref: '#/components/responses/InternalServerError'
   /fs/script:
     post:
-      summary: Create a shell script file from a blob
+      summary: Create shell script file from a blob
       description: |
         Creates a shell script in the temporary directory of the file system that is access through the shell connection.
         

@@ -37,3 +37,11 @@ h1, h2, h3, h4, h5, h6 {
 
     @apply text-teal-700 dark:text-teal-400 !important;
 }
+
+button[type=submit] {
+    @apply dark:bg-teal-800 bg-teal-300 border border-teal-500;
+}
+
+button[type=button][role=combobox] {
+    @apply dark:bg-teal-900 bg-teal-200 border border-teal-700 mt-4;
+}
