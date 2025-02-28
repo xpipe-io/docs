@@ -1,5 +1,5 @@
 ---
-title: Establish a new API session
+title: Establish session
 description: >
   Prior to sending requests to the API, you first have to establish a new API
   session via the handshake endpoint.
@@ -20,6 +20,13 @@ description: >
 
   Note that for development you can also turn off the required authentication in
   the XPipe settings menu, allowing you to send unauthenticated requests.
+
+
+  Certain connection IDs are hardcoded, e.g. the ID of the local machine
+  connection. This makes it easier to perform actions on it across systems.
+
+  The local machine connection ID is "f0ec68aa-63f5-405c-b178-9a4454556d6b".
+  This one will be used in many of these samples.
 full: true
 _openapi:
   method: POST
@@ -50,6 +57,15 @@ _openapi:
           Note that for development you can also turn off the required
           authentication in the XPipe settings menu, allowing you to send
           unauthenticated requests.
+
+
+          Certain connection IDs are hardcoded, e.g. the ID of the local machine
+          connection. This makes it easier to perform actions on it across
+          systems.
+
+          The local machine connection ID is
+          "f0ec68aa-63f5-405c-b178-9a4454556d6b". This one will be used in many
+          of these samples.
 ---
 
 <APIPage document={"./public/openapi.yaml"} operations={[{"path":"/handshake","method":"post"}]} webhooks={[]} hasHead={false} />

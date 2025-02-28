@@ -264,7 +264,7 @@ paths:
           $ref: '#/components/responses/InternalServerError'
   /connection/browse:
     post:
-      summary: Open connection in file browser
+      summary: Open connection file browser
       description: |
         Creates a new tab in the file browser and opens the specified connections with an optional starting directory.
       operationId: connectionBrowse
@@ -579,7 +579,7 @@ paths:
           $ref: '#/components/responses/InternalServerError'
   /fs/script:
     post:
-      summary: Create shell script file from a blob
+      summary: Write blob to a shell script
       description: |
         Creates a shell script in the temporary directory of the file system that is access through the shell connection.
         
