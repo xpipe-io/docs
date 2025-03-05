@@ -43,12 +43,6 @@ Instead, the vision behind XPipe is to create a lean connection hub that brings 
 
 All of this works without having to install or setup anything on your servers at all. XPipe will use only the local and remote applications that are available, dynamically adapting based on what's available.
 
-## The desktop on the web
-
-A desktop environment with all its applications can't be replaced by a single application, at least not if you want a good user experience. But what about scenarios where you are not at your local workstation?
-
-To take the desktop wherever you need it, XPipe offers the [Webtop docker image](/guide/webtop). This image is a full desktop environment that you can run in a docker container and access from your browser. You can host it wherever you want, put it behind some form of authentication layer, and access it from wherever you are. With the [git sync](/guide/sync), you also have access to all your connection data.
-
 ## Flexible file management
 
 Most other graphical clients use protocols like SFTP and SCP for file management. After all, they are based on SSH and have a (somewhat) defined interface that both clients and servers can work with. However, these protocols have a few showstoppers that make life more complicated than it needs to be.
@@ -68,6 +62,12 @@ Importing and exporting your user data is a feature that almost all other compar
 Instead, XPipe focuses exclusively on using git for this. Essentially, XPipe can initialize and update a local repository of your user data and commit any changes you make in the app. That way, you already get a fully versioned storage of your user data. In addition, you can link this local repository to a remote repository within XPipe, allowing for it to pull and push changes from and to the remote. This remote repository can be hosted anywhere you want and can be accessed with any supported git protocol like HTTPS or also SSH. You can use the full functionality of XPipe's SSH connectivity for that as well.
 
 This XPipe vault git repository can be shared with other team members and linked to other XPipe installations to guarantee that everyone always has a fully up-to-date version of all connection data, on any system they currently are on. And this in a manner that is self-hosted as you have full control over how and where you host this git repository. XPipe's sync does not involve any services outside your control.
+
+## The desktop on the web
+
+A desktop environment with all its applications can't be replaced by a single application, at least not if you want a good user experience. But what about scenarios where you are not at your local workstation?
+
+To take the desktop wherever you need it, XPipe offers the [Webtop docker image](/guide/webtop). This image is a full desktop environment that you can run in a docker container and access from your browser. You can host it wherever you want, put it behind some form of authentication layer, and access it from wherever you are. With the [git sync](/guide/sync), you also have access to all your connection data.
 
 ## Shell-based connections
 
