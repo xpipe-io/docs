@@ -14,13 +14,13 @@ The [.msi installer](https://github.com/xpipe-io/xpipe/releases/latest/download/
 You can install it quietly with just as other normal installers:
 
 ```powershell
-Start-Process -FilePath "msiexec.exe" -ArgumentList "/i `"xpipe-installer-windows-x86_64.msi`" /qn" -Wait -PassThru
+Start-Process -FilePath "msiexec.exe" -ArgumentList "/i `"https://github.com/xpipe-io/xpipe/releases/latest/download/xpipe-installer-windows-x86_64.msi`" /qn" -Wait -PassThru
 ```
 
 It also supports the property `ALLUSERS` to control whether it should be installed only for the current user or all users on a system. If you run the following command with Administrator privileges, it will install for all users:
 
 ```powershell
-Start-Process -Verb runAs -FilePath "msiexec.exe" -ArgumentList "/i `"xpipe-installer-windows-x86_64.msi`" /qn ALLUSERS=1" -Wait -PassThru
+Start-Process -Verb runAs -FilePath "msiexec.exe" -ArgumentList "/i `"https://github.com/xpipe-io/xpipe/releases/latest/download/xpipe-installer-windows-x86_64.msi`" /qn ALLUSERS=1" -Wait -PassThru
 ```
 
 ### Chocolatey
