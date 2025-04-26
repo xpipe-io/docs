@@ -54,27 +54,32 @@ If everything works out, XPipe should push a commit to your remote repository.
 By default, no connection categories are set to sync so that you have explicit control on what connections to commit.
 So at the start, your remote repository will be empty.
 
-To have your connections of a category put inside your git repository,
-you need to click on the gear icon (when hovering over the category)
-in your `Connections` tab under the category overview on the left side.
-Then click on `Add to git repository` to sync the category and connections to your git repository.
-This will add all syncable connections to the git repository.
+To have your connections of a category put inside your git repository, you first need to change its sync configuration.
+In your `Connections` tab under the category overview on the left side, you can open the category configuration menu either by right-clicking the category or click on the `⚙️` icon when hovering over the category, and then clicking on the `🔧` configure button.
 
-![sync-add](/sync-add.png)
+![category-config](/images/category-config.png)
+
+Then, set the `Sync with git repository` value to `Yes` to sync the category and connections to your git repository.
+This will add all syncable connections in that category to the git repository.
+The sync settings for a category are inherited by default from its parent if not explicitly set.
+
+![sync-add](/images/sync-add.png)
+
+## Adding files to git
+
+When everything is set up, you have the option to add any additional files such as SSH keys to git as well.
+Next to every file choice is a git button that will add the file to the git repository.
+
+![sync-file](/sync-file.png)
+
+These files are then added to the git vault data directory and committed in encrypted form.
+This means that any files you add to git, such as keys, are only committed encrypted just as other secrets.
 
 ## Local connections
 
 Any connection located under the local machine cannot be shared as it refers to connections and data that are only available on the local system.
 
 Certain connections that are based on a local file, for example, SSH configs, can be shared via git if the underlying data, in this case the file, have been added to the git repository as well.
-
-## Adding files to git
-
-When everything is set up, you have the option to add any additional files such as SSH keys to git as well.
-Next to every file choice is a git button that will add the file to the git repository.
-These files are also encrypted when pushed.
-
-![sync-file](/sync-file.png)
 
 ## GPG signing
 

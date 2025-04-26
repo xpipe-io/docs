@@ -59,3 +59,15 @@ With older installations, Microsoft ships an old version of SSH as well. This se
 
 If you are planning on configuring key-based authentication for your SSH server instead of just password authentication, note that Windows SSHD has an additional layer of complexity involved when adding authorized keys for users which have administrator privileges. You have to add public keys for these users into a separate `administrators_authorized_keys` file as explained [here](https://learn.microsoft.com/en-us/windows-server/administration/openssh/openssh_keymanagement#administrative-user).
 
+## Troubleshooting
+
+### No matching MAC found
+
+If your SSH server only offers outdated MACs that are not enabled by default in your local SSH client, you can manually add those to a specific connection via the additional SSH config options for SSH. For example, to support the MAC `hmac-sha1`, add the following additional option:
+
+```
+MACs +hmac-sha1
+```
+
+
+
