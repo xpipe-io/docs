@@ -1,0 +1,108 @@
+---
+title: Terminals
+description: Using your favourite terminal with XPipe
+---
+
+## Introduction
+
+XPipes comes with integrations for almost every terminal out there, so you can keep using it in combination with XPipe. However, the amount of features for each individual integration depends on how much is possible to control from an outside application like XPipe with each terminal.
+
+Some terminals allow very flexible control so that XPipe can implement all the functionality it needs. Other terminals lack various features. In many cases, this is either tab support or the ability to open new tabs from the outside. A few terminals require some configuration to work optimally with XPipe.
+
+This page intends to cover all the things to watch out for when using various terminals. Note that this page does not list all supported terminals, it only covers important ones that might need additional context.
+
+## Multiplexers
+
+XPipe comes with integrated support for terminal multiplexers such as tmux or zellij. You can enable this in the settings menu. Using terminal multiplexers allows you to make proper use of terminals that don't support opening new tabs from XPipe. Or if your favorite terminal here is listed as not recommended as it does not support tabs, using a multiplexer will fix this issue.
+
+On Windows, these terminal multiplexers are not supported by default. To work around this limitation, you can select a terminal environment in the settings menu that is used to run the commands instead. This terminal environment must be a WSL distribution installed on your local machine.
+
+![](/images/multiplexers.png)
+
+## Prompts
+
+Terminal prompt tools allow you to fully customize the prompts in your shell with additional information. These prompts require installation on the remote system you access. When you enable a terminal prompt in the settings menu, XPipe will automatically install it on the system you connect to, granted that you marked the connection category to allow these kinds of modifications to a system.
+
+XPipe will also automatically set up the specified configuration on the remote system so that all your prompts are configured uniformly.
+
+![](/images/prompts.png)
+
+As described later on for some terminals, having a custom prompt interfere with other prompt-based terminal integrations, e.g. for the Warp terminal.
+
+## Noteworthy integrations
+
+Here you can find a summary of the suitability of various popular terminal emulators to be used with XPipe. Terminals where there isn't a lot to mention aren't listened here.
+
+### Windows Terminal
+
+On Windows, [Windows Terminal](https://aka.ms/terminal) is the recommended terminal of choice for XPipe. It supports all features and provides the best native integration on Windows. The early access variants called Preview and Canary are also supported by XPipe if you are using them.
+
+XPipe creates a new separate profile for connections started from XPipe. This allows you to customize, for example, the appearance or other terminal settings for XPipe connections specifically. You can find the profile in the settings menu:
+
+![](/images/windows-terminal-settings.png)
+
+### Warp
+
+If you are looking for an AI-assisted workflow, then [Warp](https://www.warp.dev/) might be your terminal of choice. It supports most features required by XPipe and works on all operating systems. Limitations are missing tab color support, no prompt support, and tabs not automatically closing.
+
+XPipe will automatically run a command to [warpify](https://docs.warp.dev/features/warpify/subshells) your session. This is important to access to all the shell integrations of Warp:
+
+![](/images/warpify.png)
+
+Custom terminal prompts like oh-my-zsh or starship are not compatible with Warp's shell integration and will prevent the shells from being warpified.
+
+### Alacritty
+
+[Alacritty](https://alacritty.org/) is a terminal that offers good rendering performance but is kept basic in terms of features. It is available on all platforms. It does not support tabs by default. To effectively use it with XPipe, it is strongly recommended to make use of the terminal multiplexer integration of XPipe to add tabbing functionality.
+
+If you are using a multiplexer regardless, alacritty is a good choice for a high-performant terminal that is available on all platforms.
+
+### WezTerm
+
+WezTerm is a cross-platform terminal, but the level of support varies by platform, however. On Windows, WezTerm is missing the ability to open new tabs from the outside, making it not recommended for Windows. On Linux and macOS, the WezTerm integration supports tabs properly and can be recommended to be used.
+
+### Tabby
+
+Tabby is a cross-platform terminal. It is not recommended to be used with XPipe as it is rather unstable, prone to hang, and slow. It is supported by XPipe but various large configurations might result in Tabby freezing. The underlying freezing issues are unlikely to be fixed as Tabby is only sparsely maintained.
+
+### Waveterm
+
+[Waveterm](https://www.waveterm.dev/) is a flexible terminal that can arrange individual tabs in tiles. It is rather difficult to use from XPipe as Waveterm does not permit external applications to open new tabs from the outside. The solution to this is to start XPipe as a child process from Waveterm like this so that XPipe has access to its environment variables:
+
+![](/images/waveterm-open.png)
+
+If you don't launch XPipe through Waveterm, XPipe won't be able to open any terminal sessions in it.
+
+### Windows Console Host
+
+The Windows shells cmd.exe, PowerShell, and pwsh all come with their own console host window. If you don't have any other Windows terminals available, you can use them as well. This is, however, not recommended as they don't support tabs and various special characters and escape sequences. You should only use these terminals if you don't have any alternative.
+
+### Konsole
+
+[Konsole](https://konsole.kde.org/) is the default terminal shipped with KDE. It can be used with XPipe effectively, provided that it is correctly configured to support opening tabs from the outside. By default, the single instance mode is disabled. It is, however, required for XPipe to be able to open tabs. You can enable this setting in the Konsole settings:
+
+![](/images/konsole-settings.png)
+
+### Gnome Terminal
+
+The old version of Gnome Terminal, which is no longer the default on modern gnome systems, is not recommended to be used with XPipe as it lacks the ability to open tabs from the outside. You can take a look at the more modern Gnome Console instead.
+
+### Gnome Console
+
+[Gnome Console](https://apps.gnome.org/en-GB/Console/), which is unrelated to Gnome Terminal, is the default terminal shipped with modern Gnome versions. This terminal supports all necessary features like tabbing support and is therefore recommended to be used with XPipe.
+
+### Kitty
+
+[Kitty terminal](https://sw.kovidgoyal.net/kitty/) is currently available for Linux and macOS. It is highly customizable and supports all necessary features and is recommended. To interact with kitty, XPipe communicates with the socket. For that it requires `socat` on Linux and `nc` on macOS.
+
+### Ghostty
+
+[Ghostty terminal](https://ghostty.org/) is currently available for Linux and macOS. The feature set it differs between these two platforms, however. On Linux, Ghostty is missing tabbing support and can only be recommended to be used with a terminal multiplexer. On macOS, tabs are supported, and it can be properly used without a multiplexer as well.
+
+### Foot
+
+Foot is a terminal that offers good rendering performance but is kept basic in terms of features. It does not support tabs by default. To effectively use it with XPipe, it is strongly recommended to make use of the terminal multiplexer integration of XPipe to add tabbing functionality.
+
+### Custom command
+
+If you are using a terminal that is not currently supported by XPipe, you can still launch it by specifying a custom command. XPipe will call the terminal command with a command to run a script file, so you don't have to configure anything. The only thing you need is to provide a command in the form of for example `myterminal --tab -- $CMD`. This will get resolved by XPipe it to something like `myterminal --tab -- bash -c <script file>.sh`.
