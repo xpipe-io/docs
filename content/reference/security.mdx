@@ -62,7 +62,7 @@ In case you choose to store passwords and other secrets within XPipe, all sensit
 - A dynamically generated vault key file (The data can then only be decrypted with that file present)
 - A custom vault user passphrase that can be set by you in the settings menu (This option is only as secure as the passphrase you choose)
 
-The detailed encryption algorithm is an AES-128 GCM block-cipher with 12 IV bytes and 128 tag bits. The encryption keys are generated with a [Password-based key-derivation algorithm (PBKDF)](https://datatracker.ietf.org/doc/html/rfc8018) using SHA-256 HMAC. The full secret encryption implementation is open source and available on [GitHub](https://github.com/xpipe-io/xpipe/blob/master/core/src/main/java/io/xpipe/core/util/AesSecretValue.java). It is important that your supplied passphrase provides a high level of entropy in order to guarantee the best possible encryption.
+The detailed encryption algorithm is an AES-128 GCM block-cipher with 12 IV bytes and 128 tag bits. The encryption keys are generated with a [Password-based key-derivation algorithm (PBKDF)](https://datatracker.ietf.org/doc/html/rfc8018) using SHA-256 HMAC. It is important that your supplied passphrase provides a high level of entropy in order to guarantee the best possible encryption.
 
 ### Prompted secrets
 

@@ -25,10 +25,16 @@ Start-Process -Verb runAs -FilePath "msiexec.exe" -ArgumentList "/i `"https://gi
 
 ### Chocolatey
 
-There is also a [choco package](https://community.chocolatey.org/packages/xpipe) that provides the same .msi installers. It can be installed with the following command:
+There is also a [choco package](https://community.chocolatey.org/packages/xpipe) that provides the same .msi installers. It can be installed for your current user with the following command:
 
 ```powershell
 choco install xpipe
+```
+
+If you want to install the package for all users, you can do so by passing the ALLUSERS property:
+
+```powershell
+choco install xpipe --install-arguments="'ALLUSERS=1'"
 ```
 
 ### Winget
@@ -38,6 +44,8 @@ Furthermore, there is also a winget package available that provides the same .ms
 ```powershell
 winget install xpipe-io.xpipe --source winget
 ```
+
+
 
 ## macOS
 
