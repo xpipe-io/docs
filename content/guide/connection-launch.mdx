@@ -78,6 +78,20 @@ xpipe launch "ubuntu"
 
 In the end, it is the easiest option to just have distinct names for every system.
 
+### Terminal profiles
+
+If you want to start up a common set of connections in a predefined terminal layout, you can use the launch command to do that as well. For example, if you are using Windows Terminal, running the following commands:
+
+```
+wt -w 1 sp xpipe launch "local machine"
+wt -w 1 sp xpipe launch "archlinux"
+wt -w 1 sp xpipe launch "ubuntu-24.04"
+```
+
+will allow you to obtain the same split pane terminal configuration of the 3 connections every time.
+
+This way, you can make use of the full CLI and features of your specific terminal to create custom tabs and split pane layouts. If you are using a multiplexer, you can do the same thing as well with the launch command.
+
 ## From a script
 
 Using the XPipe [HTTP API](/api), you can instruct XPipe to launch shell connections either in the background or also in a new terminal window/tab. As an example, using the [Python API](/guide/python-api), you can start a shell connection and run commands like this:
