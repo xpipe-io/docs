@@ -1,9 +1,8 @@
-# xpipe-docs
+# XPipe Documentation
 
-This is a Next.js application generated with
-[Create Fumadocs](https://github.com/fuma-nama/fumadocs).
+The sources of the XPipe documentation site.
 
-Run development server:
+This is a Next.js application. To run a development server:
 
 ```bash
 npm run dev
