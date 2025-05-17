@@ -1,0 +1,58 @@
+---
+title: First steps
+description: Starting out with XPipe
+---
+
+## Introduction
+
+Once installed, you can start with adding your first connections to XPipe. You will be greeted by the introduction screen, which gives you the option to automatically add all available connections on the local machine:
+
+![](/images/intro.png)
+
+In contrast to many other tools, XPipe is not just a remote connection tool. It can also be used to access your locally installed shells, VMs, containers, and more. The local search for available connections should add all supported local tools plus various remote connections, e.g., connections from your SSH config file or from PuTTY/KiTTY.
+
+As of now, there isn't a proper import feature to add remote connections from other tools. This is because the connection schema in general differs a lot from other tools, so at best you would get incomplete connections when importing. In practice, the missing import feature doesn't matter a lot because XPipe comes with a big focus on automatic connection discovery.
+
+## Adding remote connections
+
+Once XPipe has added all available local connections it could find, you can continue by adding your first remote connection. In most cases this is an SSH connection. You can do this in the `New ...` menu:
+
+![](/images/add-menu.png)
+
+This simple SSH connection dialog should be straightforward so that you only have to enter your connection details.
+
+If your connection requires passwords, and you are using a password manager, you can look into integrating your existing password manager with XPipe in the [password manager guide](/guide/password-manager).
+
+For key-based authentication, XPipe supports many different key sources, ranging from a simple file, over various agents, to smartcards.
+
+If you're looking to customize your connection even more, e.g., with custom OpenSSH options, you can take a look at the full [SSH guide](guide/ssh).
+
+![](/images/intro-ssh.png)
+
+After your connection has been validated, you will see the automatic connection search dialogue again, allowing you to add all supported connections on that remote system automatically:
+
+![](/images/connection-search-dialog.png)
+
+If you encounter any issues with this SSH connection, you can refer to the [SSH troubleshooting guide](guide/ssh#troubleshooting). As XPipe has a different approach compared to most other SSH clients and uses your local OpenSSH client instead, there might be a few behavioral differences between XPipe and other SSH clients.
+
+## Terminals
+
+In contrast to other SSH clients, XPipe does not come with its own integrated terminal. Instead, it fully relies on you using your own terminal with XPipe. When you click on a connection in the connection hub interface, your default terminal should open. On startup, XPipe it tries its best at determining the best possible matching terminal installed to use. If you don't like the default selection, you can change it at `Settings -> Terminal`. There you will also find a list of all supported terminals to choose from.
+
+XPipe also supports various other terminal-related tools such as terminal multiplexers and terminal prompts. So if you are using a multiplexer like tmux already, you can keep using it with XPipe. The same goes for prompt tools such as starship or oh-my-posh. You can find all the related configuration options in the terminal settings as well.
+
+## Other applications
+
+Similar to terminals, XPipe also interacts with other types of external applications such as text editors, RDP clients, and more. These should also be automatically detected, but you can also change them later on in the settings menu.
+
+## Password managers
+
+XPipe comes with integrations for many popular password managers, allowing you to retrieve passwords from your password manager instead of having to store the secrets itself. You can check in the [password manager guide](/guide/password-manager) whether your password manager is supported. You can configure the password manager to use in the settings menu.
+
+## Synchronization
+
+If you are looking to use XPipe on multiple systems, this synchronization feature should be interesting for you as it allows you to have access to all your connection data from all your XPipe installations. For that, it uses a remote git repository to sync with. The only thing you need is either a GitHub account or any other platform to host a private repository. Self-hosted git repositories are also supported. You can check out the [synchronization guide](/guide/sync) for detailed instructions on how to set this up. This synchronization feature also supports teams, so that you can sync to one central remote repository while still keeping your individual authentication options like passwords and keys private so they can only be decrypted by you.
+
+
+
+

@@ -18,8 +18,6 @@ First of all, you need to create a remote repository with your Git provider of c
 You also need to have a locally installed `git` client ready on your local machine. You can try running `git --help` in a local terminal to check.
 If you don't have one, you can visit [https://git-scm.com](https://git-scm.com/) to install git.
 
-
-
 ## Authentication
 
 There are multiple ways to authenticate. Most repositories use HTTPS where you have to specify a username and password.
@@ -98,3 +96,31 @@ git push --force -u remote-storage HEAD
 ```
 
 The push is required to overwrite the remote repository. Without the push, XPipe would just pull the changes from the remote repository again.
+
+## Team vaults
+
+The git synchronization also supports multiple different users for when you are working with your team. It allows each team member to share access to systems that are designated to be available to all users, while also allowing each user to keep selected systems and authentication options private:
+
+<Callout type="info">Team vaults are supported starting from the Professional plan.</Callout>
+
+To start off, each team member first has to sync to the same git repository. You can then configure the vault users in the `Vault` settings menu. Each vault user requires a passphrase to be set which will be used to encrypt personal secrets in the vault. If your passphrase is complex enough, other users won't be able to decrypt any connections and identities marked as personal.
+
+![](/images/team-vault.png)
+
+To mark an identity as personal, you have to create a synced identity:
+
+![](/images/synced-identity.png)
+
+These identities can be configured to either be global or personal identities:
+
+![](/images/personal-identity.png)
+
+Then, configuring a connection to use this personal identity will automatically make XPipe also encrypt the connection itself and all subconnections with your personal key as well. This will result in only your user having access to the identity and all associated connections. Any kind of key files associated with personal identities are also added to the repository using your personal key for encryption.
+
+<Callout type="info">Other vault users can still see that changes are made to all your personal connections and identities. However, they can't decrypt the changes itself and will only see binary diffs in the repository.</Callout>
+
+When working in a team, occasional merge conflict might occur when another user pushes changes while your local XPipe instance is running. XPipe will automatically check in the background if someone else pushed something to the remote meanwhile. If this happens, you will get the chance to automatically restart XPipe to pull and apply remote changes in the status bar:
+
+![](/images/resolve-conflict.png)
+
+You can also choose to ignore any remote changes if you don't need them and instead merge them the next time you start XPipe.

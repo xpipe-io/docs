@@ -13,6 +13,8 @@ By default, interaction with the PVE command-line tools requires root permission
 
 <Callout type="info">This integration also works on systems that are not a PVE distro as long as all required tools like `qm` and `pct` are present. This is useful for cases where Proxmox was manually installed onto an existing system of another distro.</Callout>
 
+If you are running a Proxmox cluster with multiple PVE systems, you have to add each one separately, usually via SSH. This is necessary as XPipe runs over the system shell and not over any Proxmox API endpoint.
+
 <Callout type="info">Interacting with more than one PVE system, e.g. a cluster of multiple PVE systems, requires at least the Homelab plan.</Callout>
 
 ## Connecting to VMs
