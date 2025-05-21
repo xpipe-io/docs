@@ -30,6 +30,7 @@
     "guide/podman",
     "guide/kvm",
     "guide/vmware",
+    "guide/rdp",
     "guide/vnc",
     "---Troubleshooting---",
     "troubleshoot/license-activation",

@@ -1,0 +1,52 @@
+---
+title: RDP
+description: Launching RDP connections
+---
+
+## Introduction
+
+XPipe acts as a lean connection hub to launch your connections. For that reason, it doesn't implement the RDP stack itself. Instead, it focuses on giving you the ability to quickly launch RDP connections with your preferred RDP client. The selection of viable RDP clients out there isn't that great, so in most cases this will be mstsc on Windows, Remmina on Linux, and the Remote Desktop app on macOS.
+
+XPipe is not just a launcher that just runs .rdp files, it does more than that. If you go to the desktop connection creation menu, you will find that there are several RDP options:
+
+![](/images/rdp-menu.png)
+
+## RDP tunnels
+
+The main type of RDP connections are tunneled RDP connections where essentially the remote RDP port is tunneled to your local machine. The advantage of this is that the RDP port doesn't have to be publicly exposed, and you can reuse authentication from an SSH connection. Furthermore, you will gain access to the more advanced SSH authentication options to connect to your RDP server compared to the often times basic password authentication for RDP.
+
+The only thing you need is an SSH connection to the remote system to select it as the target host. Since RDP is most often used for Windows systems, note that nowadays, having an SSH connection to a Windows Server is simple. The latest Windows Server versions ship a built-in OpenSSH server by default, and for slightly older versions the OpenSSH Server feature can easily be enabled. For more information, see [here](https://learn.microsoft.com/en-us/windows-server/administration/openssh/openssh_install_firstuse?tabs=gui&pivots=windows-server-2025).
+
+![](/images/rdp-creation.png)
+
+You can leave the use your identity section blank if you intend to use the same password authentication of your SSH connection. For other advanced authentication options, see the additional RDP options field described later on this page.
+
+## Basic RDP connections
+
+Of course, you can also create direct RDP connections to a system without any SSH tunnel. These can be either specified in-place using a direct RDP connection or via an .rdp file.
+
+![](/images/rdp-direct-creation.png)
+
+In this case, XPipe will just assemble the .rdp file with all the necessary options, including any additional RDP options you specified.
+
+## Additional RDP options
+
+If you want to further customize your connection, you can do that by providing RDP properties the same way as they are contained in .rdp files. For a full list of available properties, see the official [RDP documentation](https://learn.microsoft.com/en-us/windows-server/remote/remote-desktop-services/clients/rdp-files).
+
+These options have the format `option:type:value`. So for example, to customize the size of the desktop window, you can pass the following configuration:
+```
+desktopwidth:i:*width*
+desktopheight:i:*height*
+```
+
+## RDP RemoteApps
+
+Any RDP connection can also be used to run individual remote applications using the RemoteApp functionality built into RDP. This feature is only supported on Windows. Instead of opening the full RDP session, it is kept in the background and only the application window is displayed. That way, the remote application blends in with your local desktop, and you are not bound to the full RDP client window:
+
+![](/images/desktop-explorer.png)
+
+You can create these RemoteApps very easily by just specifying which graphical application should be run:
+
+![](/images/desktop-app-creation.png)
+
+If the RDP connection allows it, the application will then be launched. For more information on how to configure allow lists, see the [dedicated RemoteApps section](/guide/desktop-applications#rdp-remoteapps).
