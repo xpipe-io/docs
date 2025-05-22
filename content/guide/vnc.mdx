@@ -9,6 +9,20 @@ VNC is commonly used in server administration to access servers in a graphical m
 
 ![](/images/vnc-connection.png)
 
+## VNC tunnels
+
+The main type of VNC connections are tunneled VNC connections where essentially the remote VNC port is tunneled to your local machine. The advantage of this is that the VNC port doesn't have to be publicly exposed, the traffic is encrypted, and you can reuse authentication from an SSH connection. Furthermore, you will gain access to the more advanced SSH authentication options to connect to your VNC server compared to the often times more basic authentication for VNC. The only thing you need is an SSH connection to the remote system to select it as the target host.
+
+![](/images/vnc-tunnel.png)
+
+## Direct RDP connections
+
+Of course, you can also create direct VNC connections to a system without any SSH tunnel:
+
+![](/images/vnc-direct.png)
+
+## VNC sessions
+
 VNC sessions are opened in a browser tab:
 
 ![](/images/vnc.png)

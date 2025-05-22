@@ -23,11 +23,11 @@ body {
 }
 
 #nd-docs-layout {
-    @apply bg-[#3331] dark:bg-[#4572];
+    @apply bg-[#3331] dark:bg-[#3462];
 }
 
 #nd-sidebar {
-    @apply bg-[#fffb] dark:bg-[#151a22cc];
+    @apply bg-[#fffb] dark:bg-[#101215ee];
 }
 
 #nd-sidebar p {
