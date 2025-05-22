@@ -30,6 +30,22 @@ body {
     @apply bg-[#fffb] dark:bg-[#151a22cc];
 }
 
+#nd-sidebar p {
+    @apply mb-1 pl-1;
+}
+
+#nd-sidebar a {
+    @apply py-1 pl-1;
+}
+
+#nd-sidebar p.mt-8 {
+    @apply mt-5 !important;
+}
+
+#nd-sidebar button.flex-row {
+    @apply py-1 pl-1;
+}
+
 #nd-page {
 }
 

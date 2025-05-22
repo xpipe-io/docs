@@ -1,0 +1,24 @@
+---
+title: WinRM
+description: Connect to remote Windows systems via PowerShell remote sessions
+---
+
+## Introduction
+
+Windows offers an alternative to SSH with the [WinRM](https://learn.microsoft.com/en-us/windows/win32/winrm/portal) implementation. XPipe supports this Windows Remote Management implementation via the PowerShell [PsSession](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/new-pssession?view=powershell-7.5) functionality. Essentially, this will open a remote PowerShell session similar to SSH, but with a few differences.
+
+Compared to an SSH session, a PsSession has access to both the local system and remote system at the same time. While this a more seamless experience sounds good at first, there are also many limitations to it. The biggest limiting factor is probably the inability to run any interactive commands. Any kind of commands that require user input on stdin in a remote PsSession won't run.
+
+Therefore, you are probably better off using SSH. Note that nowadays, having an SSH connection to a Windows Server is simple. The latest Windows Server versions ship a built-in OpenSSH server by default, and for slightly older versions the OpenSSH Server feature can easily be enabled. For more information, see [here](https://learn.microsoft.com/en-us/windows-server/administration/openssh/openssh_install_firstuse?tabs=gui&pivots=windows-server-2025).
+
+PsSessions work within XPipe, including the file browser. However, the terminal session experience is significantly worse, and you can't add any subconnections for a connection based on PsSessions. This means that [searching for available connections](/guide/connection-search) will not be available and you also can't manually add any subconnections to things like containers, VMs, shell environments, and more.
+
+If you still decided to use PsSessions anyway, this page covers the basics.
+
+## PsSession
+
+Creating a PowerShell remote session connection is pretty simple, assuming that the remote system is configured to allow these kinds of connections. Then you just have to enter the hostname (called computer name in Windows) along with the login information, and you should be good to go:
+
+![](/images/pssession.png)
+
+By default, a computer name is not included in the local trusted hosts list. If that is the case, XPipe will ask you for confirmation to trust the system and add it to the list.
