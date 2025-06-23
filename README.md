@@ -14,6 +14,10 @@ yarn dev
 
 Open http://localhost:3000 with your browser to see the result.
 
+## PTB docs
+
+You can find the release documentation in the `master` branch and the PTB documentation for the next release in the `ptb` branch.
+
 ## Learn More
 
 To learn more about Next.js and Fumadocs, take a look at the following
