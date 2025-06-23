@@ -3,21 +3,16 @@ info:
   title: XPipe API Documentation
   description: |
     The XPipe API provides programmatic access to XPipe’s features.
-    You can get started by either using this page as an API reference or alternatively import the OpenAPI definition file into your API client of choice:
-    
-    <a download href="/openapi.yaml" style="font-size: 20px">OpenAPI .yaml specification</a>
     
     The XPipe application will start up an HTTP server that can be used to send requests.
     Note that this server is HTTP-only for now as it runs only on localhost. HTTPS requests are not accepted.
     
-    You can either call the API directly or using the official [XPipe Python API](https://github.com/xpipe-io/xpipe-python-api).
-
     See the authentication handshake below on how to authenticate prior to sending requests.
     For development, you can also skip the authentication step by disabling it in the settings menu.
   contact:
     name: XPipe - Contact us
     url: mailto:hello@xpipe.io
-  version: "15.2"
+  version: "17.0"
 servers:
   - url: http://localhost:21721
     description: XPipe Daemon API
@@ -203,7 +198,7 @@ paths:
         Creates a new empty category in the vault.
         
         New categories always need a parent as it's not allowed to create root categories.
-      operationId: categoryAd
+      operationId: categoryAdd
       requestBody:
         required: true
         content:
@@ -233,6 +228,119 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '500':
           $ref: '#/components/responses/InternalServerError'
+  /category/query:
+    post:
+      summary: Query categories
+      description: |
+        Queries all categories using a filter.
+        
+        The filter supports globs and can match the category names.
+        All matching is case insensitive.
+      operationId: categoryQuery
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CategoryQueryRequest'
+            examples:
+              all:
+                summary: All
+                value: { "filter": "**" }
+              simple:
+                summary: Default
+                value: { "filter": "all connections/default" }
+              globs:
+                summary: First level categories
+                value: { "filter": "all connections/*" }
+      responses:
+        '200':
+          description: The query was successful. The body contains all matched categories.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryQueryResponse'
+              examples:
+                standard:
+                  summary: Matched categories
+                  value: { "found": [ "97458c07-75c0-4f9d-a06e-92d8cdf67c40" ] }
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /category/info:
+    post:
+      summary: Get category info
+      description: |
+        Queries detailed information about categories.
+      operationId: categoryInfo
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CategoryInfoRequest'
+            examples:
+              simple:
+                summary: Single category
+                value: { "categories": [ "97458c07-75c0-4f9d-a06e-92d8cdf67c40" ] }
+      responses:
+        '200':
+          description: The query was successful. The body contains the detailed category information.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryInfoResponse'
+              examples:
+                standard:
+                  summary: Single category information
+                  value: { "infos": [ { "category": "97458c07-75c0-4f9d-a06e-92d8cdf67c40",
+                                        "parentCategory": "bfb0b51a-e7a3-4ce4-8878-8d4cb5828d6c",
+                                        "name": [ "all connections", "default" ],
+                                        "lastUsed": "2024-05-31T11:53:02.408504600Z",
+                                        "lastModified": "2024-06-23T21:15:25.608097Z",
+                                        "config": { } } ] }
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /category/remove:
+    post:
+      summary: Remove categories
+      description: |
+        Removes a set of categories. This can include any possible children categories and connections associated with the category.
+        
+        Some categories, for example the root categories, can not be removed.
+      operationId: categoryRemove
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CategoryRemoveRequest'
+            examples:
+              simple:
+                summary: Remove single category
+                value: { "categories": [ "36ad9716-a209-4f7f-9814-078d3349280c" ] }
+      responses:
+        '200':
+          description: The removal was successful.
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
   /connection/remove:
     post:
       summary: Remove connection
@@ -254,89 +362,6 @@ paths:
       responses:
         '200':
           description: The removal was successful.
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-  /connection/browse:
-    post:
-      summary: Open connection file browser
-      description: |
-        Creates a new tab in the file browser and opens the specified connections with an optional starting directory.
-      operationId: connectionBrowse
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ConnectionBrowseRequest'
-            examples:
-              simple:
-                summary: Open local file browser
-                value: { "connection": "f0ec68aa-63f5-405c-b178-9a4454556d6b" }
-      responses:
-        '200':
-          description: The request was successful. The connection was opened.
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-  /connection/terminal:
-    post:
-      summary: Open connection in terminal
-      description: |
-        Launches a new terminal session for a connection with an optional specified working directory.
-      operationId: connectionTerminal
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ConnectionTerminalRequest'
-            examples:
-              simple:
-                summary: Open terminal for local shell
-                value: { "connection": "f0ec68aa-63f5-405c-b178-9a4454556d6b" }
-      responses:
-        '200':
-          description: The request was successful. The connection was opened.
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-  /connection/toggle:
-    post:
-      summary: Toggle connection
-      description: |
-        Updates the state of a connection to either start or stop a session.
-        
-        This can be used for all kinds of services and tunnels.
-      operationId: connectionToggle
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ConnectionToggleRequest'
-            examples:
-              simple:
-                summary: Activate connection
-                value: { "connection": "36ad9716-a209-4f7f-9814-078d3349280c", "state": true }
-      responses:
-        '200':
-          description: The request was successful. The connection state was updated.
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -614,6 +639,122 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '500':
           $ref: '#/components/responses/InternalServerError'
+  /action:
+    post:
+      summary: Execute an action
+      description: |
+        Executes an action, which is defined by its own schema. To obtain the schema and data for any action within XPipe, use the action shortcut menu.
+      operationId: action
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ActionRequest'
+            examples:
+              simple:
+                summary: Launch local machine terminal
+                value: { "action": {
+                    "ref" : "f0ec68aa-63f5-405c-b178-9a4454556d6b",
+                    "id" : "launch"
+                  },
+                  "confirm": false
+                }
+              batch:
+                summary: Run a script in batch mode
+                value: { "action": {
+                    "ref" : [ "3c7ebb2a-e420-4190-b885-23fc9fada2ca", "30ee96ae-6b4c-4cde-8262-fd64ec93ad29" ],
+                    "scriptStore" : "cd34e0a7-2f3e-4327-ae51-5d8537f56bb1",
+                    "id" : "runTerminalStore"
+                  }, "confirm": false
+                }
+      responses:
+        '200':
+          description: The action was executed successfully.
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /secret/encrypt:
+    post:
+      summary: Encrypts a secret string to be used for XPipe use, e.g. using the secret when creating a new connection.
+      description: |
+        For connections, the secrets are encrypted in json form.
+        
+        When creating connections in an automated fashion, secrets have to be first converted into the proper representation. To obtain the representation of a secret of an existing connection, use the decrypt endpoint.
+        
+        The secret encryption method depends on your vault setup. Without any vault user and passphrase, the secret will be encrypted with a generic vault key. If you have a vault user and custom passphrase set up, the secret will be encrypted with your passphrase key.
+      operationId: secretEncrypt
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SecretEncryptRequest'
+            examples:
+              simple:
+                summary: Encrypt string
+                value: { "value": "123" }
+      responses:
+        '200':
+          description: The request was successful. The secret was encrypted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SecretEncryptResponse'
+              examples:
+                standard:
+                  summary: Encrypted representation
+                  value: { "encrypted": {'encryptedToken': {'token': 'lX6JOtL-mKbuUBR4nYdhJsv3RzrXm+f+JLLKpkSAfg=='}, 'secret': {'encryptedValue': 'VR1brTq1-i3p5fLcz5O58tmbnmDjRKL5IOmSkFaQag==', 'type': 'locked'}} }
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /secret/decrypt:
+    post:
+      summary: Decrypts a secret.
+      description: |
+        For connections, the secrets are encrypted in json form.
+        
+        When creating connections in an automated fashion, secrets have to be first converted into the proper representation. This endpoint can be used to obtain the representation of a secret of an existing connection.
+      operationId: secretDecrypt
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SecretDecryptRequest'
+            examples:
+              simple:
+                summary: Encrypt string
+                value: { "encrypted": {'encryptedToken': {'token': 'lX6JOtL-mKbuUBR4nYdhJsv3RzrXm+f+JLLKpkSAfg=='}, 'secret': {'encryptedValue': 'VR1brTq1-i3p5fLcz5O58tmbnmDjRKL5IOmSkFaQag==', 'type': 'locked'}} }
+      responses:
+        '200':
+          description: The request was successful. The secret was decrypted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SecretDecryptResponse'
+              examples:
+                standard:
+                  summary: Decrypted secret
+                  value: { "decrypted": "123" }
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
   /daemon/version:
     post:
       summary: Query daemon version
@@ -786,6 +927,70 @@ components:
             description: The connection uuid
       required:
         - found
+    CategoryQueryRequest:
+      type: object
+      properties:
+        filter:
+          type: string
+          description: The filter string to match category names. Category names are delimited by / if they are hierarchical. The filter supports globs.
+      required:
+        - filter
+    CategoryQueryResponse:
+      type: object
+      properties:
+        found:
+          type: array
+          description: The found categories
+          items:
+            type: string
+            description: The category uuid
+      required:
+        - found
+    CategoryInfoRequest:
+      type: object
+      properties:
+        categories:
+          type: array
+          description: The categories
+          items:
+            type: string
+            description: The unique id of the category
+      required:
+        - categories
+    CategoryInfoResponse:
+      type: array
+      items:
+        type: object
+        description: The array of information for each category
+        properties:
+          category:
+            type: string
+            description: The unique id of the category
+          parentCategory:
+            type: string
+            description: The unique id of the parent category, if present
+          name:
+            type: array
+            description: The full category name path as an array
+            items:
+              type: string
+              description: Individual category name
+          lastModified:
+            type: string
+            description: The timestamp of when the category configuration was last modified in ISO 8601
+          lastUsed:
+            type: string
+            description: The timestamp of when the category was last launched in ISO 8601
+          config:
+            type: object
+            description: The internal configuration data of the category
+        required:
+          - category
+          - parentCategory
+          - name
+          - lastUsed
+          - lastModified
+          - config
     ConnectionInfoRequest:
       type: object
       properties:
@@ -924,42 +1129,67 @@ components:
             description: The unique id of the connection
       required:
         - connections
-    ConnectionBrowseRequest:
+    CategoryRemoveRequest:
       type: object
       properties:
-        directory:
-          type: string
-          description: The optional directory to browse to
-        connection:
-          type: string
-          description: The connection uuid
-      required:
-      - directory
-      - connection
-    ConnectionToggleRequest:
-      type: object
-      properties:
-        state:
+        categories:
+          type: array
+          description: The categories to remove
+          items:
+            type: string
+            description: The unique id of the category
+        removeChildrenCategories:
           type: boolean
-          description: The state to switch to
-        connection:
-          type: string
-          description: The connection uuid
+          description: Whether to also remove any children categories
+        removeContents:
+          type: boolean
+          description: Whether to also remove any connection entries in the categories. If this is false, any connections are moved to the default category instead.
       required:
-        - state
-        - connection
-    ConnectionTerminalRequest:
+        - categories
+        - removeChildrenCategories
+        - removeContents
+    ActionRequest:
       type: object
       properties:
-        directory:
-          type: string
-          description: The optional directory to use as the working directory
-        connection:
-          type: string
-          description: The connection uuid
+        action:
+          type: object
+          description: The raw action data in json form. The best way to obtain this data is to use the action shortcut creation functionality.
+        confirm:
+          type: boolean
+          description: If the action is modifying something and the category has been configured to confirm all modifications, a confirmation dialog will be shown if this is is true.
       required:
-        - directory
-        - connection
+        - action
+        - confirm
+    SecretEncryptRequest:
+      type: object
+      properties:
+        value:
+          type: string
+          description: The raw string value to encrypt
+      required:
+        - value
+    SecretEncryptResponse:
+      type: object
+      properties:
+        encrypted:
+          type: object
+          description: The internal encrypted representation of the secret
+      required:
+        - encrypted
+    SecretDecryptRequest:
+      type: object
+      properties:
+        encrypted:
+          type: object
+          description: The internal encrypted representation of the secret
+      required:
+        - encrypted
+    SecretDecryptResponse:
+      type: object
+      properties:
+        decrypted:
+          type: string
+          description: The decrypted secret
     HandshakeRequest:
       type: object
       properties:
