@@ -13,7 +13,6 @@ export function createMetadata(override: Metadata): Metadata {
         },
         twitter: {
             card: 'summary_large_image',
-            creator: '@money_is_shark',
             title: override.title ?? undefined,
             description: override.description ?? undefined,
             images: 'https://docs.xpipe.io/images/social.png',
