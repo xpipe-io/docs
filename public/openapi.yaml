@@ -681,7 +681,7 @@ paths:
           $ref: '#/components/responses/InternalServerError'
   /secret/encrypt:
     post:
-      summary: Encrypts a secret string to be used for XPipe use, e.g. using the secret when creating a new connection.
+      summary: Encrypts a secret
       description: |
         For connections, the secrets are encrypted in json form.
         
@@ -720,7 +720,7 @@ paths:
           $ref: '#/components/responses/InternalServerError'
   /secret/decrypt:
     post:
-      summary: Decrypts a secret.
+      summary: Decrypts a secret
       description: |
         For connections, the secrets are encrypted in json form.
         
@@ -734,7 +734,7 @@ paths:
               $ref: '#/components/schemas/SecretDecryptRequest'
             examples:
               simple:
-                summary: Encrypt string
+                summary: Decrypt secret
                 value: { "encrypted": {'encryptedToken': {'token': 'lX6JOtL-mKbuUBR4nYdhJsv3RzrXm+f+JLLKpkSAfg=='}, 'secret': {'encryptedValue': 'VR1brTq1-i3p5fLcz5O58tmbnmDjRKL5IOmSkFaQag==', 'type': 'locked'}} }
       responses:
         '200':
