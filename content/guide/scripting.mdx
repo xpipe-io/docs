@@ -16,7 +16,7 @@ XPipe's scripting functionality for shells allows you to extend and customize yo
 
 Each remote system you connect to has a specific login shell dialect. This can be anything like cmd, powershell, bash, etc. Any scripts you create will also be bound to that shell dialect. For example, if you write a bash script, it won't run on a powershell-based connection. Therefore, the first choice you have to make is which shell dialect you are creating a script for:
 
-![script-dialects](/script-dialects.png)
+![script-dialects](/images/script-dialects.png)
 
 Any script declared as a `sh` script will be able to run in any posix-related shell environment, such as `bash` or `zsh`.
 If you intend to run a basic script on many different systems, then using only `sh` syntax scripts is the best solution.
@@ -27,7 +27,7 @@ Scripts that are declared as normal `powershell` scripts can also run in `pwsh` 
 
 Each script has a toggle that you can use to enable or disable a script. A script must first be enabled for it to appear anywhere in XPipe. This toggle allows you to control which scripts you want to use at the moment, so you can ignore the ones you don't need at the moment without having to delete them. You can also enable whole groups of scripts by toggling the group itself.
 
-![script-toggle](/script-toggle.png)
+![script-toggle](/images/script-toggle.png)
 
 It is important to always check if a script is enabled if it does not appear in the menus as expected.
 
@@ -35,7 +35,7 @@ It is important to always check if a script is enabled if it does not appear in 
 
 Since you can use a script in several different scenarios, you should first choose which execution type you want to create the script for. These different types are explained in detail below.
 
-![script-types](/script-types.png)
+![script-types](/images/script-types.png)
 
 You can also check multiple boxes for a script's execution types if you want to use it in multiple scenarios.
 
@@ -43,7 +43,7 @@ You can also check multiple boxes for a script's execution types if you want to 
 
 You can either edit scripts in-place in the text box or use the external edit button in the top right corner to launch an external text editor. Any changes you make in this external editor will be automatically applied when you save.
 
-![script-content](/script-content.png)
+![script-content](/images/script-content.png)
 
 When creating scripts, you don't need to specify a shebang line for shells that support it, one will be added automatically with the appropriate shell type you specified earlier. Adding a shebang line won't break the script, but it's unnecessary here.
 
@@ -51,7 +51,7 @@ When creating scripts, you don't need to specify a shebang line for shells that 
 
 For more complex scripting tasks, it is also possible to create multiple independent reusable script parts, each of which performs a specific task. If you want to bring them all together, you can create a script with those other scripts as dependencies. This will make all the dependent scripts run before the actual script, allowing you to chain multiple scripts together and avoid duplication.
 
-![script-dependencies](/script-dependencies.png)
+![script-dependencies](/images/script-dependencies.png)
 
 ### Groups
 
@@ -61,7 +61,7 @@ For organization purposes, you can assign scripts to a certain group.
 
 This allows you to have a menu available when choosing which script to run:
 
-![/script-browser-menu](/script-browser-menu.png)
+![script-browser-menu](/images/script-browser-menu.png)
 
 If you have not created a script group yet, you can do so at `New` -> `Script` -> `Script group`.
 
@@ -75,7 +75,7 @@ Any script that is enabled, compatible with the remote system's shell, and marke
 
 As a simple example, you can create a script like this
 
-![script-alias](/script-alias.png)
+![script-alias](/images/script-alias.png)
 
 to have your aliases available in your remote shells.
 
@@ -101,7 +101,7 @@ This script also checks to see if it is already installed. If not, starship will
 
 As an alternative to having all enabled init scripts run whenever a remote shell session is started, you can also create shell environment configurations to use only a selected subset of scripts specific to this environment. These don't even need to be enabled to run.
 
-![/script-env](/script-env.png)
+![script-env](/images/script-env.png)
 
 This is also important if you're looking to run scripts as root. Shell environments provide the ability to launch them elevated via sudo, so any scripts you run in them will also be run as root.
 
@@ -109,7 +109,7 @@ This is also important if you're looking to run scripts as root. Shell environme
 
 Scripts can also be run on demand on any system from the connection hub. Any script that is enabled, compatible with the remote system's shell, and marked as a runnable script can be run from the script context menu for a connection.
 
-![scripts-hub](/scripts-hub.png)
+![scripts-hub](/images/scripts-hub.png)
 
 This is useful for actions you want to perform at any time. In this example, a simple
 
@@ -125,7 +125,7 @@ All file browser sessions that work through shell connections also support the e
 
 Any script that is enabled, compatible with the file browser session shell, and marked as a file script will appear in the file browser context menu.
 
-![/script-browser-menu](/script-browser-menu.png)
+![script-browser-menu](/images/script-browser-menu.png)
 
 #### Arguments
 
@@ -139,7 +139,7 @@ You can either run the script in a new terminal window, or in the file browser t
 
 For example, if you want to create a script that diffs two files, using the script
 
-![script-diff](/script-diff.png)
+![script-diff](/images/script-diff.png)
 
 will allow you to do this by running the script with two files selected.
 
@@ -151,6 +151,6 @@ A session script is intended to be called in a shell session in your terminal. A
 
 For example, with a simple shell script like
 
-![/script-shell](/script-shell.png)
+![script-shell](/images/script-shell.png)
 
 you can run it on any compatible system with `git-push.sh "<message>"` in a terminal session if the script is enabled. The script file will be automatically created by XPipe in the background on the target system and added to the terminal session PATH so that you can run it immediately.

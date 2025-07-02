@@ -9,7 +9,7 @@ XPipe can synchronize all connection configuration data across multiple installa
 
 First of all, you need to create a remote repository with your Git provider of choice. This repository must be private. Next, copy and paste the URL into the XPipe remote repository setting.
 
-![sync](/sync.png)
+![sync](/images/sync.png)
 
 <Callout type="warn">Ensure that your repository visibility is set to private to prevent data leakage.</Callout>
 
@@ -27,25 +27,30 @@ If you use an SSH URL for git, you probably know how to configure it, so this se
 You need to set up your git CLI to be able to authenticate with your remote git repository via HTTPS. There are multiple ways to do that.
 You can check if that is already done by clicking on the `Test` button below the remote repository URL in XPipe.
 
+### Credentials
+
+If no credentials are configured, XPipe will ask you for your credentials on startup. To automate this, there are multiple ways to store your git credentials and handle authentication.
+
 Many special tools like the [GitHub CLI](https://cli.github.com/) handle the whole authentication automatically for you when installed.
 Some newer git client versions can also authenticate via special web services where you just have to log in into your account in your browser.
+These approaches will store your credentials for your git client using a credential helper.
+For more information, see:
+- [git credential helpers](https://git-scm.com/doc/credential-helpers)
+- [GitHub credential manager](https://docs.github.com/en/get-started/getting-started-with-git/caching-your-github-credentials-in-git)
 
-There are also manual ways to authenticate via a username and token.
+Alternatively, if no credentials are configured for your local git client yet, you have the option to specify them in XPipe itself:
+
+![](/images/sync-auth.png)
+
 Nowadays, most providers require a personal access token (PAT) to authenticate from the command-line instead of traditional passwords.
-You can find common (PAT) pages here:
+You can find common PAT pages here:
 - **GitHub**: [Personal access tokens (classic)](https://github.com/settings/tokens)
 - **GitLab**: [Personal access token](https://docs.gitlab.com/ee/user/profile/personal_access_tokens.html)
 - **BitBucket**: [Personal access token](https://support.atlassian.com/bitbucket-cloud/docs/access-tokens/)
 - **Gitea**: `Settings -> Applications -> Manage Access Tokens section`
 Set the token permission for repository to Read and Write. The rest of the token permissions can be set as Read. XPipe just needs enough permissions to commit changes to the private vault repository.
 
-If XPipe asks you for your git login credentials every time, you need to configure your command-line git client if you don't want to enter them every time.
-You can use any git credentials manager for that.
-For more information, see for example:
-- [git credential helpers](https://git-scm.com/doc/credential-helpers)
-- [GitHub credential manager](https://docs.github.com/en/get-started/getting-started-with-git/caching-your-github-credentials-in-git)
-
-If everything works out, XPipe should push a commit to your remote repository.
+If everything works out, XPipe should push an initial commit to your remote repository.
 
 ## Syncing categories
 
@@ -68,7 +73,7 @@ The sync settings for a category are inherited by default from its parent if not
 When everything is set up, you have the option to add any additional files such as SSH keys to git as well.
 Next to every file choice is a git button that will add the file to the git repository.
 
-![sync-file](/sync-file.png)
+![sync-file](/images/sync-file.png)
 
 These files are then added to the git vault data directory and committed in encrypted form.
 This means that any files you add to git, such as keys, are only committed encrypted just as other secrets.
@@ -99,11 +104,13 @@ The push is required to overwrite the remote repository. Without the push, XPipe
 
 ## Team vaults
 
-The git synchronization also supports multiple different users for when you are working with your team. It allows each team member to share access to systems that are designated to be available to all users, while also allowing each user to keep selected systems and authentication options private:
+The git synchronization also supports multiple different users for when you are working with your team. It allows each team member to share access to systems that are designated to be available to all users, while also allowing each user to keep selected systems and authentication options private.
 
 <Callout type="info">Team vaults are supported starting from the Professional plan.</Callout>
 
-To start off, each team member first has to sync to the same git repository. You can then configure the vault users in the `Vault` settings menu. Each vault user requires a passphrase to be set which will be used to encrypt personal secrets in the vault. If your passphrase is complex enough, other users won't be able to decrypt any connections and identities marked as personal.
+### Vault users
+
+To start off, each team member first has to sync to the same git repository. You can then configure the vault users in the `Vault` settings menu. Each vault user requires a passphrase to be set which will be used to encrypt personal secrets in the vault. With a passphrase, other users won't be able to decrypt any connections and identities marked as personal.
 
 ![](/images/team-vault.png)
 
@@ -119,8 +126,10 @@ Then, configuring a connection to use this personal identity will automatically 
 
 <Callout type="info">Other vault users can still see that changes are made to all your personal connections and identities. However, they can't decrypt the changes itself and will only see binary diffs in the repository.</Callout>
 
-When working in a team, occasional merge conflict might occur when another user pushes changes while your local XPipe instance is running. XPipe will automatically check in the background if someone else pushed something to the remote meanwhile. If this happens, you will get the chance to automatically restart XPipe to pull and apply remote changes in the status bar:
+### Merge conflicts
+
+When working in a team, an occasional merge conflict might occur when another user pushes changes while your local XPipe instance is running. XPipe will automatically check in the background if someone else pushed something to the remote and will attempt to perform a fast-forward merge automatically. You will see this notification when this happens:
 
 ![](/images/resolve-conflict.png)
 
-You can also choose to ignore any remote changes if you don't need them and instead merge them the next time you start XPipe.
+In most cases, you won't have to do anything as it can be handled automatically. However, if you and another team member modify the same connection configuration at the same time, you might receive a merge conflict error that can't be solved automatically. In this case, you can choose between either overriding your changes or the external changes.

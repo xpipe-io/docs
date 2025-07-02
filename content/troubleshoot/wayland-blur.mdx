@@ -1,0 +1,24 @@
+---
+title: Gnome Wayland blur
+description: Fixing application blurriness
+---
+
+## Introduction
+
+XPipe currently uses xwayland for rendering in Wayland. While this works well enough in most cases, there are some environments where this causes some problems. One of these cases is the lacking support for fractional scaling in XPipe.
+
+If you are using a display scale that is not 100%, you might see a blurry application that is not enjoyable to look at. This is especially prevalent with greater scales like 175%+.
+
+## Workaround
+
+Starting from [Gnome 47](https://release.gnome.org/47/), there are experimental options to improve the fractional scaling support for xwayland. These options are however not enabled by default.
+
+You can enable these options with
+
+```
+gsettings set org.gnome.mutter experimental-features '["scale-monitor-framebuffer", "xwayland-native-scaling"]'
+```
+
+## Display scale
+
+As an alternative, you can also set the system display scale to 100% and instead scale apps individually. In the XPipe appearance settings, you can configure a display scale value that achieves the same thing as the system scale but does not result in blurriness.

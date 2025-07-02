@@ -1,0 +1,102 @@
+---
+title: Connection hub
+description: Using and navigating the connection hub
+---
+
+## Introduction
+
+The connection hub is the central component of XPipe and the place for managing and accessing all your connections. While the basic usage should be pretty self-explanatory, this page covers some of the more advanced topics, which will come in handy when dealing with an ever-growing collection of connections.
+
+## Categories
+
+As your collection of connections grows, organizing them into different categories/folders becomes more important to keep an overview and maintain structure:
+
+![](/images/category-list.png)
+
+The main advantage of having connections in a category is to configure shared settings and behavior for all the connections contained in it. Then, splitting the connections even further between subcategories allows you to have a finer-grained control over these shared category settings by overriding the parent settings.
+
+A subcategory can also be seen as a sub-view of the parent category. Selecting the subcategory will only show the children connections contained in it without anything else. For example, when taking a category with many connections like this:
+
+![](/images/category-parent.png)
+
+Then assigning individual containers to a subcategory will give you a detailed subview if you select the subcategory:
+
+![](/images/category-child.png)
+
+For more information on how to create these child connections like for these containers automatically, see the [breakout categories](#breakout-categories) section.
+
+### Configuration
+
+Categories contain a variety of different options to control how they handle and how contained connections behave. You can find this configuration dialog in the category settings menu:
+
+![](/images/category-config.png)
+
+Once clicked, you enter the recording mode. The next action you perform in the GUI will not be run as normal but will be opened in the action shortcut dialog instead:
+
+![](/images/category-config-menu.png)
+
+Each option uses inheritance to determine the effective value. If an option is not set, the option of the parent category will be applied, and so on. This means that you don't need to set an option for each category, only one parent. Once an option is set, you can unset it in the dialog by clicking on the selected value again.
+
+### Breakout categories
+
+When dealing a lot with deeply nested connections, it might become tedious to navigate to the right system in a long list of nested connections:
+
+![](/images/category-depth.png)
+
+As a solution to this problem, you can create breakout categories for entries that contain a lot of children. For example, in this screenshot, the default docker context can be converted into a standalone category where the children become top level entries. You can find the breakout category action here:
+
+![](/images/category-breakout.png)
+
+This will create a new subcategory and automatically move all child connections into it:
+
+![](/images/category-child.png)
+
+Whenever you refresh the parent, the default docker context, any new container entries are also added to the breakout category. You can also create further nested breakout categories on systems within a breakout category.
+
+### Common setups
+
+A common setup for categories is to separate each environment into, for example, development and production. In the production category, you can then configure that all modifications should require confirmation and that scripts are disabled for connections. This reduces the number of possible mistakes.
+
+As a visual indicator, you can assign different category colors for production and development environments. These colors are then shown for all connections of that category, both in the file browser and in the terminal (if supported).
+
+![](/images/category-setup.png)
+
+If you have multiple clients and want to separate everything, partitioning the top-level categories with all the different clients also makes sense:
+
+![](/images/category-setup-client.png)
+
+## Compact mode
+
+The connection hub interface will compact itself in situations where the window width is small. This gives you more space for your connections.
+
+One use of this to enable a tiling window layout with an external terminal, for example. You don't need some kind of tiling window manager, every OS nowadays supports some form of basic window tiling. Having the terminal on one side and the connection hub on the other, makes optimal use of the space.
+
+Here is a sample of the Windows 11 snapping functionality to split the screen layout:
+
+![](/images/hub-tile.png)
+
+## Icons
+
+If you are looking to fully customize all your connections, assigning custom icons might be a good start. Any connection can be freely assigned any icon:
+
+![](/images/icons-list.png)
+
+You can assign a custom icon to a connection by either clicking on the connection icon or in the right-click context menu of a connection. This will bring up the icon chooser dialog:
+
+![](/images/icons-dialog.png)
+
+The first time you open this dialog, it will show a button to refresh the icon sources first.
+
+### Icon sources
+
+Custom icons are not shipped with XPipe directly. Instead, there is the possibility to configure custom icon sources in the settings menu. This can either be a local directory or a remote git repository containing .svg files. XPipe only supports .svg icons, so it will only pick up those from any sources. Icon sources can be added, removed, and also disabled:
+
+![](/images/icons-settings.png)
+
+By default, XPipe ships with a git icon source for https://github.com/selfhst/icons, a repository of freely licensed icons for common services. If you don't want to retrieve icons from there, you can just disable the icon source with the checkbox.
+
+Furthermore, there is also a synced custom icon directory available if you are using [git sync](/guide/sync). This helps you have access to all your custom icon files on any synced system.
+
+If you want to use other repositories or directories of icons, you can easily add them. Once you change the icon sources, make sure to also refresh the icon database to render all the .svg files. Otherwise, your changes might not apply.
+
+

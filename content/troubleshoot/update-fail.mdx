@@ -1,0 +1,32 @@
+---
+title: Update failures
+description: Fixing application blurriness
+---
+
+## Introduction
+
+Many XPipe distribution support automatic updates. These automatic updates can fail in some cases.
+
+## Download failure
+
+If the automatic update fails to download in the first place, it might be one of the following issues:
+
+- Connections to api.xpipe.io or github.com are blocked, or the servers are down. Connections to github.com typically fail in China and with some VPNs
+- Your internet connection is unstable
+- An existing release was deleted. This can be the case if a newly released update turns out to be broken
+
+## TLS Decryption
+
+If your organization is decrypting TLS traffic to monitor it, you have the option to disable certificate checking for HTTPS requests in XPipe. You can find this option in the security settings menu:
+
+![](/images/security-tls.png)
+
+## Installation failure
+
+If the update was downloaded successfully, the other point of failure is the installation. The exact method of installation depends on the operating system. It is usually a .msi on Windows, a .deb or .rpm on Linux, and a .pkg on macOS.
+
+Windows failures:
+- The xpipe process was running while the update was attempted to be installed. This will cancel the update without a lot of user feedback from the .msi. So it's best to check if a process still shows up in the task manager if the update failed
+
+Linux failures:
+- Both the .deb and .rpm installers require root permissions to install. If you don't have root permissions and are not a sudo user, the installation will fail.
