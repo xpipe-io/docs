@@ -1,0 +1,58 @@
+---
+title: Shell environments
+description: Customizing your shell login environments
+---
+
+## Introduction
+
+When connecting to a remote system, XPipe will log into the default login shell. While this is good enough in many cases, you might want to customize the shell environment to log into. With custom shell environments, you can do that.
+
+XPipe supports basically all regular command shells, and you can automatically add all available shells on a system by [searching for available connections](/guide/connection-search) and selecting shell environments. In addition to all shells, this will also add a sudo shell environment to automatically log in as root via sudo.
+
+You can either customize these added shell environments or create your own ones for a system:
+
+![](/images/env.png)
+
+## Shell type
+
+You can choose out of a long list of shells when creating a shell environment:
+
+![](/images/shell-list.png)
+
+All of these shells are supported by XPipe, assuming that they are installed on the target system. More exotic shells might lack some features, e.g., nushell missing the scripting ability, but most of the regular shells work without limitations.
+
+If you don't want to assign an explicit shell type, you can choose to keep the default of the target system. This will then essentially use your currently configured login shell on a system. This is useful if you don't care about the exact shell and only want to change the user of the shell environment, e.g., elevating to root in your current shell.
+
+## Users
+
+Shell environments support running the shell as a different user. This can either be any other user on the system, including an elevated user (root or Administrator).
+
+### Elevated users
+
+Shell environments can run as an elevated user if wanted. The process of elevation is operating-system-specific.
+
+#### Linux & macOS
+
+Any elevated command is executed with `sudo`. The optional `sudo` password is queried via XPipe when needed.
+
+If you have configured user credentials for the system already, e.g., via SSH login details, XPipe will automatically use any specified user password for sudo. If a password is not available to XPipe, it will prompt for your input. You also have the ability to adjust the elevation behavior in the settings to control whether you want to enter your password every time it is needed or if you want to cache it for the current session.
+
+#### Windows
+
+On Windows, it is not possible to elevate a child process if the parent process is not elevated as well.
+Therefore, if XPipe is not run as an administrator, you will be unable to use any elevation locally.
+For remote connections, the connected user account has to be given administrator privileges.
+
+### Custom users
+
+On non-Windows system, you can enter a custom user to log in as. XPipe will then use sudo to switch to the specified user. This is done as only sudo supports all features required for this switch. As a result, you potentially have to enter your sudo password for this switch to succeed.
+
+The user also needs to support logins. If the target user's login shell is set to `nologin`, launching the shell environment will fail.
+
+## Scripts
+
+For further customization, you can supply custom scrips that will be run on shell init, after the shell's init files and profiles have been executed:
+
+![](/images/env-scripts.png)
+
+You can treat this as a normal shell script, i.e., make use of all the syntax that the shell supports in scripts. All commands you execute are sourced by the shell and modify the environment. So if you, for example, set a variable, you will have access to this variable in the launched shell sessions.

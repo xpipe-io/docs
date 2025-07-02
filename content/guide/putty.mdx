@@ -1,5 +1,5 @@
 ---
-title: Migrating from PuTTY
+title: PuTTY
 description: Easing the transition from PuTTY to XPipe
 ---
 
@@ -17,9 +17,9 @@ This will import connections from the registry. If your connections are not save
 
 The imported data is not fully complete though. Passwords aren't imported and ppk keys can't be imported due to the format incompatibility.
 
-## Keys
+## .ppk keys
 
-PuTTY has its own non-standard SSH key file format with .ppk files. This poses a challenge as these are not supported by OpenSSH, nor can they be automatically converted to the standardised .pem format. The best that you can do is manually export them into the correct format from PuTTY as shown in the [documentation](https://www.puttygen.com/convert-pem-to-ppk).
+PuTTY has its own non-standard SSH key file format with .ppk files. This poses a challenge as these are not supported by OpenSSH, nor can they be automatically converted to the standardized .pem format. The best that you can do is manually export them into the correct format from PuTTY as shown in the [documentation](https://www.puttygen.com/convert-pem-to-ppk).
 
 If you only have a few keys added to PuTTY, this manual convert option should work fine. For more keys, it might make sense to keep them in [PuTTY's pageant](https://winscp.net/eng/docs/ui_pageant), which is the PuTTY equivalent to the SSH agent. You can configure a connection in XPipe to use pageant for keys:
 
