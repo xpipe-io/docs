@@ -56,3 +56,11 @@ For further customization, you can supply custom scrips that will be run on shel
 ![](/images/env-scripts.png)
 
 You can treat this as a normal shell script, i.e., make use of all the syntax that the shell supports in scripts. All commands you execute are sourced by the shell and modify the environment. So if you, for example, set a variable, you will have access to this variable in the launched shell sessions.
+
+## Default environments
+
+To always use a shell environment for a system which is not the default login shell, you can set a certain environment to be the default within XPipe. If this is done, the selected environment is always used when launching the main connection, there is no need to explicitly launch the shell environment.
+
+You can find the button for this in the context menu:
+
+![](/images/env-default.png)

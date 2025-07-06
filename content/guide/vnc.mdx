@@ -9,11 +9,17 @@ VNC is commonly used in server administration to access servers in a graphical m
 
 ![](/images/vnc-connection.png)
 
+While XPipe has its own built-in VNC support, it is not as extensive as other dedicated VNC clients. If you're missing certain features or authentication methods, you can also use your own VNC client in combination with XPipe and its tunneling capabilities. You can change the default VNC in the settings menu:
+
+![](/images/vnc-list.png)
+
 ## VNC tunnels
 
-The main type of VNC connections are tunneled VNC connections where essentially the remote VNC port is tunneled to your local machine. The advantage of this is that the VNC port doesn't have to be publicly exposed, the traffic is encrypted, and you can reuse authentication from an SSH connection. Furthermore, you will gain access to the more advanced SSH authentication options to connect to your VNC server compared to the often times more basic authentication for VNC. The only thing you need is an SSH connection to the remote system to select it as the target host.
+The main type of VNC connections are tunneled VNC connections where essentially the remote VNC port is tunneled via SSH to your local machine. The advantage of this is that the VNC port doesn't have to be publicly exposed, the traffic is encrypted, and you can reuse authentication from an SSH connection. Furthermore, you will gain access to the more advanced SSH authentication options to connect to your VNC server compared to the often times more basic authentication for VNC. The only thing you need is an SSH connection to the remote system to select it as the target host.
 
 ![](/images/vnc-tunnel.png)
+
+These tunnels bind to localhost on the remote system. This means that, for the connection to work, the VNC server must listen on localhost. Some servers do not do that by default. For more information on SSH tunnels, see also the [local SSH tunnels page](/guide/ssh-tunnels#local-tunnels).
 
 ## Direct RDP connections
 
@@ -21,28 +27,18 @@ Of course, you can also create direct VNC connections to a system without any SS
 
 ![](/images/vnc-direct.png)
 
-## VNC sessions
+## Integrated VNC client
 
-VNC sessions are opened in a browser tab:
+If you are using the integrated VNC client, which is the default setting, all VNC sessions are opened in a browser tab:
 
 ![](/images/vnc.png)
 
-The usage of the built-in VNC client is straightforward. The only two noteworthy points are:
+The usage of the built-in VNC client is straightforward, and there aren't a lot of configuration options. The only two noteworthy points are:
 
 1. You can drop files, either from another file browser tab or from your local desktop environment, into the VNC session window to transfer them to the target system
 2. You can input the special key combination `CTRL+ALT+DEL` via `SHIFT+CTRL+ALT+DEL` to prevent your local desktop environment from catching the key combination
 
-## Custom VNC clients
-
-While XPipe has its own built-in VNC support, it is not as extensive as other dedicated VNC clients. If you're missing certain features or authentication methods, you can also use your own VNC client in combination with XPipe and its tunneling capabilities.
-
-The way to do this is via [service tunnels](http://localhost:3000/guide/services#tunnels) and a custom command. These service connections can be used to tunnel any remote port over SSH to your local desktop. This port doesn't have to be publicly exposed at all. For VNC, the port to tunnel is usually `5900 + <display number>`.
-
-![](/images/vnc-custom.png)
-
-You can provide any command you want to launch your VNC client of choice with the correct options.
-
-As the VNC server port does not have to be publicly exposed, you also don't have to worry about setting up authentication and VNC encryption for it as that is done automatically by XPipe with SSH. Having a VNC server listening on localhost with no authentication and encryption configured will still be secure when tunneled with XPipe.
+If you are looking for more advanced VNC features, take a look at configuring a custom VNC client in the settings menu.
 
 ## RealVNC server
 

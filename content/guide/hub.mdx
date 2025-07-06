@@ -7,6 +7,52 @@ description: Using and navigating the connection hub
 
 The connection hub is the central component of XPipe and the place for managing and accessing all your connections. While the basic usage should be pretty self-explanatory, this page covers some of the more advanced topics, which will come in handy when dealing with an ever-growing collection of connections.
 
+## Ordering
+
+As your connection grows, ordering individual connections in relative to their siblings will improve your user experience. By default, XPipe has two sorting mechanisms that work sequentially:
+- Each connection has an individual order index that you can set explicitly. The smaller the index, the more on top a connection will be shown. By default, every connection has an order index of 0
+- In case the primary order indices are not set, XPipe will use a default order. This can either be a last access date timestamp or an alphabetical order. By default, XPipe uses the last access timestamp order, meaning that connections will go on top of the list as soon as you access them
+
+You can see the currently active ordering mode in the status bar:
+
+![](/images/order-status.png)
+
+In the screenshot, you can see that the primary index-based order is set to ascending, and that the default order is set to ascending last access. You can toggle the orders between ascending and descending by clicking on them.
+
+![](/images/order-status-inv.png)
+
+In this case, the primary order is set to index-based descending, and the default order is set to alphabetical ascending.
+
+You can assign these primary order indices in the order menu:
+
+![](/images/order-menu.png)
+
+Move to first/last will assign the next smallest/largest index value so that the connection is shown on top. Keep to first/last will assign the smallest/largest possible index, so that the connection will stay on top/bottom all the time, regardless of what other indices you set for other connections.
+
+Explicitly assigned indices will show up next to the connection name like this:
+
+![](/images/order-list.png)
+
+## Batch mode
+
+To perform actions on multiple systems, you can enable the batch mode:
+
+![](/images/batch-toggle.png)
+
+When this mode is enabled, you will get checkboxes for each connection, to include them in the current batch. When you have selected every connection you want, you can run in action on all of them:
+
+![](/images/batch-kvm.png)
+
+Parent group entries, like the VM root entry shown above, are not included in the batch selection even when they are selected, but can be used to quickly select all child connections. You can see that in the screenshot above where only the 3 individual VMs are counted for the selection.
+
+You can also mix multiple different types of connections in your batch selection, you are not limited to only one type of connection. If you mix connection types, only actions that can be applied to all connections will be shown. For example, the following selection will still show actions for shell connections in general:
+
+![](/images/batch-mixed.png)
+
+Even other connections than shell connections support some actions, however most of the time, the available actions are pretty limited:
+
+![](/images/batch-services.png)
+
 ## Categories
 
 As your collection of connections grows, organizing them into different categories/folders becomes more important to keep an overview and maintain structure:
@@ -36,6 +82,14 @@ Once clicked, you enter the recording mode. The next action you perform in the G
 ![](/images/category-config-menu.png)
 
 Each option uses inheritance to determine the effective value. If an option is not set, the option of the parent category will be applied, and so on. This means that you don't need to set an option for each category, only one parent. Once an option is set, you can unset it in the dialog by clicking on the selected value again.
+
+### Shared identities
+
+In some cases, especially when dealing with a lot of connections in a category with the same login credentials, you don't have to assign an identity to each connection separately. Instead, you can configure a default identity for the whole category, which will be then automatically assigned to all newly added connections in that category:
+
+![](/images/category-identity.png)
+
+This is especially useful if you combine it with the breakout categories. For example, if you have 10+ VMs with all the same login details, first creating a breakout category for the VMs, then assigning the default identity, and finally refreshing the VM connections will assign the identity.
 
 ### Breakout categories
 
