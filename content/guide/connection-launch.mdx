@@ -13,25 +13,15 @@ By default, this action is triggered by a single click. If you prefer having to 
 
 ![](/images/launch-settings.png)
 
-## From desktop shortcuts
+## From actions
 
-For frequently launched connections, it might make sense to make them available in your desktop environment itself instead of having to go through the XPipe GUI to launch it.
+Via the action recorder mode, you can create an action shortcut to launch a connection in a terminal:
 
-You can find the option to create a shortcut in the submenu for the launch action:
+![](/images/action-shortcut.png)
 
-![](/images/launch-menu.png)
+For more information on how to use the action shortcut system, check out there [actions page](/guide/actions).
 
-This will create a shortcut on your desktop:
-
-![](/images/launch-shortcut.png)
-
-This is supported on all operating systems, each shortcut is adapted to fit in with the operating system and desktop environment. This means that you can use these shortcuts in many different contexts like the start menu, taskbar, dock, and more:
-
-![](/images/launch-start-menu.png)
-
-
-<Callout type="info">Creating shortcuts is supported for many different actions in XPipe, not just shell launches itself.</Callout>
-
+<Callout type="info">Creating action shortcuts is supported for all actions in XPipe, not just shell launches itself.</Callout>
 
 ## From the terminal
 
@@ -132,21 +122,3 @@ ssh_version = version_format.findall(ret["stderr"])[0]
 # Clean up after ourselves by stopping the shell session
 client.shell_stop(connection)
 ```
-
-If you want to open the shell connection in a new terminal session instead, you can do it like this:
-
-```python
-from xpipe_api import Client
-
-client = Client()
-
-connection = "f0ec68aa-63f5-405c-b178-9a4454556d6b"
-
-# Opens the file browser in a specified starting directory for a connection
-client.connection_browse(connection, "/etc")
-
-# Opens a terminal session in a specified starting directory for a connection
-client.connection_terminal(connection, "/etc")
-```
-
-For more information on how to work with the Python API, how to obtain connection UUIDs, and more, take a look at the [Python API page](/guide/python-api).
