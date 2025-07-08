@@ -63,5 +63,14 @@ Host jump
 
 Note that it is recommended to use a proper SSH config file for cases like this as it is not possible for custom SSH connections to specify multiple different authentication credentials. Custom SSH connections are therefore mostly intended for simpler types of hosts and not jump chains.
 
+## Adding SSH options
+
+Simple SSH connections can be augmented with SSH config options if needed. This bridges the gap between basic SSH connections and fully custom SSH connections, which might be overkill for some cases. If you are just looking to add a simple option for a connection, like accepting a deprecated host key algorithm, you can add this in the advanced configuration:
+
+![](/images/ssh-options.png)
+
+Similar to custom SSH connections, you don't need to specify a `Host` header, only the raw options itself.
+
+One common case for this is to, for example, allow deprecated SSH algorithms that are still used by older servers but not accepted by newer clients. To add the old `ssh-rsa` algorithm for a server, you can add the `HostKeyAlgorithms +ssh-rsa` option.
 
 

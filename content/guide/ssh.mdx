@@ -17,6 +17,117 @@ If, for example, your ssh command-line client is outdated and does not support c
 
 If your client is outdated and susceptible to newly discovered exploits or vulnerable in any other way, there is no way for XPipe to guarantee that data can be transferred securely. It is your responsibility to use external programs that XPipe interacts with in a secure environment and keep them up to date with security patches and more. Connections established with XPipe can only be as secure as your underlying command-line SSH client itself. Always make sure to upgrade your installed packages.
 
+
+## Key-based authentication
+
+XPipe supports all established key-based authentication methods for SSH:
+
+![](/images/ssh-keys.png)
+
+### None
+
+If selected, XPipe will not supply any identities. This will also prevent any external sources like agents from providing keys.
+
+### Key file
+
+You can also specify a key file with an optional passphrase.
+This option is the equivalent of `ssh -i <file>`.
+All kinds of keys, including FIDO2, are supported.
+
+Note that you should select the *private* key, not the public one.
+If you mix that up, ssh will only give you cryptic error messages.
+
+### SSH-Agent
+
+In case your identities are stored in the SSH-Agent, the ssh executable can use them if the agent is started. The agent socket is retrieved from the environment variables passed to XPipe or set in the local shell init files. On Windows, XPipe will automatically start the agent process if it is not running yet.
+
+### Password manager agent
+
+If you are using a password manager with an SSH agent functionality, you can choose to use it here. XPipe will verify it doesn't conflict with any other agent configuration. XPipe however can't start this agent by itself, you have to ensure that it is running.
+
+For more information, see [password manager page](guide/password-managers).
+
+### GPG Agent
+
+If you have configured a smartcard with GPG keys that support authentication, you can choose to provide them to the SSH client via the `gpg-agent`.
+This option requires GPG to be installed on your local system and will automatically enable SSH support of the agent if not enabled yet and restart the GPG agent daemon with the correct settings.
+
+### Pageant (Windows)
+
+In case you are using pageant on Windows, XPipe will check whether pageant is running first.
+Due to the nature of pageant, it is your responsibility to have it
+running as you manually have to specify all keys you would like to add every time.
+If it is running, XPipe will pass the proper named pipe via
+`-oIdentityAgent=...` to ssh, you don't have to include any custom config files.
+
+### Pageant (Linux & macOS)
+
+In case your identities are stored in pageant, the ssh executable can use them if the agent is started.
+XPipe will automatically start the agent process if it is not running yet.
+
+### Yubikey PIV
+
+If your identities are stored with the PIV smartcard function of the Yubikey, you can retreive
+them with Yubico's YKCS11 library, which comes bundled with [Yubico PIV Tool](https://developers.yubico.com/yubico-piv-tool/).
+
+Note that you also need an up-to-date build of OpenSSH in order to use this feature as this is a relatively recent feature not supported in older versions.
+
+### Custom PKCS#11 library
+
+This will instruct the OpenSSH client to load the specified shared library file, which will handle the authentication.
+
+Note that you need an up-to-date build of OpenSSH in order to use this feature.
+
+### Other external source
+
+This option will permit any external running identity provider to supply its keys to the SSH client. You should use this option if you are using any other agent to manage your SSH keys. XPipe will not interact with any external agent in this case, it will just allow any program to supply keys to the SSH client.
+
+## Gateways and jump servers
+
+If you are planning to establish connections over another intermediate host, you can use XPipe's gateway feature:
+
+![](/images/ssh-gateway.png)
+
+By default, when a gateway is used, XPipe will tunnel the host address and port over the gateway host to localhost. This requires the gateway SSH server to have port for worthy enabled with `AllowTcpForwarding=yes`.
+
+This functionality is different from jump servers with `ProxyJump` by default. You can, however, use proper jump server behavior as well by designating the gateway system as a jump server in its configuration:
+
+![](/images/ssh-jump.png)
+
+This might be required in case the jump server is a restricted system where no port forwarding or system shell is available.
+
+## Limited / embedded systems
+
+XPipe works by detecting the shell type of the connection and then interacting with the active shell. This approach only works, however, when the shell type is known and supports a certain number of actions and commands. All common shells like `bash`, `cmd`, `powershell`, and more, are supported. If you are connecting to a system that does not run a known command shell, e.g., a router, link, or some other embedded device, XPipe will be unable to detect the shell type and error out after some time.
+
+To work around these cases, you can explicitly designate a system as such:
+
+![](/images/ssh-limited.png)
+
+When this setting is enabled, XPipe will not attempt to identify the shell type and launch the shell as-is. This allows you to open the connection without errors, but many features, e.g., the file browser, scripting, subconnections, and more, will not be supported for this connection.
+
+## X11 Forwarding
+
+XPipe supports X11 forwarding for SSH connections. You can enable this in the advanced SSH configuration for a connection:
+
+![](/images/ssh-x11.png)
+
+When this option is enabled, the SSH connection will be started with X11 forwarding set up. On Linux, this will usually work out of the box and does not require any setup. On macOS, you need an X11 server like [XQuartz](https://www.xquartz.org/) to be running on your local machine.
+
+### X11 on Windows
+
+XPipe allows you to use the WSL2 X11 capabilities for your SSH connection. The only thing you need for this is a [WSL2](https://learn.microsoft.com/en-us/windows/wsl/install) distribution installed on your local system. XPipe will automatically choose a compatible installed distribution if possible, but you can also use another one in the settings menu:
+
+![](/images/ssh-x11-settings.png)
+
+This means that you don't need to install a separate X11 server on Windows. However, if you are using one already, XPipe will detect and use the currently running X11 server.
+
+### X11 connections as desktops
+
+Any SSH connection that has X11 forwarding enabled can be used as a desktop host. This means that you can launch desktop applications and desktop environments through this connection. When any desktop application is launched, this connection will automatically be started in the background to start the X11 tunnel.
+
+For more information, see the [desktop applications page](/guide/desktop-applications).
+
 ## VSCode SSH
 
 If you have VSCode installed on your system, you can also use XPipe to launch the SSH remote development feature of VSCode from XPipe.
