@@ -156,19 +156,90 @@ If you have VSCode installed on your system, you can also use XPipe to launch th
 
 This option will show up if VSCode is installed and the SSH connection can be launched with VSCode. All SSH config connections can be launched in VSCode. For other connections defined in XPipe itself, the VSCode feature only supports password authentication. If you are using normal SSH connections with key-based authentication, this option will not show up by default. As a workaround, you can define the connection in your local SSH config and then add that config to XPipe.
 
-## Windows SSH servers
+## Troubleshooting
+
+With SSH, a lot can go wrong. And since many OpenSSH error messages are very vague, troubleshooting might not be straightforward. This section compiles a few common issues.
+
+In any case, you can always try out the verbose SSH output troubleshooting option you can find in the settings menu:
+
+![](/images/ssh-troubleshoot.png)
+
+This option will give additional information for connection attempts. You should only use it when troubleshooting though as it can break other functionality. If you identify the issue, make sure to disable it again.
+
+### Key permissions too open
+
+By default, OpenSSH requires that all key files should only be accessible by your current user. This behavior can't be changed, so you will have the same permission requirements with XPipe.
+
+On Windows, since file-based permissions are rather untypical, so OpenSSH requires your key file to be located somewhere in your user home director at `C:\Users\User`. If your key is not located there, there is still the option to modify file-based permissions to make the file only accessible by your current user. XPipe will offer you the option to attempt to do this, however, this might not always work due to the complexities of Windows file permissions and how strict OpenSSH is. If the automatic permission change in XPipe doesn't work, which happens for keys located on some external flash drive, the best option is to just copy the file into your user directory.
+
+On Unix-based operating systems, this is enforced by requiring a key file to have no permissions for anything other than the current user, e.g. `400` or `600` permissions. XPipe will automatically attempt to adjust permissions on these platforms if the permissions are too open. This might fail if the key is stored on a different file system that prevents these kinds of modifications, like a formatted flash drive. In that case, you have to make sure that the permissions are correct.
+
+
+
+### Permission denied
+
+If you get a generic permission denied error, there are multiple possibilities on what went wrong.
+
+First, you have to make sure that you have the right credentials and also the right hostname.
+
+#### Publickey
+
+If you get `Permission denied (publickey)`, you will have to check the key and whether it is the correct one.
+
+If you are using something like an agent, make sure that the agent is running and contains the necessary key. As the agent does not know which key to supply, it will try every key it has without knowing which one is the correct one.
+
+If you have configured the keys in the local SSH config file, XPipe might not apply these for all connections. So you can also try setting them explicitly for a connection in XPipe.
+
+For Windows servers, also see the [Administrator keys](#administrator-keys) section for necessary Windows-specific configuration.
+
+#### Password
+
+If you get `Permission denied (password)`, there are not that many possible causes other than the password being wrong.
+
+If you are connecting to a Windows server, the user account password might be expired. This will cause the same error until the password is changed, even though the password is theoretically correct.
+
+If you are using a password manager, make sure that you have the correct entry name specified in XPipe.
+
+### No route to host
+
+The error message `no route to host` indicates a DNS resolution failure. It is recommended to check your local DNS configuration and maybe restart your system to takes any issues where any DNS service doesn't work correctly.
+
+On macOS, this issue might also occur if you don't allow XPipe network access. You can explicitly allow network access for XPipe in the system settings -> `Security and privacy` -> `Local network`.
+
+### Windows SSH servers
 
 Since Windows 10, Microsoft has been shipping an OpenSSH client and server with Windows that you can use. You just have to enable the OpenSSH server feature for your Windows installation as shown [here](https://learn.microsoft.com/en-us/windows-server/administration/openssh/openssh_install_firstuse?tabs=gui&pivots=windows-server-2022).
 
-### Versions
+The older Windows 10 OpenSSH server has some issues, which might make the initial connection fail. The server on Windows 11 doesn't have these issues. You might run into errors like `client_loop: send disconnect: Connection reset` or `client_loop: send disconnect: Broken pipe` when establishing a connection for Windows 10 servers.
 
-With older installations, Microsoft ships an old version of SSH as well. This server version, however, has a few bugs which commonly cause issues with SSH clients in general, so also with XPipe. If you are planning on setting up an SSH server on Windows, make sure that your SSH version is relatively recent. Any SSH version of `v9.x` should work fine. If you have an older version installed, you can install the latest version from [here](https://github.com/PowerShell/Win32-OpenSSH/wiki/Install-Win32-OpenSSH). Otherwise, you might run into errors like `client_loop: send disconnect: Connection reset` when establishing a connection.
+#### Versions
 
-### Keys
+With older installations, Microsoft ships an old version of SSH as well. This server version, however, has a few bugs which commonly cause issues with SSH clients in general, so also with XPipe. If you are planning on setting up an SSH server on Windows, make sure that your SSH version is relatively recent. Any SSH version of `v9.x` should work fine. If you have an older version installed, you can install the latest version from [here](https://github.com/PowerShell/Win32-OpenSSH/wiki/Install-Win32-OpenSSH).
+
+#### Administrator keys
 
 If you are planning on configuring key-based authentication for your SSH server instead of just password authentication, note that Windows SSHD has an additional layer of complexity involved when adding authorized keys for users which have administrator privileges. You have to add public keys for these users into a separate `administrators_authorized_keys` file as explained [here](https://learn.microsoft.com/en-us/windows-server/administration/openssh/openssh_keymanagement#administrative-user).
 
-## Troubleshooting
+
+### No matching host key type found
+
+If your SSH server only offers outdated host key algorithms that are not enabled by default in your local SSH client, you can manually add those to a specific connection via the additional SSH config options for SSH. For example, to support the algorithm `ssh-dss`, add the following additional option:
+
+```
+HostKeyAlgorithms=+ssh-dss
+```
+
+XPipe is able to automatically configure this for simple SSH connections. For other types of SSH connections, you have to add this option by yourself.
+
+### No matching key exchange method
+
+If your SSH server only offers outdated key exchange algorithms that are not enabled by default in your local SSH client, you can manually add those to a specific connection via the additional SSH config options for SSH. For example, to support the algorithm `diffie-hellman-group14-sha1`, add the following additional option:
+
+```
+KexAlgorithms +diffie-hellman-group14-sha1
+```
+
+XPipe is able to automatically configure this for simple SSH connections. For other types of SSH connections, you have to add this option by yourself.
 
 ### No matching MAC found
 
@@ -178,5 +249,10 @@ If your SSH server only offers outdated MACs that are not enabled by default in 
 MACs +hmac-sha1
 ```
 
+XPipe is able to automatically configure this for simple SSH connections. For other types of SSH connections, you have to add this option by yourself.
 
+### Connection closed by remote host
 
+If you get a message like `kex_exchange_identification: Connection closed by remote host`, the SSH server explicitly disconnected your connection attempt. This can happen if, for example, rate limits are exceeded and too many users connect.
+
+For example, if you find the output `debug1: kex_exchange_identification: banner line 0: Exceeded MaxStartups` in the debug output, this indicates that too many connection attempts were made in parallel. In practice, this is caused by bots probing SSH servers all the time. You can either increase the `MaxStartups` in the sshd config, improve your firewall, or just use another port for SSH to reduce bot spam.

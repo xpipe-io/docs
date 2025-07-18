@@ -7,20 +7,22 @@ If you're looking for options to install XPipe across multiple systems either us
 
 ## Windows
 
-<Callout type="info">Right now there are no separate ARM64 builds for Windows. However, the x86-64 versions also work on Windows ARM systems via the built-in compatibility layer.</Callout>
-
-The [.msi installer](https://github.com/xpipe-io/xpipe/releases/latest/download/xpipe-installer-windows-x86_64.msi) is flexible and supports managed installations as well. This includes standard .msi properties to control the installation.
+The .msi installer is flexible and supports managed installations as well. This includes standard .msi properties to control the installation.
 
 You can install it quietly with just as other normal installers:
 
 ```powershell
-Start-Process -FilePath "msiexec.exe" -ArgumentList "/i `"https://github.com/xpipe-io/xpipe/releases/latest/download/xpipe-installer-windows-x86_64.msi`" /qn" -Wait -PassThru
+$RawArch = [System.Runtime.InteropServices.RuntimeInformation,mscorlib]::OSArchitecture.ToString().ToLower();
+$Arch = If ($RawArch -eq "x64") {"x86_64"} Else {"arm64"}
+Start-Process -FilePath "msiexec.exe" -ArgumentList "/i `"https://github.com/xpipe-io/xpipe/releases/latest/download/xpipe-installer-windows-$($Arch).msi`" /qn" -Wait -PassThru
 ```
 
 It also supports the property `ALLUSERS` to control whether it should be installed only for the current user or all users on a system. If you run the following command with Administrator privileges, it will install for all users:
 
 ```powershell
-Start-Process -Verb runAs -FilePath "msiexec.exe" -ArgumentList "/i `"https://github.com/xpipe-io/xpipe/releases/latest/download/xpipe-installer-windows-x86_64.msi`" /qn ALLUSERS=1" -Wait -PassThru
+$RawArch = [System.Runtime.InteropServices.RuntimeInformation,mscorlib]::OSArchitecture.ToString().ToLower();
+$Arch = If ($RawArch -eq "x64") {"x86_64"} Else {"arm64"}
+Start-Process -Verb runAs -FilePath "msiexec.exe" -ArgumentList "/i `"https://github.com/xpipe-io/xpipe/releases/latest/download/xpipe-installer-windows-$($Arch).msi`" /qn ALLUSERS=1" -Wait -PassThru
 ```
 
 ### Chocolatey
