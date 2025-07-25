@@ -88,6 +88,25 @@ Certain connections that are based on a local file, for example, SSH configs, ca
 
 If you have enabled GPG signing of your git commits, then this should work as expected. The only more complicated case is on Windows where you can have potentially two `gpg` executables with the git bash gpg and the native [Gpg4win](https://www.gpg4win.org/) executable. By default, XPipe will choose the gpg client which has keys configured in it, under the assumption that you only use one of the two clients. If you switch between using both gpg clients, make sure that your git GPG key is available in gpg4win, as this client will be used if both clients have keys added.
 
+## Local repositories
+
+If you don't want to host your remote git repository on some server somewhere and instead prefer a local option, for example, a flash drive, to sync data between machines, you can do that as well.
+
+Git and XPipe support a `file://` URL as well in addition to the more commonly used https and SSH URLs. You can create a local sync repository as follows:
+
+```bash
+cd <external repo dir>
+git init --bare
+```
+
+Note that the `--bare` option is important, without it, git can't push to the repository.
+
+Then, you can configure a file URL in XPipe:
+
+![](/images/sync-local.png)
+
+Note that the syntax for a file URL is `file://<absolute path>` where the absolute path on Windows has to be adjusted to use forward slashes and start with one as well. The path `/home/user/xpipe_repo` on Linux would become `file:///home/user/xpipe_repo` and the path `C:\Users\User\xpipe_repo` on Windows would become `file:///C:/Users/User/xpipe_repo`.
+
 ## Reverting to a previous commit
 
 In case anything goes wrong or you just want to restore the vault at an earlier date, you can do so easily using the normal git reset functionality. The first step is to find the SHA of the commit you want to revert to. This will look like this: `42e2e5af9d49de268cd1fda3587788da4ace418a`. You can find the commit SHA in any web interface of git your provider or on the command line with `git log`.

@@ -29,6 +29,34 @@ XPipe will also automatically set up the specified configuration on the remote s
 
 As described later on for some terminals, having a custom prompt interfere with other prompt-based terminal integrations, e.g. for the Warp terminal.
 
+## Logging
+
+To keep track of past terminal sessions, you can enable terminal session logging in the settings menu:
+
+![](/images/logging.png)
+
+This option is available in the Professional plan.
+
+### Logging on Windows
+
+If you are on Windows, the native PowerShell transcripts functionality lacks several features and is therefore not the recommended option to use. You can switch to using the better Linux-based `script` logging tools by using a WSL-based terminal environment in the settings:
+
+![](/images/multiplexers.png)
+
+### Logging output
+
+When logging is enabled, all terminal sessions are recorded and written to log files. In practice, due to the sheer number of ANSI escape sequences for colored output and prompts, the raw logs might be cluttered with escape codes. For that reason, the logs are also cleaned to remove these escape sequences, and each session is logged to two files, one raw log and one cleaned text log:
+
+![](/images/logging-files.png)
+
+### Logging improvements
+
+It is almost impossible to fully clean complex terminal output with lots of formatting, so there will always be some leftovers. What you can do is minimize the complexity by avoiding more visual-oriented shells like fish, custom terminal prompts, and things like zsh extensions. For example, in a standard bash shell environment on a system, logging is much cleaner than in a fish environment with a custom prompt on top.
+
+Some terminals, for example Warp, also run various commands in your shell to realize their own functionality, such as advanced auto-completion. These commands, which are normally hidden in your terminal session, will show up when using logging and will clutter your output. Since you can't fully turn this behavior of in some terminals, it is recommended to switch to a more conservative terminal that does not implement custom functionality on top of shell sessions.
+
+Furthermore, as mentioned before in the Windows section, you should use a WSL terminal environment on Windows to improve the quality of the output. 
+
 ## Noteworthy integrations
 
 Here you can find a summary of the suitability of various popular terminal emulators to be used with XPipe. Terminals where there isn't a lot to mention aren't listened here.
