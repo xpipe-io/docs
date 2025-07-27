@@ -10,7 +10,7 @@ XPipe comes with a powerful action system where every action you perform, e.g. w
 ```json
 {
   "ref" : "f0ec68aa-63f5-405c-b178-9a4454556d6b",
-  "id" : "launch"
+  "id" : "open"
 }
 ```
 
@@ -63,7 +63,7 @@ if __name__ == "__main__":
     client = Client(ptb=False)
     data = json.loads('''{
       "ref" : "f0ec68aa-63f5-405c-b178-9a4454556d6b",
-      "id" : "launch"
+      "id" : "open"
     }''')
     client.action(data, False)
 ```

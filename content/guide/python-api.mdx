@@ -5,9 +5,14 @@ description: Interacting with XPipe from Python
 
 ## Introduction
 
-The XPipe Python API is a Python client for the XPipe HTTP API. It is essentially a wrapper for the raw [HTTP API](/api) and intended to make working with it more convenient.
+The XPipe Python API is a Python client for the XPipe HTTP API. It is essentially a wrapper for the raw [HTTP API](/api) and intended to make working with it more convenient. If you are not that comfortable with Python, the API can also be used in other languages via a simple HTTP client library that supports exchanging json requests.
 
 You can find the source code at https://github.com/xpipe-io/xpipe-python-api.
+
+The primary use cases for the Python API are:
+
+- Automatic import and migration of lots of servers from other sources where configuring them manually it would take too much time, e.g. if you want to migrate ~1000 servers to XPipe. There are only limited migration tools for other tools, so using the API makes sense, especially when it comes to also importing secrets.
+- Automated management of a fleet of servers. For example, upgrading or configuring a tool on all servers. Especially when the workflow is more than just running a command, e.g., different control flows based on the server configuration. Furthermore, this allows for an automated aggregation of results to check whether the task completed successfully on all systems.
 
 ## Installation
 
@@ -30,11 +35,12 @@ client = Client()
 # as the PTB releases use a different port
 client = Client(ptb=True)
 
-# To connect to a remote instance with an API key, use
+# To connect to a remote instance with an API key
+# This is a rather uncommon use case, but still possible nevertheless
 client = Client(token="foo", base_url = "http://servername:21721")
 ```
 
-There's also an async version of the client that can be accessed as AsyncClient. All calls are run asynchronously with that client. This intro will only cover the sync client though.
+There's also an async version of the client that can be accessed as AsyncClient. All calls are run asynchronously with that client. This page will only cover the sync client though.
 
 ```python
 import asyncio
@@ -51,7 +57,7 @@ if __name__ == "__main__":
 
 ## Querying connections
 
-A connection reference is just a UUID string. You can query one or multiple connections stored in XPipe based on various filters.
+A connection reference is just a UUID string. You can query one or multiple existing connections stored in XPipe based on various filters.
 
 [**API reference**](/api/connection-query)
 
@@ -106,6 +112,7 @@ from xpipe_api import Client
 
 client = Client()
 
+# Returns an array of UUID strings
 connections = client.connection_query(categories="Default/**")
 
 # Works in bulk, so it expects an array of connections
@@ -130,51 +137,250 @@ You can add custom connections as well.
 
 [**API reference**](/api/connection-add)
 
+The schema for each connection type is not publicly documented as it might be subject to change. However, you can see the current active schemas for every connection and use that as a basis.
+
 ```python
 from xpipe_api import Client
 
 client = Client()
 
-# The raw connection data. You can find the internal json representation of any existing connection
-# by querying it first. You can use that information to then create your own connection json representation
+# The connection reference to the connection you want to expect the schema of
+# If you have the HTTP API setting enabled in XPipe, you can copy the API UUID of a connection in its context menu
+connection = "f0ec68aa-63f5-405c-b178-9a4454556d6b"
+
+# The schema is just a json object
+schema = client.connection_info(connections)[0]["config"]
+```
+
+For an SSH connection, it could, for example, look something like this if it references an existing identity:
+
+```json
+{
+  "type" : "ssh",
+  "proxy" : "f0ec68aa-63f5-405c-b178-9a4454556d6b",
+  "host" : "myip.eu-central-1.compute.amazonaws.com",
+  "port" : 22,
+  "identity" : {
+    "type" : "ref",
+    "ref" : "34c7ea9a-b00d-45e1-a324-78ef0750acc2"
+  },
+  "dontInteractWithSystem" : false,
+  "forwardX11" : false,
+  "jumpServer" : false,
+  "additionalOptions" : null
+}
+```
+
+or something like this if it has encrypted credentials configured in-place:
+
+```json
+{
+  "type" : "ssh",
+  "proxy" : "f0ec68aa-63f5-405c-b178-9a4454556d6b",
+  "host" : "myip.eu-central-1.compute.amazonaws.com",
+  "port" : 22,
+  "identity" : {
+    "type" : "inPlace",
+    "identityStore" : {
+      "type" : "localIdentity",
+      "username" : "User",
+      "password" : {
+        "secret" : {
+          "type" : "locked",
+          "encryptedValue" : "PTSOUnuY4eNTakHvnhZdbPuxBwYLD3FtUl-V_AL_W0jVVrdGeJtTntcHjrXK8aXqv4_eRYE3HkBKSosBWFOrEkygWMbqTrjwUlFyG8O0htvnsuSJdkPqoYA8bEbOgcdk_PbeSWEWqlODHNnx9f-c3PSh4zas57AycebWoIYPZx1wgQdZ2HdBtlFhpn3HL25CbvL8woPH8S7FDqN1C0x7cdujMKlynMKIZ2qg"
+        },
+        "encryptedToken" : {
+          "token" : "5wuy5IADZvzjAl0IKurM66C6SMZsOuhStsdX8nGZvg=="
+        }
+      },
+      "sshIdentity" : {
+        "secret" : {
+          "type" : "locked",
+          "encryptedValue" : "zPcMsYaHh9n0QcTdliQ94PQAV4mdAGnIz8N_OcVC58-f7F9shDUDIUTqL0PFSAoewpzM"
+        },
+        "encryptedToken" : {
+          "token" : "5wuy5IADZvzjAl0IKurM66C6SMZsOuhStsdX8nGZvg=="
+        }
+      }
+    }
+  },
+  "dontInteractWithSystem" : false,
+  "forwardX11" : false,
+  "jumpServer" : false,
+  "additionalOptions" : null
+}
+```
+
+### Encrypting secrets
+
+Based on that information, you can create your own connections via the API. The challenge here is encrypting secrets so that they can be stored correctly. But this is also possible via the API:
+
+```python
+encrypted_password = client.secret_encrypt("passw0rd")
+# {'secret': {'type': 'locked', 'encryptedValue': '5Tqtd68uFhef8evQV8fKG9nXisgRb2wvfdgeV8LdbxB1V6qi'}, 'encryptedToken': {'token': 'xmz9eAjJ4ms4yqIv9lrYhnsm1RhJVw0AijOee1IZew=='}}
+print(encrypted_password)
+
+decrypted_password = client.secret_decrypt(encrypted_password)
+# passw0rd
+print(decrypted_password)
+```
+
+Note that you can't decrypt the secrets of these samples yourself if you try it as your XPipe instance uses another unique encryption key. If you're also using a custom vault user passphrase, then the encryption key is unique to your user as well.
+
+### Encrypting key information
+
+For SSH, any identities like key references also need to be encrypted. XPipe itself doesn't store the private keys itself, it will only keep references like a file path. These are, however, still encrypted.
+
+With that, you can now create connection schemas and add them like this:
+
+```python
+# No SSH key is used at all
+raw_key = '''{
+    "type" : "none"
+}'''
+
+encrypted_key = client.secret_encrypt(raw_key)
+# {'secret': {'type': 'locked', 'encryptedValue': '0N_LSNW_Gu_kz-HzBmNC5VcMY7kJuIN-Dam0bv370fSTgIJyGPENklzovp_9kCdvPS206m-giPr-fVfV6Q=='}, 'encryptedToken': {'token': 'bDTjRHsCMgvwPiXPEt5xF6JbLuj5UuaBSheF75pB5A=='}}
+print(encrypted_key)
+```
+
+There are also other types of schemas for keys available. For example, to use a specific key file, you would use the following schema and encrypt it:
+
+```python
+# SSH key file is used
+raw_key = '''{
+  "type" : "file",
+  "file" : "C:/Users/User/.ssh/key.pem",
+  "password" : {
+    "type" : "none"
+  }
+}'''
+
+encrypted_key = client.secret_encrypt(raw_key)
+```
+
+Of course, there are also more variants for SSH keys. To inspect the key information of an existing connection, you can use the `secret_decrypt` function.
+
+### Putting it together
+
+Now that the password and key information have been encrypted, you can add a new connection with credentials:
+
+```python
+from xpipe_api import Client
+
+client = Client()
+
+# The connection schema
 data = {
-    "type": "shellEnvironment",
-    "commands": None,
-    "host": {
-      "storeId": "f0ec68aa-63f5-405c-b178-9a4454556d6b"
-    },
-    "shell": "pwsh",
-    "elevated": False,
+    "type": "ssh",
+    "proxy": "f0ec68aa-63f5-405c-b178-9a4454556d6b",
+    "host" : "myip.eu-central-1.compute.amazonaws.com",
+    "port" : 22,
+     "identity" : {
+        "type" : "inPlace",
+        "identityStore" : {
+          "type" : "localIdentity",
+          "username" : "User",
+          "password" : encrypted_password,
+          "sshIdentity" : encrypted_key
+        }
+      },
+    "dontInteractWithSystem" : False,
+    "forwardX11" : False,
+    "jumpServer" : False,
+    "additionalOptions" : None
 }
 
 # The target category to put this connection into
 category = "97458c07-75c0-4f9d-a06e-92d8cdf67c40"
 
+# The validate option controls whether XPipe should verify that a connection can be established to the system
 client.connection_add(name="My Connection", conn_data=data, validate=True, category=category)
 ```
 
-## Actions
+### Using reusable identities
 
-You can perform some actions for the desktop application from the CLI as well.
+To skip the need to pass secrets in-place, you can also create identities instead. Once you have created an identity in XPipe, you can then just use the identity UUID as a reference:
 
 ```python
 from xpipe_api import Client
 
 client = Client()
 
-connection = "f0ec68aa-63f5-405c-b178-9a4454556d6b"
+# The connection schema
+data = {
+    "type": "ssh",
+    "proxy": "f0ec68aa-63f5-405c-b178-9a4454556d6b",
+    "host" : "myip.eu-central-1.compute.amazonaws.com",
+    "port" : 22,
+     "identity" : {
+        "type" : "ref",
+        "ref" : "34c7ea9a-b00d-45e1-a324-78ef0750acc2"
+      },
+    "dontInteractWithSystem" : False,
+    "forwardX11" : False,
+    "jumpServer" : False,
+    "additionalOptions" : None
+}
+```
 
-# Opens the file browser in a specified starting directory for a connection
-client.connection_browse(connection, "/etc")
+This will make the connection creation much easier. You can also create identites through the same API and with the same encrypted values for the password and SSH key; however, it is easier to use in the GUI.
 
-# Opens a terminal session in a specified starting directory for a connection
-client.connection_terminal(connection, "/etc")
+### Adding other connections
+
+While the process of adding an SSH connection has been quite complex due to the encryption, other ways aren't that complex.
+
+To start off, you can also skip adding any data you don't want to include and instead leave it empty. This will still add the connection, but will keep it in an invalid state where you have to configure any missing data in the XPipe interface if you click on it. If you are looking to just import the hostnames first without all the secrets, assigning `"identity": None` also works.
+
+Furthermore, most connection types, for example shell environments, do not require any secrets and can therefore be created much easier:
+
+```python
+data = {
+    "type": "shellEnvironment",
+    "commands": "echo test",
+    "host": "f0ec68aa-63f5-405c-b178-9a4454556d6b",
+    "shell": "pwsh",
+    "elevated": False,
+    "user": None,
+    "scripts": None
+}
+```
+
+## Actions
+
+You can perform actions for the desktop application from the API as well. For more information on actions in general, see the [actions](/actions) page.
+
+[**API reference**](/api/action)
+
+```python
+from xpipe_api import Client
+
+client = Client()
+
+# Opens a terminal session for a connection
+client.action(json.loads('''{
+  "id" : "open"
+  "ref" : "f0ec68aa-63f5-405c-b178-9a4454556d6b"
+}'''), confirm=False)
 
 # Toggles the session state for a connection. If this connection is a tunnel, then this operation will start or stop the tunnel
-client.connection_toggle(connection, True)
+client.action(json.loads('''{
+  "id" : "toggleStore",
+  "ref" : "4dc0c7d4-083e-446e-8a75-7a29490eaec1",
+  "enabled" : true,
+}'''), confirm=False)
 
-# Refreshes a connection. This operation is the same as for validating a connection when creating it by attempting whether the connection is functioning.
-client.connection_refresh(connection)
+# Run a file browser action like chmod
+client.action(json.loads('''{
+  "id" : "chmod",
+  "ref" : "1aa86bc3-9ab8-4b2e-b3bc-dd028d142faf",
+  "files" : [ "/home/ubuntu/archive.tar.gz" ],
+  "permissions" : "755",
+  "recursive" : false
+}'''), confirm=False)
+
+# The confirm option gives you a GUI dialog to first confirm
+# the action with the parameters before executing it to prevent any mistakes
 ```
 
 ## Shell operations

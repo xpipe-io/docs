@@ -165,9 +165,7 @@ paths:
                   {
                     "type": "shellEnvironment",
                     "commands": null,
-                    "host": {
-                      "storeId": "f0ec68aa-63f5-405c-b178-9a4454556d6b"
-                    },
+                    "host": "f0ec68aa-63f5-405c-b178-9a4454556d6b",
                     "shell": "pwsh",
                     "elevated": false,
                   }
@@ -656,7 +654,7 @@ paths:
                 summary: Launch local machine terminal
                 value: { "action": {
                     "ref" : "f0ec68aa-63f5-405c-b178-9a4454556d6b",
-                    "id" : "launch"
+                    "id" : "open"
                   },
                   "confirm": false
                 }
