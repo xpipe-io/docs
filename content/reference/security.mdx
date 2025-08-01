@@ -114,11 +114,21 @@ The first one is the licensing API to which the XPipe application communicates t
 
 We offer fully offline licenses that do not require an internet connection for our customers at no additional cost. If you are planning to deploy XPipe in an air-gapped environment with no outside internet connectivity, you can request offline licenses by sending an email to [hello@xpipe.io](mailto:hello@xpipe.io). These offline licenses can also be used if the API servers are blocked or not whitelisted and can't be reached by the XPipe application in other cases. For more information, see the [license activation troubleshooting page](/troubleshoot/license-activation).
 
+### Update check
+
+To retrieve the latest updates for XPipe, an update check request is sent to `https://api.xpipe.io` on startup, which effectively just performs a lookup on the GitHub releases.
+
+These automatic update checks can be disabled in the settings menu. There are two settings for update checks, one to check for regular releases and the other to only check for security releases. To fully disable any requests, you will have to disable both.
+
+Note that only the check is performed automatically. Any new updates are not installed automatically and always require user confirmation.
+
 ### Error reports
 
-The second service the XPipe application communicates with is the error-tracking service [Sentry](https://sentry.io/). This service is used to diagnose newly introduced problems, keep track of errors, and prevent exploits. Requests are sent when an unexpected error occurs in the XPipe application. So under normal operation, no requests are sent.
+The second service the XPipe application communicates with is the error-tracking service Sentry. This service is used to diagnose newly introduced problems, keep track of errors, and prevent exploits. Requests are sent when an unexpected error occurs in the XPipe application, so under normal operation without any errors, no requests are sent.
 
-Requests are sent to [ingest.sentry.io](https://o1084459.ingest.sentry.io). These requests do not contain any personal or sensitive data and are stripped of any contextual information. They are intended to show trends of new developing errors and are not intended to diagnose or troubleshoot individual error cases. The only information they contain is the OS name/version/architecture, XPipe version, an anonymized user ID that is used to group issues, and the stack trace without error message.
+Requests are sent to `ingest.sentry.io`. These requests do not contain any personal or sensitive data and are stripped of any contextual information. They are intended to show trends of new developing errors for the latest releases, and are not intended to diagnose or troubleshoot individual error cases. The only information they contain is the local OS name/version/architecture, XPipe version, an anonymized user ID that is used to group issues, and the stack trace without any error messages or details.
+
+To account for the needs and requirements of data handling policing in enterprises, these requests can also be fully disabled in the enterprise plan.
 
 ## Other data handling
 
