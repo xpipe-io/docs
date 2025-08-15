@@ -1,0 +1,93 @@
+---
+title: MCP server
+description: Interacting with remote connections through an MCP client
+---
+
+## Introduction
+
+If you haven't heard about it before, Model Context Protocol (MCP) is an open standard developed by Anthropic. The core idea is to give AI agents a consistent way to connect with tools, services, and data, no matter where they are or how they’re built. If you are using any AI-powered application like Cursor, Claude Desktop, or others, you can get started right away as they all support MCP.
+
+XPipe provides an MCP server on a local HTTP server that an MCP client of your choice can connect to. Once connected, the MCP client can connect to remote systems, interact with file systems, run commands, and more.
+
+## Getting started
+
+First, you will have to enable the MCP server feature in the settings menu as it is disabled by default. Once enabled, any local application can interact with your connections in XPipe via the MCP interface with an API key:
+
+![](/images/mcp-settings.png)
+
+Note that there is a separate option for potentially destructible functionality. By default, only read-only functionality is exposed by the MCP server, for example, the ability to read the contents of a remote file. To also give your MCP client access to write files and more, you will have to enable the mutation tool setting. When starting out, it is best to start with read-only tools first to prevent any accidents.
+
+When the MCP server is enabled, it will show the connection information in the standard `mcp.json` format that you can just copy-paste into your client (if it supports the format):
+
+![](/images/mcp-config.png)
+
+If your client does not support the `mcp.json` format, you will have to configure it manually with the connection information provided.
+
+Once your client is configured, reloading the MCP integrations should recognize the XPipe MCP server and its provided capabilities:
+
+![](/images/mcp-cursor-settings.png)
+
+## The first prompt
+
+To test whether everything works, you can execute your first prompt. You can use the following prompt to see how it works:
+
+```
+List files of directory C:\ on system local machine (if on Windows)
+List files of directory / on system local machine (otherwise)
+```
+
+This should call the `list_files` MCP tool of XPipe. Your agent should detect automatically that this capability is available and delegate calls to XPipe that match the available XPipe tools. It is not deterministic how your client interprets these statements, so there might be different steps and invocations depending on what the client thinks is best. For example, running this in Cursor results in the following:
+
+![](/images/mcp-list.png)
+
+## Executing proper prompts
+
+Simply listing files is a pretty basic use case, not worth the effort of going through a chat if you can do the same in the XPipe file browser. The true value of the MCP integration comes in conjunction with the abilities of the agent LLM to interpret more complex tasks, break them down into smaller steps, execute them via XPipe, interpret the results, and adjust the workflow from there.
+
+For example, the following prompt is automatically broken down into smaller steps by the agent, the atomic XPipe tools are called, and dynamically evaluated:
+
+![](/images/mcp-error-check.png)
+
+You can experiment for yourself on how far you can push the agent to still provide accurate results and determine whether such a workflow is a productivity improvement for you, at least in some cases. Everything shown in the chat could have also been done manually by you, but this would have taken more time.
+
+You will have to use your own judgment on whether to trust and rely on all the operations that your agent performs. There is no guarantee that your MCP client does the right thing or interprets the results correctly. It is always required to verify that everything was done as expected.
+
+## Write operations
+
+Up until now, we only covered read-only tools such as reading files. If you enable them, write tools are also available. This includes things like writing files and executing shell commands on remote systems.
+
+With the added ability of running commands, the agent becomes much more flexible in its ability:
+
+![](/images/mcp-network.png)
+
+Note that these commands can potentially be destructive, especially if your agent is not running the right commands that you imagined. When first starting out with these tools, make sure that your MCP client is configured to confirm any external tool invocations:
+
+![](/images/mcp-cursor-autorun.png)
+
+Later on, you can move onto unchecked tool invocations if you trust your agent enough:
+
+![](/images/mcp-cursor-autorun-all.png)
+
+Please note that the various kinds of file protections your MCP client offers do not apply to operations performed through XPipe. Your agent is not able to implement these additional limitations on file operations for remote systems that are exposed via XPipe.
+
+## Context management
+
+Managing the context is important for the agent to work correctly and to understand your prompts. By default, the client does not know any of your system names in XPipe. This means that it will be unable to identify that you are referring to a system within XPipe.
+
+If you run a prompt like this, the results will be completely different based on whether you requested your client to list the systems in XPipe prior within the session. With the knowledge of the system names, it will look like this:
+
+![](/images/mcp-context-yes.png)
+
+In a session without this context, however, it will look completely different:
+
+![](/images/mcp-context-no.png)
+
+On the same note, your agent can remember all the other MCP tool call results as well. If you list the files in a directory, for example, your client will be able to take into account the files that exist in the directory. You then don't need to provide exact paths anymore. If there is only one docker compose config file in a directory, your client will understand the prompt `Check the compose config file for configuration errors` as it knows the exact path to the file you refer to.
+
+## MCP schema reference
+
+You can find the MCP schema files at https://github.com/xpipe-io/xpipe/tree/master/app/src/main/resources/io/xpipe/app/resources/mcp. The names and parameters of most schemas should be pretty self-explanatory. It is however still good to check them out to discover such things as that the `list_files` tool also supports a recursive listing.
+
+To use the MCP integration effectively, you will need to know what tools XPipe provides to your MCP client. Otherwise, you might run into situations where your agent is not sure what to do with your prompt. If it can't find any matching MCP tool integration for a certain task, it will automatically resort to giving generic answers without any useful information.
+
+You will have to adjust your prompts to give the agent the right direction. If your agent doesn't pick up what MCP tool you want to call, you can also try to give more explicit directions, for example, by adding `with xpipe` to the end of a prompt. Alternatively, you can reformulate your prompt to align more with MCP tool name and arguments to replace something like `Get content of aws ubuntu /etc/hosts` with `Read file /etc/hosts on system aws ubuntu`.
