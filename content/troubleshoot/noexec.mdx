@@ -7,6 +7,22 @@ description: How to handle cases where script execution is disabled on remote sy
 
 The 'NOEXEC' flag in the mount command for Unix systems does not allow the execution of executable binaries in the mounted file system. If your /tmp directory is mounted with this option, mostly for security reasons, then certain XPipe features like scripting and sudo elevation are not possible on that system by default. You will get a permission denied error even if a file is marked as executable.
 
+## Checking for noexec
+
+You can easily list all mountpoints that are configured with the noexec flag with:
+
+```bash
+findmnt -l | grep noexec
+```
+
+If the list it contains `/tmp`, for example, with something like this:
+
+```
+/tmp tmpfs tmpfs rw,nosuid,nodev,noexec,inode64
+```
+
+then you will need to change the temp director for XPipe to one that is not listed as noexec.
+
 ## Using another directory
 
 To work around this issue, you can set the variable `XPIPE_TEMP` on the remote system to a switch to using another directory. This can, for example, be a directory like `~/.xpipe/scripts` or `/var/xpipe`, depending on the noexec limitations for other available directories.
