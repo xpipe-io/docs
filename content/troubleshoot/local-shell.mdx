@@ -1,0 +1,63 @@
+---
+title: Local shell
+description: How to handle cases where the local shell does not start up properly
+---
+
+## About
+
+XPipe works through interacting with local and remote shells to realize its functionality. To properly bootstrap on your local machine, it requires a functioning local shell that it can interact with. In most cases, this isn't a problem as every operating system has multiple available shells installed. However, in practice it might happen that the shell is blocked, broken, or otherwise not suitable to be used with XPipe.
+
+XPipe supports the following shell configurations on these operating systems:
+- On Windows, cmd.exe is the default with the option to fall back to PowerShell
+- On Linux, bash is the default with the option to fall back to sh
+- On macOS, zsh is the default with the option to fall back to sh
+
+These shells are hardcoded per operating system, so they are independent of your login shell configuration. For example, even if your system login shell is fish on Linux, XPipe will still use bash as the default. This is done to ensure a stable experience as these shells are known to work. With fish, for example, several required features are not supported by it, so using it as a local shell would be impossible.
+
+## Startup failures
+
+In case the local shell failed to start at all, you will get an error like this:
+
+![](/images/local-shell-error.png)
+
+This error dialog comes with the option to switch the shell to another fallback shell available on the system. Usually this fallback option works fine.
+
+In practice, there are two main cases where this often occurs:
+- On Windows, cmd.exe or PowerShell might be blocked on your system in general by your Administrator
+- On macOS, zsh might be configured to use extensions which break the shell when using it in a noninteractive environment such as within XPipe
+
+## Startup warnings
+
+In other cases, your local shell might start up but does not work properly. XPipe runs a quick test to see whether basic features such as creating shell scripts and running them results in the expected output. If it doesn't, you will receive an error message like this:
+
+![](/images/local-shell-warning.png)
+
+There might be a variety of reasons why this happens:
+
+- There is a permissions issue
+- An AntiVirus program might block required programs and commands
+- The system shell is restricted or blocked
+- Your PATH environment variable is corrupt / incomplete. You can check this by manually trying to run some commands in a terminal
+- Some elementary command-line tools are not available or not working correctly
+- Applocker might block script execution
+- You are using some kind of shell extensions that break easily
+
+These kinds of error messages are only a warning, and XPipe can start up and work. Some features might not work as expected though.
+
+## Occasional failures
+
+In case the initial XPipe startup succeeded, but you still receive occasional errors about a local shell that failed to start, there might still be a problem with the local system shell or its configuration. XPipe starts several instances of local shells for different components, so it might fail only for some.
+
+In this case, XPipe won't forcefully offer you the option to automatically fall back to another shell. In this case, you can switch your local shell manually as shown below.
+
+## Manually selecting another shell
+
+You can switch the local shell in the settings menu under system settings:
+
+![](/images/local-shell-settings.png)
+
+The available list of shells is dependent on the operating system as explained earlier.
+
+## Fixing the PATH of the fallback shell
+
+If XPipe is using the fallback shell, a problem might be that the PATH is incomplete as it is only configured in the rcfiles and profile files of your primary shell. For example, if you switch to sh on macOS, it won't read any of your .zshrc and .zprofile files. If you configured your PATH in these files, you will also have to do it in the sh .profile file to make it properly apply to sh as well.
