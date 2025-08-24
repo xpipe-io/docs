@@ -21,13 +21,15 @@ The only thing you need is an SSH connection to the remote system to select it a
 
 You can leave the use your identity section blank if you intend to use the same password authentication of your SSH connection. For other advanced authentication options, see the additional RDP options field described later on this page.
 
-## Basic RDP connections
+## Direct RDP connections
 
-Of course, you can also create direct RDP connections to a system without any SSH tunnel. These can be either specified in-place using a direct RDP connection or via an .rdp file.
+Of course, you can also create direct RDP connections to a system without an SSH tunnel to the target system itself:
 
 ![](/images/rdp-direct-creation.png)
 
 In this case, XPipe will just assemble the .rdp file with all the necessary options, including any additional RDP options you specified.
+
+The gateway option allows you to tunnel the RDP traffic over an intermediate system without establishing a tunnel to the target system. This is useful if you can only reach an RDP host over a bastion system and don't want to manually create tunnels all the time.
 
 ## Additional RDP options
 

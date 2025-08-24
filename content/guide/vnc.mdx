@@ -23,9 +23,11 @@ These tunnels bind to localhost on the remote system. This means that, for the c
 
 ## Direct RDP connections
 
-Of course, you can also create direct VNC connections to a system without any SSH tunnel:
+Of course, you can also create direct VNC connections to a system without an SSH tunnel to the target system itself:
 
 ![](/images/vnc-direct.png)
+
+The gateway option allows you to tunnel the VNC traffic over an intermediate system without establishing a tunnel to the target system. This is useful if you can only reach an VNC host over a bastion system and don't want to manually create tunnels all the time.
 
 ## Integrated VNC client
 

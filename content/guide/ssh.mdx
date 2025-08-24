@@ -37,13 +37,21 @@ All kinds of keys, including FIDO2, are supported.
 Note that you should select the *private* key, not the public one.
 If you mix that up, ssh will only give you cryptic error messages.
 
-### SSH-Agent
+You also have to specify any potential passphrase the key has. If you want to enter the passphrase manually, you can choose the prompt option for the passphrase.
+
+### OpenSSH agent
 
 In case your identities are stored in the SSH-Agent, the ssh executable can use them if the agent is started. The agent socket is retrieved from the environment variables passed to XPipe or set in the local shell init files. On Windows, XPipe will automatically start the agent process if it is not running yet.
 
-### Password manager agent
+Note that XPipe attempts to use the OpenSSH agent if it can find it. If you are using any other agent, for example from a password manager, you can use the custom SSH agent option instead.
 
-If you are using a password manager with an SSH agent functionality, you can choose to use it here. XPipe will verify it doesn't conflict with any other agent configuration. XPipe however can't start this agent by itself, you have to ensure that it is running.
+### Custom agent
+
+On Linux and macOS, you will also have access to the custom agent option as on these systems, any custom agent will use a different location for the socket. The custom socket location can be configured in the settings menu:
+
+![](/images/ssh-agent-custom.png)
+
+If you are using a password manager with an SSH agent functionality, you can choose to use it here. XPipe will verify it doesn't conflict with any other agent configuration. XPipe, however, can't start this agent by itself, you have to ensure that it is running.
 
 For more information, see [password manager page](guide/password-managers).
 
@@ -52,7 +60,9 @@ For more information, see [password manager page](guide/password-managers).
 If you have configured a smartcard with GPG keys that support authentication, you can choose to provide them to the SSH client via the `gpg-agent`.
 This option requires GPG to be installed on your local system and will automatically enable SSH support of the agent if not enabled yet and restart the GPG agent daemon with the correct settings.
 
-### Pageant (Windows)
+This option will only show up if you have the GPG agent installed on your local system.
+
+### Pageant
 
 In case you are using pageant on Windows, XPipe will check whether pageant is running first.
 Due to the nature of pageant, it is your responsibility to have it
@@ -60,10 +70,10 @@ running as you manually have to specify all keys you would like to add every tim
 If it is running, XPipe will pass the proper named pipe via
 `-oIdentityAgent=...` to ssh, you don't have to include any custom config files.
 
-### Pageant (Linux & macOS)
+On Linux and macOS, in case your identities are stored in pageant, the ssh executable can use them if the agent is started.
+XPipe will automatically start the agent process if it is not running yet and pass the socket to SSH.
 
-In case your identities are stored in pageant, the ssh executable can use them if the agent is started.
-XPipe will automatically start the agent process if it is not running yet.
+This option will only show up if you have pageant installed on your local system.
 
 ### Yubikey PIV
 
@@ -78,9 +88,9 @@ This will instruct the OpenSSH client to load the specified shared library file,
 
 Note that you need an up-to-date build of OpenSSH in order to use this feature.
 
-### Other external source
+### Other external agent
 
-This option will permit any external running identity provider to supply its keys to the SSH client. You should use this option if you are using any other agent to manage your SSH keys. XPipe will not interact with any external agent in this case, it will just allow any program to supply keys to the SSH client.
+This option will permit any external running identity provider to supply its keys to the SSH client. You should use this option if you are using a password manager agent on Windows or any other agent to manage your SSH keys. XPipe will not interact with any external agent in this case, it will just allow any program to supply keys to the SSH client. You will have to make sure that the agent you want to use is running beforehand and configured correctly.
 
 ## Gateways and jump servers
 
