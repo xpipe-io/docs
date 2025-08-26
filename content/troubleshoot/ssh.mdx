@@ -104,3 +104,13 @@ For example, if you find the output `debug1: kex_exchange_identification: banner
 If you specified an IPv6 host address and are getting the SSH error `Network is unreachable` or `Unknown error`, chances are that your local system is not configured correctly to use IPv6. Make sure that IPv6 is enabled and working on your local system.
 
 If you receive a generic `Permission denied` error without additional context when connecting to a server with an IPv6 address, check that the SSH server is accepting IPv6 connections. Furthermore, check if your local system is configured to support IPv6.
+
+### Connection timeout
+
+An SSH connection timeout indicates that no connection to the target system's SSH server could be established at all. Make sure that you have to correct connection information and the system is reachable from your local system. Also make sure that no firewall is blocking connection attempts on the SSH server port and that the SSH server is running on the correct port.
+
+### Shell timeout
+
+A shell init timeout error indicates that an SSH connection succeeded, but the remote shell did not respond in time. This can have multiple reasons:
+- The server is overloaded or just very slow
+- The server is not using a regular command shell such as cmd, bash, zsh, or otherwise. This is true for limited and embedded devices such as routers, links, etc. For information on how to connect to these systems, see [limited and embedded devices](/guide/ssh#limited--embedded-systems).
