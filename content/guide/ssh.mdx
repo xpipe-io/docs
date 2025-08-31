@@ -106,6 +106,8 @@ This functionality is different from jump servers with `ProxyJump` by default. Y
 
 This might be required in case the jump server is a restricted system where no port forwarding or system shell is available.
 
+This gateway system also supports chained gateways and jump servers. This means that if you set a system as a gateway, which already itself has configured a gateway (and so on), the connection well effectively through 2 intermediate systems before reaching your target system. To properly make use of chained gateways, make sure that you don't mix between gateways configured as jump servers vs non-jump servers. Either set all gateways to be jump servers or none of them, depending on which gateway type you want to use.
+
 ## Limited / embedded systems
 
 XPipe works by detecting the shell type of the connection and then interacting with the active shell. This approach only works, however, when the shell type is known and supports a certain number of actions and commands. All common shells like `bash`, `cmd`, `powershell`, and more, are supported. If you are connecting to a system that does not run a known command shell, e.g., a router, link, or some other embedded device, XPipe will be unable to detect the shell type and error out after some time.
