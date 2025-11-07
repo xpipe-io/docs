@@ -71,7 +71,7 @@ If your SSH server only offers outdated host key algorithms that are not enabled
 HostKeyAlgorithms=+ssh-dss
 ```
 
-XPipe is able to automatically configure this for simple SSH connections. For other types of SSH connections, you have to add this option by yourself.
+XPipe is able to automatically configure this for simple SSH connections. For other types of SSH connections, you have to add this option by yourself. You can check which host key types your SSH client supports with `ssh -Q key`.
 
 ### No matching key exchange method
 
@@ -81,7 +81,7 @@ If your SSH server only offers outdated key exchange algorithms that are not ena
 KexAlgorithms +diffie-hellman-group14-sha1
 ```
 
-XPipe is able to automatically configure this for simple SSH connections. For other types of SSH connections, you have to add this option by yourself.
+XPipe is able to automatically configure this for simple SSH connections. For other types of SSH connections, you have to add this option by yourself. You can check which key exchange types your SSH client supports with `ssh -Q kex`.
 
 ### No matching MAC found
 
@@ -91,13 +91,17 @@ If your SSH server only offers outdated MACs that are not enabled by default in 
 MACs +hmac-sha1
 ```
 
-XPipe is able to automatically configure this for simple SSH connections. For other types of SSH connections, you have to add this option by yourself.
+XPipe is able to automatically configure this for simple SSH connections. For other types of SSH connections, you have to add this option by yourself. You can check which MACs your SSH client supports with `ssh -Q mac`.
 
 ### Connection closed by remote host
 
 If you get a message like `kex_exchange_identification: Connection closed by remote host`, the SSH server explicitly disconnected your connection attempt. This can happen if, for example, rate limits are exceeded and too many users connect.
 
 For example, if you find the output `debug1: kex_exchange_identification: banner line 0: Exceeded MaxStartups` in the debug output, this indicates that too many connection attempts were made in parallel. In practice, this is caused by bots probing SSH servers all the time. You can either increase the `MaxStartups` in the sshd config, improve your firewall, or just use another port for SSH to reduce bot spam.
+
+### Bad file descriptor
+
+The error message `ssh: connect to host port 22: Bad file descriptor` can occur if an invasive external monitoring program interferes with SSH connections. For example, if you are using [LittleSnitch](https://www.obdev.at/products/littlesnitch/index.html) or something similar
 
 ### IPv6 issues
 

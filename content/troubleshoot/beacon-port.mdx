@@ -1,0 +1,19 @@
+---
+title: Beacon port conflict
+description: Handling issues with binding to a port
+---
+
+## About
+
+XPipe utilizes an internal HTTP server to realize inter-process communication between different terminal processes, API calls, and MCP server functions. The HTTP server binds to localhost on the port `21721` (or `21722` for PTB versions). If this port is occupied or blocked, then this will fail and XPipe will fail to start.
+
+## If the port is occupied
+
+If another application is already running on the port, and you don't have the ability to easily change the used port of the other application, you can override the default XPipe port as well. For this, you have to set the `XPIPE_BEACON_PORT` environment variable on your system to the new port and restart XPipe.
+
+## If the port is not occupied
+
+If you don't think that any other application is occupying the port, but XPipe still reports that the port is blocked, you can do multiple things:
+- Restart your system: Especially on Windows, the networking implementation can be a bit buggy, sometimes a restart fixes these issues
+- Check if any AntiVirus or other monitoring program might interfere with the port allocation
+- On Windows, check if the port is in the excluded port range with `netsh interface ipv4 show excludedportrange protocol=tcp`. Your administrator might have configured something custom there

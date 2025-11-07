@@ -6,7 +6,7 @@ description: Information about all local directories that XPipe uses
 XPipe utilizes the following directories:
 
 ## Installation data
-* `%LOCALAPPDATA%\XPipe` on Windows
+* `%LOCALAPPDATA%\XPipe` or `%ProgramFiles%\XPipe` on Windows, depending on the type of installation
 * `/opt/xpipe` on Linux
 * `/Applications/XPipe.app` on macOS
 
@@ -28,7 +28,7 @@ Any files they are being edited in the file browser are downloaded locally and r
 
 ## File downloads
 
-Any files they are being downloaded in the file browser are saved to the following directories
+Any files they are being downloaded in the file browser are saved temporarily to the following directories
 * `%TEMP%\xpipe\download` on Windows
 * `/tmp/xpipe/$USER/download` on Linux
 * `$TMPDIR/download` on macOS
@@ -39,11 +39,3 @@ When you choose to bring certain user scripts to a remote system, they are copie
 * `%TEMP%\xpipe\scripts` on Windows
 * `/tmp/xpipe/$USER/scripts` on Linux
 * `/tmp/xpipe/$USER/scripts` on macOS
-
-## Script data
-
-In case any created user script has to write some data to a system, e.g. the starship scripts installing starship files, they are created in
-* `%TEMP%\xpipe\scriptdata` on Windows
-* `/tmp/xpipe/$USER/scriptdata` on Linux
-* `/tmp/xpipe/$USER/scriptdata` on macOS
-

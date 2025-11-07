@@ -67,7 +67,7 @@ This feature only supports **Open Source** GPU drivers:
 The `DRINODE` environment variable can be used to point to a specific GPU.
 Up to date information can be found [here](https://www.kasmweb.com/kasmvnc/docs/master/gpu_acceleration.html)
 
-### Networking and Tailscale
+### Networking, Tailscale, and Netbird
 
 By default, a docker container does not have access to the network tunnel driver ([TUN](https://en.wikipedia.org/wiki/TUN/TAP)) or the host system. For most types of connections this one is not needed, so it will work fine without it.
 
@@ -84,7 +84,6 @@ To help you get started creating a container from this image, you can either use
 #### docker-compose
 
 ```yaml
----
 services:
   webtop:
     image: ghcr.io/xpipe-io/xpipe-webtop:latest
