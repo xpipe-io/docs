@@ -5,7 +5,7 @@ description: Learn how to optimize your file browser workflow
 
 ## Introduction
 
-The file browser is a major component of XPipe. Contrary to most other tools, the file browser works with shell sessions, not any protocol like SFTP or SCP. This means that the file browser is supported on any system that you can open a remote shell to.
+The file browser is a major component of XPipe. Contrary to most other tools, the file browser works with shell sessions, not any protocol like SFTP or SCP (Although it supports that as well). This means that the file browser is supported on any system that you can open a remote shell to.
 
 To realize its functionality, it uses standard shell tools that are available on most systems like `touch`, `mkdir`, `dd`, and many more. On other platforms, it will use the equivalents of these programs. For systems that are lacking some basic tools as do some busybox systems, XPipe tries its best to dynamically adapt its implementation based on what's available. Overall, the experience is pretty uniform but might slightly differ for different systems due to these circumstances. More details can be found later on this page.
 

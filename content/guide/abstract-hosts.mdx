@@ -1,0 +1,44 @@
+---
+title: Abstract hosts
+description: Accessing your tailscale systems
+---
+
+## Introduction
+
+XPipe usually attempts to connect to a remote system via some form of shell connection to be able to detect general system information like operating system, shell ,etc. to realize many of its features. However, this might not always be possible for various reasons. Either your system is an embedded/limited system that does not offer full SSH support, or you are connecting to a system which typically it does not put emphasis on shell connections, e.g. Windows servers with RDP being the main form of connection.
+
+![](/images/abstract-host.png)
+
+The concept of abstract hosts in XPipe has the goal of still giving you all the organization features in the connection hub without requiring a shell-connection-based parent entry. For example, if you have a remote system which accepts RDP connections and has multiple web dashboard services, you can add all of these under an abstract host entry so they will be grouped under it.
+
+## Configuration
+
+An abstract host can be configured with a host address, which all child connections can use automatically. They also support setting other connections as gateways, which will direct all child connections to tunnel their traffic over the gateway.
+
+![](/images/abstract-host-config.png)
+
+### Address
+
+For example, if you create a new [HTTP service](/guide/services) for this host, the service will automatically use the specified hostname when opened.
+
+![](/images/abstract-host-service.png)
+
+Any other types of connections like RDP or VNC will also take the address as their hostname that they will connect to.
+
+### Gateway
+
+For example, if you have a Windows server without direct shell connectivity which is only reachable through a bastion server, then you can set the bastion server as a gateway. Now, any child connection like RDP will tunnel their traffic via the gateway, which in most cases is done through SSH, assuming that your bastion server supports SSH, which they usually do.
+
+![](/images/abstract-host-gateway.png)
+
+## Creating abstract hosts
+
+In addition to being able to just add a new abstract host entry at `New` -> `Remote Host`, you can also take a quicker approach of directly converting singular connection entries to an abstract host.
+
+If you created a single direct connection at some point, e.g. a [direct RDP connection](/guide/rdp#direct-rdp-connections), and are now deciding that you want to add more entries for the same host, e.g. a web service, you can quickly convert these entries into an abstract host in the context menu:
+
+![](/images/abstract-host-convert.png)
+
+By clicking on this, you will receive a converted abstract host that you can now use to add more connections:
+
+![](/images/abstract-host-converted.png)
