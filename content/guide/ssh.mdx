@@ -118,6 +118,20 @@ To work around these cases, you can explicitly designate a system as such:
 
 When this setting is enabled, XPipe will not attempt to identify the shell type and launch the shell as-is. This allows you to open the connection without errors, but many features, e.g., the file browser, scripting, subconnections, and more, will not be supported for this connection.
 
+## SFTP sessions
+
+By default, any session opened in the file browser will use an SSH shell-based session, to allow for more flexibility by running commands. However, a side effect of this is that transfer speeds are a bit slower and some connections might fail if the target system only allows for pure SFTP and no SSH shells.
+
+To open an SFTP session to a system in the file browser, you can either mark the system as limited/embedded. This will automatically attempt to open an SFTP session and these kinds of systems often do not support shells. Alternatively, you can switch to pure SFTP in any SSH-based file browser session in the context menu for a directory:
+
+![](/images/sftp-open.png)
+
+You can see in the tab name whether you are using an SFTP session or not:
+
+![](/images/sftp-tabs.png)
+
+Note that SFTP sessions are limited compared to shell-based sessions in terms of features as no commands can be executed.
+
 ## X11 Forwarding
 
 XPipe supports X11 forwarding for SSH connections. You can enable this in the advanced SSH configuration for a connection:
