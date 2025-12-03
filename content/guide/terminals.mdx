@@ -5,29 +5,84 @@ description: Using your favourite terminal with XPipe
 
 ## Introduction
 
-XPipes comes with integrations for almost every terminal out there, so you can keep using it in combination with XPipe. However, the amount of features for each individual integration depends on how much is possible to control from an outside application like XPipe with each terminal.
+XPipes comes with integrations for almost every terminal tool out there, so changes are high that you can keep using your favourite terminal setup in combination with XPipe.
 
-Some terminals allow very flexible control so that XPipe can implement all the functionality it needs. Other terminals lack various features. In many cases, this is either tab support or the ability to open new tabs from the outside. A few terminals require some configuration to work optimally with XPipe.
+However, the amount of features for each individual integration depends on how much is possible to control from an outside application like XPipe with each terminal. Some terminals allow very flexible control so that XPipe can implement all the functionality it needs. Other terminals lack some features, for example, proper tabbing support. As described later on this page, a lack of certain features can also be offset by using additional tools like a terminal multiplexer.
 
-This page intends to cover all the things to watch out for when using various terminals. Note that this page does not list all supported terminals, it only covers important ones that might need additional context.
+This page intends to cover all the things to watch out for when using various terminals and how to configure them so that they can work with XPipe in the most optimal fashion. Note that this page does not list all supported terminals, it only covers important ones that might need additional context.
 
 ## Multiplexers
 
-XPipe comes with integrated support for terminal multiplexers such as tmux or zellij. You can enable this in the settings menu. Using terminal multiplexers allows you to make proper use of terminals that don't support opening new tabs from XPipe. Or if your favorite terminal here is listed as not recommended as it does not support tabs, using a multiplexer will fix this issue.
+XPipe comes with integrated support for the terminal multiplexers [tmux](https://github.com/tmux/tmux/wiki), [zellij](https://zellij.dev/), and [GNU screen](https://www.gnu.org/software/screen/). Using terminal multiplexers allows you to make proper use of terminals that don't support opening new tabs from XPipe. So if your favorite terminal here is listed as not recommended as it does not support tabs, using a multiplexer can fix this limitation.
 
-On Windows, these terminal multiplexers are not supported by default. To work around this limitation, you can select a terminal environment in the settings menu that is used to run the commands instead. This terminal environment must be a WSL distribution installed on your local machine.
+For example, you can use a multiplexer to turn the Alacritty terminal, which does not support tabs, into a fully tabbed terminal with many additional features for your terminal sessions:
+
+![](/images/terminal-zellij.png)
+
+### Windows environments
+
+On Windows, most terminal multiplexers are not supported by default as they are designed to work on Linux systems. To work around this limitation, you can select a Linux-based terminal environment in the settings menu that is used to run the multiplexer instead. This terminal environment must be a WSL distribution installed on your local machine if you want to use multiplexers on Windows.
 
 ![](/images/multiplexers.png)
 
 ## Prompts
 
-Terminal prompt tools allow you to fully customize the prompts in your shell with additional information. These prompts require installation on the remote system you access. When you enable a terminal prompt in the settings menu, XPipe will automatically install it on the system you connect to, granted that you marked the connection category to allow these kinds of modifications to a system.
+Terminal prompt tools allow you to fully customize the prompts in your shell with additional information. XPipe supports the popular terminal prompts [Starship](https://starship.rs/), [Oh My Posh](https://ohmyposh.dev/), and [Oh My Zsh](https://ohmyz.sh/). Here is how Starship looks like with the default configuration:
 
-XPipe will also automatically set up the specified configuration on the remote system so that all your prompts are configured uniformly.
+![](/images/terminal-starship.png)
+
+These prompts require installation on the remote system you access. When you enable a terminal prompt in the settings menu, XPipe will automatically download and install it on the system you connect to, granted that you marked the connection category to allow these kinds of modifications to a system. XPipe will also automatically set up the specified configuration on the remote system so that all your prompts are configured uniformly.
+
+### Configuration
+
+You can configure everything in the terminal settings:
 
 ![](/images/prompts.png)
 
-As described later on for some terminals, having a custom prompt might interfere with other prompt-based terminal integrations, e.g. for the Warp terminal.
+As described later, for some terminals, having a custom prompt might interfere with other prompt-based terminal integrations, e.g. for the Warp terminal. It is also possible that a prompt might not support a certain login shell. For example, if you are using Oh My Zsh, it won't work on any systems that do not start up into a zsh shell environment by default.
+
+## Split views
+
+In addition to tabs, XPipe can also open multiple terminal sessions in one tab in a split view where the window is partitioned into multiple separate terminal sessions. The main reason why you would want to do this is to have a direct overview over multiple sessions or if you want to type a command to run into multiple terminal sessions in parallel. Especially when managing many systems, it might be very convenient to type a command into multiple sessions and see how they run in each one in parallel in an interactive fashion.
+
+Here is how a four view split looks like when using Windows Terminal:
+
+![](/images/terminal-split.png)
+
+### Support
+
+These split views are only supported in certain terminal configurations:
+- Windows Terminal
+- Kitty
+- Wezterm
+- Any other terminals with zellij or tmux configured as the multiplexer
+
+To use the split-view functionality, switch to [batch mode](/guide/hub#batch-mode) and select the connections you want to open in the split view:
+
+![](/images/terminal-split-batch.png)
+
+If the split view button is disabled, then your terminal configuration does not support split views.
+
+### Split direction
+
+In the settings menu, you can also configure the preferred split strategy to control in which direction the splits should be performed:
+
+![](/images/terminal-split-direction.png)
+
+The balanced direction will try to give each terminal pane an equal amount of horizontal and vertical space if possible. The other two strategies **horizontal** and **vertical** will always split along one axis, meaning that you can stack many terminal panes next to each other if you want.
+
+This split strategy is done in the best effort manner, meaning that it might happen that your terminal does not fully work with all direction settings. Some terminals have certain limitations or restrictions on how they can align split terminal sessions.
+
+### Broadcast mode
+
+Broadcast mode, sync mode, or multi-exec, however you want to call it, refers to sending the same command input to all active split views at the same time. This makes running an interactive command in multiple sessions much easier:
+
+How to use a feature like a command broadcast depends on your individual configuration:
+- Windows Terminal: [Broadcast input](https://learn.microsoft.com/en-us/windows/terminal/customize-settings/actions#broadcast-input)
+- Kitty: [Broadcast kitten](https://sw.kovidgoyal.net/kitty/kittens/broadcast/#command-line-interface)
+- Wezterm [Not supported, custom script might work](https://github.com/wezterm/wezterm/discussions/1130#discussioncomment-4678096)
+- zellij: [Sync tab mode](https://zellij.dev/documentation/cli-actions#toggle-active-sync-tab)
+- tmux: `setw synchronize-panes`
 
 ## Logging
 
@@ -37,19 +92,19 @@ To keep track of past terminal sessions, you can enable terminal session logging
 
 This option is available in the Professional plan.
 
-### Logging on Windows
+### Usage on Windows
 
 If you are on Windows, the native PowerShell transcripts functionality lacks several features and is therefore not the recommended option to use. You can switch to using the better Linux-based `script` logging tools by using a WSL-based terminal environment in the settings:
 
 ![](/images/multiplexers.png)
 
-### Logging output
+### Output format
 
 When logging is enabled, all terminal sessions are recorded and written to log files. In practice, due to the sheer number of ANSI escape sequences for colored output and prompts, the raw logs might be cluttered with escape codes. For that reason, the logs are also cleaned to remove these escape sequences, and each session is logged to two files, one raw log and one cleaned text log:
 
 ![](/images/logging-files.png)
 
-### Logging improvements
+### Possible improvements
 
 It is almost impossible to fully clean complex terminal output with lots of formatting, so there will always be some leftovers. What you can do is minimize the complexity by avoiding more visual-oriented shells like fish, custom terminal prompts, and things like zsh extensions. For example, in a standard bash shell environment on a system, logging is much cleaner than in a fish environment with a custom prompt on top.
 
@@ -59,11 +114,11 @@ Furthermore, as mentioned before in the Windows section, you should use a WSL te
 
 ## Noteworthy integrations
 
-Here you can find a summary of the suitability of various popular terminal emulators to be used with XPipe. Terminals where there isn't a lot to mention aren't listened here.
+Here you can find a summary of the suitability of various popular terminal emulators to be used with XPipe. Terminals where there isn't a lot to mention aren't excplitily listed here.
 
 ### Windows Terminal
 
-On Windows, [Windows Terminal](https://aka.ms/terminal) is the recommended terminal of choice for XPipe. It supports all features and provides the best native integration on Windows. The early access variants called Preview and Canary are also supported by XPipe if you are using them.
+On Windows, [Windows Terminal](https://aka.ms/terminal) is the recommended terminal of choice for XPipe. It supports all features and provides the best native integration on Windows. The early access variants called [Preview](https://apps.microsoft.com/detail/9n8g5rfz9xk3) and [Canary](https://devblogs.microsoft.com/commandline/introducing-windows-terminal-canary/) are also supported by XPipe if you want to use them instead.
 
 XPipe creates a new separate profile for connections started from XPipe. This allows you to customize, for example, the appearance or other terminal settings for XPipe connections specifically. You can find the profile in the settings menu:
 
@@ -71,7 +126,7 @@ XPipe creates a new separate profile for connections started from XPipe. This al
 
 ### Warp
 
-If you are looking for an AI-assisted workflow, then [Warp](https://www.warp.dev/) might be your terminal of choice. It supports most features required by XPipe and works on all operating systems. Limitations are missing tab color support, no prompt support, and tabs not automatically closing.
+If you are looking for an AI-assisted workflow, then [Warp](https://www.warp.dev/) might be your terminal of choice. It supports most features required by XPipe and works on all operating systems. Limitations are missing tab color support, no prompt support, tabs not automatically closing, and a slow startup.
 
 XPipe will automatically run a command to [warpify](https://docs.warp.dev/features/warpify/subshells) your session. This is important to access to all the shell integrations of Warp:
 
@@ -87,11 +142,39 @@ If you are using a multiplexer regardless, alacritty is a good choice for a high
 
 ### WezTerm
 
-WezTerm is a cross-platform terminal, but the level of support varies by platform, however. On Windows, WezTerm is missing the ability to open new tabs from the outside, making it not recommended for Windows. On Linux and macOS, the WezTerm integration supports tabs properly and can be recommended to be used.
+WezTerm is a cross-platform terminal, with a good level of support for terminal features. The integration supports tabs properly and can be recommended to be used. It also supports split terminal views and command broadcast mode.
+
+### Kitty
+
+[Kitty terminal](https://sw.kovidgoyal.net/kitty/) is currently available for Linux and macOS. It is highly customizable and supports all necessary features and is recommended. It also supports split terminal views and command broadcast mode.
+
+To interact with kitty, XPipe communicates with the kitty socket interface. For that, it requires `socat` to be installed on Linux.
+
+### Ghostty
+
+[Ghostty terminal](https://ghostty.org/) is currently available for Linux and macOS. The feature set it differs between these two platforms, however. On Linux, Ghostty is missing tabbing support and can only be recommended to be used with a terminal multiplexer. On macOS, tabs are supported, so it can be properly used without a multiplexer there.
+
+### Konsole
+
+[Konsole](https://konsole.kde.org/) is the default terminal shipped with KDE. It can be used with XPipe effectively, provided that it is correctly configured to support opening tabs from the outside. By default, the single instance mode is disabled. It is, however, required for XPipe to be able to open tabs. You can enable this setting in the Konsole settings:
+
+![](/images/konsole-settings.png)
+
+### Gnome Console
+
+[Gnome Console](https://apps.gnome.org/en-GB/Console/), which is unrelated to Gnome Terminal, is the default terminal shipped with modern Gnome versions. This terminal supports all necessary features like tabbing support and is therefore recommended to be used with XPipe.
+
+### Windows Console Host
+
+The Windows shells cmd.exe, PowerShell, and pwsh all come with their own console host window. If you don't have any other Windows terminals available, you can use them as well. This is, however, not recommended as they don't support tabs and various special characters and escape sequences. You should only use these terminals if you don't have any alternative.
+
+### Gnome Terminal
+
+The old version of Gnome Terminal, which is no longer the default on modern gnome systems, is not recommended to be used with XPipe as it lacks the ability to open tabs from the outside. You can take a look at the more modern Gnome Console instead.
 
 ### Tabby
 
-Tabby is a cross-platform terminal. It is not recommended to be used with XPipe as it is rather unstable, prone to hang, and slow. It is supported by XPipe but various large configurations might result in Tabby freezing. The underlying freezing issues are unlikely to be fixed as Tabby is only sparsely maintained.
+Tabby is a cross-platform terminal. It is not recommended to be used with XPipe as it is rather unstable, prone to hang, and slow. It is supported by XPipe, but various large configurations might result in Tabby freezing. The underlying freezing issues are unlikely to be fixed as Tabby is only sparsely maintained.
 
 ### Waveterm
 
@@ -100,32 +183,6 @@ Tabby is a cross-platform terminal. It is not recommended to be used with XPipe 
 ![](/images/waveterm-open.png)
 
 If you don't launch XPipe through Waveterm, XPipe won't be able to open any terminal sessions in it.
-
-### Windows Console Host
-
-The Windows shells cmd.exe, PowerShell, and pwsh all come with their own console host window. If you don't have any other Windows terminals available, you can use them as well. This is, however, not recommended as they don't support tabs and various special characters and escape sequences. You should only use these terminals if you don't have any alternative.
-
-### Konsole
-
-[Konsole](https://konsole.kde.org/) is the default terminal shipped with KDE. It can be used with XPipe effectively, provided that it is correctly configured to support opening tabs from the outside. By default, the single instance mode is disabled. It is, however, required for XPipe to be able to open tabs. You can enable this setting in the Konsole settings:
-
-![](/images/konsole-settings.png)
-
-### Gnome Terminal
-
-The old version of Gnome Terminal, which is no longer the default on modern gnome systems, is not recommended to be used with XPipe as it lacks the ability to open tabs from the outside. You can take a look at the more modern Gnome Console instead.
-
-### Gnome Console
-
-[Gnome Console](https://apps.gnome.org/en-GB/Console/), which is unrelated to Gnome Terminal, is the default terminal shipped with modern Gnome versions. This terminal supports all necessary features like tabbing support and is therefore recommended to be used with XPipe.
-
-### Kitty
-
-[Kitty terminal](https://sw.kovidgoyal.net/kitty/) is currently available for Linux and macOS. It is highly customizable and supports all necessary features and is recommended. To interact with kitty, XPipe communicates with the socket. For that it requires `socat` on Linux and `nc` on macOS.
-
-### Ghostty
-
-[Ghostty terminal](https://ghostty.org/) is currently available for Linux and macOS. The feature set it differs between these two platforms, however. On Linux, Ghostty is missing tabbing support and can only be recommended to be used with a terminal multiplexer. On macOS, tabs are supported, and it can be properly used without a multiplexer as well.
 
 ### Foot
 
