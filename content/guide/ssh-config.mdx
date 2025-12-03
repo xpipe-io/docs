@@ -23,6 +23,8 @@ If you want to learn more about how to use SSH configs, you can use `man ssh_con
 
 If you want to create a fully customized SSH connection with more options than you can find in the simple SSH connection creation dialog, you can take a look at customized SSH connections. These allow you to specify an SSH connection in-place using the SSH config syntax you know. It is essentially a way to create SSH config connections without having to go through dealing with creating config files. This is recommended if you are an advanced user and know what you're doing.
 
+Note that most features can be realized through [simple SSH connections](/guide/ssh) already. Things like ProxyJump chains, additional SSH options, and more can already be used with simple SSH connection entries. Custom SSH connections are only really necessary for very specific use cases.
+
 ### Format
 
 You can specify connection details just as in an SSH config. The main difference is that you don't need to include an explicit host declaration. For example, the following definitions are semantically equivalent:
@@ -61,7 +63,11 @@ Host jump
     HostName jump.example.com
 ```
 
-Note that it is recommended to use a proper SSH config file for cases like this as it is not possible for custom SSH connections to specify multiple different authentication credentials. Custom SSH connections are therefore mostly intended for simpler types of hosts and not jump chains.
+In the case of multiple host definitions, XPipe will always choose the first one as the target host. Therefore, you have to take care of providing the hosts in the correct order, otherwise it will try to connect to an intermediate host. In this case, the ProxyJump option does not need the hosts to be defined in order.
+
+![](/images/ssh-order.png)
+
+Note that it is recommended to use a proper SSH config file for ProxyJump chains like this as it is not possible for custom SSH connections to specify multiple different authentication credentials. Custom SSH connections are therefore mostly intended for simpler types of hosts and not complex jump chains.
 
 ## Adding SSH options
 
