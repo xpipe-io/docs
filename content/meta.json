@@ -31,6 +31,7 @@
     "guide/ssh-tunnels",
     "guide/docker",
     "guide/proxmox",
+    "guide/aws",
     "guide/tailscale",
     "guide/netbird",
     "guide/teleport",

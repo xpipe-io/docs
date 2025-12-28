@@ -109,7 +109,7 @@ Note that the syntax for a file URL is `file://<absolute path>` where the absolu
 
 ## Reverting to a previous commit
 
-In case anything goes wrong or you just want to restore the vault at an earlier date, you can do so easily using the normal git reset functionality. The first step is to find the SHA of the commit you want to revert to. This will look like this: `42e2e5af9d49de268cd1fda3587788da4ace418a`. You can find the commit SHA in any web interface of git your provider or on the command line with `git log`.
+In case anything goes wrong, or you just want to restore the vault at an earlier date, you can do so easily using the normal git reset functionality. The first step is to find the SHA of the commit you want to revert to. This will look like this: `42e2e5af9d49de268cd1fda3587788da4ace418a`. You can find the commit SHA in any web interface of git your provider or on the command line with `git log`.
 
 Once you have obtained the SHA, you can run the following commands:
 
@@ -119,33 +119,65 @@ git reset --hard <SHA>
 git push --force -u remote-storage HEAD
 ```
 
-The push is required to overwrite the remote repository. Without the push, XPipe would just pull the changes from the remote repository again.
+The force push is required to overwrite the remote repository. Without the push, XPipe would just pull the changes from the remote repository again.
 
 Note that if multiple instances are synced to this repository, you will have to perform the reset on all instance repositories. Otherwise, starting another XPipe instance where the local reset was not performed, will push the reverted changes again.
 
 ## Team vaults
 
-The git synchronization also supports multiple different users for when you are working with your team. It allows each team member to share access to systems that are designated to be available to all users, while also allowing each user to keep selected systems and authentication options private.
+The git synchronization also supports multiple different users or groups for when you are working with your team. It allows each team member to share access to systems that are designated to be available to all users, while also allowing each user or group to keep selected systems and authentication options private.
 
 <Callout type="info">Team vaults are supported starting from the Professional plan.</Callout>
 
-### Vault users
+### Vault users and groups
 
-To start off, each team member first has to sync to the same git repository. You can then configure the vault users in the `Vault` settings menu. Each vault user requires a passphrase to be set which will be used to encrypt personal secrets in the vault. With a passphrase, other users won't be able to decrypt any connections and identities marked as personal.
+To start off, each team member first has to sync to the same git repository. With no team vault settings configured yet, all members who sync with that repository will have full access to the same connections with this configuration.
 
-![](/images/team-vault.png)
+You can then configure the vault authentication in the `Vault` settings menu. First, you can choose between user-based and group-based authentication.
 
-To mark an identity as personal, you have to create a synced identity:
+#### User-based authentication
+
+Each member has their own passphrase to either remember or stored in a password manager. With this passphrase, each team member can choose to encrypt certain connections and identities to only be available for themselves. This is suitable for smaller teams and requires minimal setup.
+
+![](/images/user-auth.png)
+
+#### Group-based authentication
+
+Each member can be assigned a group, which requires a group secret to unlock. With vault groups, this secret can be queried automatically, e.g. via commands, HTTP requests, password manager, and more. It is essentially the right type of authentication for larger teams where an organization administrator can configure the group assignments from a central location.
+
+That administrator can, for example, hook up the vault authentication to an Azure Key Vault and manage access via Azure Active Directory permissions and the Azure CLI.
+
+![](/images/group-auth.png)
+
+### Configuring access
+
+Once the vault authentication is configured, you can choose the scope when creating synced identities.
 
 ![](/images/synced-identity.png)
 
-These identities can be configured to either be global or personal identities:
+These identities can be configured to either be global or personal / group-only identities:
 
 ![](/images/personal-identity.png)
 
 Then, configuring a connection to use this personal identity will automatically make XPipe also encrypt the connection itself and all subconnections with your personal key as well. This will result in only your user having access to the identity and all associated connections. Any kind of key files associated with personal identities are also added to the repository using your personal key for encryption.
 
 <Callout type="info">Other vault users can still see that changes are made to all your personal connections and identities. However, they can't decrypt the changes itself and will only see binary diffs in the repository.</Callout>
+
+### Changing authentication secrets
+
+If, at a later date, you want to change the passphrase / group secrets of a vault user / group, you can do so at the edit button for the user / group entry. This action will re-encrypt the entire vault data and restart. This operation will take a while as this is a compute-intensive operation.
+
+You can also delete a user / group. This will perform the same operation with the main difference that all personal / group-only connections will be encrypted with the generic vault key again, meaning that they will be accessible to everyone.
+
+### Considerations
+
+This authentication system for encryption and decryption is not the most complex system you will find when compared to other solutions. It is designed to be relatively simple and robust. Each team member has full control over all connection entries they have been granted access for, meaning that they can modify them, delete them, and inspect the used passwords and keys for them. There is no fine-grained permission system akin to an administrator only granting something like read-only permissions to certain connections. Each team member has to be trusted with the connection access that they are given. If you are looking to minimize possible leaks of secrets in this scenario, using security keys like Yubikeys for server authentication is the best option. This will prevent the possibility of any used private keys being leaked when an individual user's system is compromised.
+
+Furthermore, this vault sync system is not designed for an arbitrary number of users. The maximum amount of users who can share a vault is often limited by git itself. If you have something like 50 users working on one shared vault with the same connections, there will probably be a lot of continuous pushing and pulling going on, including a lot of merge conflicts at some point. The git workflow does not scale well when working on the same data, this is also true for other normal repositories.
+
+#### Workspaces
+
+A [workspace](guide/workspaces) is a completely separate data storage location, independent of others. It lives in its own directory on your local machine and has its own connections, settings, and vault. For fine-grained access control, like a few team members having access to a few specific connections outside of the normal group borders, you can try using multiple workspaces. In many cases, a separate workspace with a separate sync repository configured is the best option to solve these cases. Separate workspaces also work well when reducing the aforementioned increasing load on git repositories when more and more users start syncing to it.
 
 ### Merge conflicts
 
@@ -154,3 +186,42 @@ When working in a team, an occasional merge conflict might occur when another us
 ![](/images/resolve-conflict.png)
 
 In most cases, you won't have to do anything as it can be handled automatically. However, if you and another team member modify the same connection configuration at the same time, you might receive a merge conflict error that can't be solved automatically. In this case, you can choose between either overriding your changes or the external changes.
+
+### Example setups
+
+This is how team bald authentication could look like.
+
+![](/images/group-auth-options.png)
+
+#### Password manager
+
+Each group member must have access to a supported password manager. Assuming that the secrets in that password manager are managed by an organization administrator, they can make the group secret available to group members in the password manager. If a password manager is configured in the XPipe settings, you can then retrieve that group secret to unlock the vault with the necessary name or key of the secret in the password manager.
+
+For details on how to use password managers in XPipe, see the [password manager page](/guide/password-manager).
+
+#### Command
+
+If your secret is not stored in a password manager, and instead at the central location with built-in access control like an Azure Key Vault, the command option is probably the right one for you. It will simply execute a command and read the secret from stdout. Assuming that the necessary CLI tools are available on your system, this gives you a lot of flexibility on how and where to retrieve the secret from.
+
+For example, you could follow this [guide to create an Azure Secret Vault](https://learn.microsoft.com/en-us/azure/key-vault/secrets/quick-create-cli) and retrieve the command with the [Azure CLI](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Many CLI tools like the Azure CLI return json output. You can extract the raw values using a tool like [jq](https://jqlang.org/download/). For example, if you create a new key vault called `xpipe-auth-vault` and the secret called `my-group-secret`, you can then pass the secret to XPipe by specifying the following command with the jq extraction for the raw value:
+
+```bash
+az keyvault secret show --name "my-group-secret" --vault-name "xpipe-auth-vault" | jq -r .value
+```
+
+The access control is built in as the Azure CLI requires you to authenticate to your Azure Active Directory setup, which automatically gives you the permissions you were assigned to. You just need to be assigned permissions to read the associated secret vault, and this command will work.
+
+#### File-based secret
+
+If your organization administrator can manage the file system of devices, creating a simple file containing the group secret is also an option. Although this is not as secure as the other ones. This file can then be used to obtain the groups secret. The file path in XPipe also supports `~` on all operating systems to allow you to refer to files in your home directory regardless of which operating system you're using.
+
+#### HTTP request
+
+You can also run a small HTTP server to handle the group secret authentication for you. Essentially, you can specify an HTTP URL in XPipe that will get called with a POST request. XPipe expects the group secret to be written in the body of the response. The access control can be implemented for example by matching the request IPs against a fixed table, for example, in an office set up with fixed device IPs. This approach requires a bit of manual scripting to create this HTTP server, but can be a good solution for certain setups.
+
+#### Manual login
+
+If the configured authentication method fails, or you don't have one configured yet, you can also just log in to the group manually in the login dialog.
+
+
+

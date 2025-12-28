@@ -103,6 +103,10 @@ For example, if you find the output `debug1: kex_exchange_identification: banner
 
 The error message `ssh: connect to host port 22: Bad file descriptor` can occur if an invasive external monitoring program interferes with SSH connections. For example, if you are using [LittleSnitch](https://www.obdev.at/products/littlesnitch/index.html) or something similar
 
+### Requested feature not supported
+
+When using a special key like a FIDO2 key that depends on a security key, some configured settings during key generation might not be supported. For example, if you are using a Yubikey, and you have configured the key to not require touch, this error will occur as touch is required for all keys.
+
 ### IPv6 issues
 
 If you specified an IPv6 host address and are getting the SSH error `Network is unreachable` or `Unknown error`, chances are that your local system is not configured correctly to use IPv6. Make sure that IPv6 is enabled and working on your local system.
