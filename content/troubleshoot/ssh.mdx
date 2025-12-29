@@ -55,7 +55,7 @@ The error message `no route to host` indicates a DNS resolution failure or netwo
 
 On macOS, this issue might also occur if you don't allow XPipe network access. You can explicitly allow network access for XPipe in the system settings -> `Security and privacy` -> `Local network`.
 
-### Client loop: send disconnect / connection reset
+### Client loop: send disconnect / connection reset / broken pipe
 
 Since Windows 10, Microsoft has been shipping an OpenSSH client and server with Windows that you can use. You just have to enable the OpenSSH server feature for your Windows installation as shown [here](https://learn.microsoft.com/en-us/windows-server/administration/openssh/openssh_install_firstuse?tabs=gui&pivots=windows-server-2022).
 
@@ -102,6 +102,10 @@ For example, if you find the output `debug1: kex_exchange_identification: banner
 ### Bad file descriptor
 
 The error message `ssh: connect to host port 22: Bad file descriptor` can occur if an invasive external monitoring program interferes with SSH connections. For example, if you are using [LittleSnitch](https://www.obdev.at/products/littlesnitch/index.html) or something similar
+
+### Requested feature not supported
+
+When using a special key like a FIDO2 key that depends on a security key, some configured settings during key generation might not be supported. For example, if you are using a Yubikey, and you have configured the key to not require touch, this error will occur as touch is required for all keys.
 
 ### IPv6 issues
 

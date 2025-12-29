@@ -1,15 +1,13 @@
 ---
-title: Service tunnels
-description: Tunneling remote services to your local machine
+title: Services
+description: Tunneling or opening remote services
 ---
 
 ## Introduction
 
-The service integration is a core component of XPipe. It is essentially a way to securely tunnel any kind of remote ports to your local machine over an existing shell connection. In most cases, these shell connections are SSH-based, so XPipe will use the tunneling features of SSH to establish these tunnels. In some other cases, it tries to do the same using other tools if they support it.
+The service integration is a core component of XPipe. It is essentially a way to open and securely tunnel any kind of remote ports to your local machine over an existing shell connection. In most cases, these shell connections are SSH-based, so XPipe will use the tunneling features of SSH to establish these tunnels. In some other cases, it tries to do the same using other tools if they support it. You can also choose to not tunnel a remote service port and instead just open it normally, for example, in your web browser.
 
 ![](/images/service.png)
-
-<Callout type="info">Not every type of shell connection supports tunneling features. One example are PowerShell remote sessions.</Callout>
 
 ## Tunnels
 
@@ -27,13 +25,19 @@ But deep down, services are just regular tunnels managed by XPipe.
 
 ## Configuration
 
-You can create a new service manually at `New` -> `Service ...`. You can configure the necessary service information plus a few additional properties:
+You can create a new service manually at `New` -> `Service ...`. You can configure the necessary service information plus a few additional properties. The exact configuration options depend on how you intend to use the service: Tunnel a remote port on an existing host to your local machine or just open a remote service without tunneling involved. Whether you have control over the tunneling settings depends on the nature of the service and whether there is a gateway involved or not.
 
-![](/images/service-creation.png)
+Here is how tunneling a remote HTTP service port for an existing host would look like:
 
-The first optional property is the local service port. If this is left empty, XPipe will choose a random free port on your local system. If you want to tunnel it to a fixed local port, you can do that by specifying the fixed local port.
+![](/images/service-tunnel.png)
 
-The second optional property is the service type. This one controls how the service should be treated and opened. If this is set to unknown, only the tunnel will be established. If it is set to HTTP/HTTPS, a browser will automatically open the service at the location. This location can also include an additional URL path if you don't want to open the root path `/`.
+You can also add service entries for hosts that are not added to XPipe or do not support normal shell connections. See also the [abstract hosts page](/guide/abstract-hosts) for this. These types of connections also support tunneling if possible, and if it is wanted:
+
+![](/images/service-direct.png)
+
+The first optional property is the service type. This one controls how the service should be treated and opened. If this is set to unknown, only the tunnel will be established. If it is set to HTTP/HTTPS, a browser will automatically open the service at the location. The configuration can also include an additional URL path if you don't want to open the root path `/`.
+
+If tunneling is enabled, the second optional property is the local service port. If this is left empty, XPipe will choose a random free port on your local system. If you want to tunnel it to a fixed local port, you can do that by specifying the fixed local port.
 
 For more advanced functionality, you can set the service type to custom and run a command when the service should be opened. This command can be anything you want. To replicate the browser open, for example, you would add the command `chrome localhost:$PORT`.
 

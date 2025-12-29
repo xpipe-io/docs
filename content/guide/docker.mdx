@@ -32,3 +32,11 @@ You can automatically add available services of any docker container that has ex
 ![](/images/services.png)
 
 For more information about services, see the [services page](/guide/services).
+
+## Compose
+
+XPipe also detects compose projects in a context. This will group all containers of the project and give some additional options like starting or stopping the entire compose project.
+
+![](/images/compose.png)
+
+Certain compose projects might only support limited actions when they are managed by an external tool like Portainer or Komodo. These management tools lock the projects down and only allow full control from their interfaces.

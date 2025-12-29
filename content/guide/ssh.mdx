@@ -92,19 +92,47 @@ Note that you need an up-to-date build of OpenSSH in order to use this feature.
 
 This option will permit any external running identity provider to supply its keys to the SSH client. You should use this option if you are using a password manager agent on Windows or any other agent to manage your SSH keys. XPipe will not interact with any external agent in this case, it will just allow any program to supply keys to the SSH client. You will have to make sure that the agent you want to use is running beforehand and configured correctly.
 
+## Generating keys
+
+If you don't have an existing key at hand and instead want to configure a new key for a system to authenticate with, you can create one in the keygen menu, which you can find at the keygen button:
+
+![](/images/ssh-keygen.png)
+
+This will open a dialog where you can configure the generation parameters for a new key. The keys are generated via the installed OpenSSH `ssh-keygen` CLI tool, so you can be assured that the keys are generated in a cryptographically secure manner. This also support FIDO2 smartcard-based keys:
+
+![](/images/ssh-keygen-fido2.png)
+
+Once the key is generated, it will be automatically placed in the open connection configuration.
+
+## Public key handling
+
+While you only need a private key for authentication, keeping track of the associated public keys is important as well. Especially when you want to add this keypair as an authorized key to another system. You can automatically generate and store the public key for any supplied private key automatically with the generate button in the public key field:
+
+![](/images/ssh-pubkeygen.png)
+
+This might prompt you for your passphrase if the key has one.
+
+## Applying identities
+
+When you create an identity entry that includes your keys, you can apply this identity automatically to a system:
+
+![Identity Apply](/images/id-apply.png)
+
+This allows you to quickly perform a key rotation or configure new systems with key authentication.
+
+The process of changing the authentication configuration of a system is not always one simple step. So the dialog is a comprehensive overview of what is needed to apply a certain identity to a remote system, with various quick-action buttons and notes. This gives you still full manual control of what should be done and an overview of what is required prior to doing so.
+
+![Identity Apply Dialog](/images/id-apply-dialog.png)
+
 ## Gateways and jump servers
 
 If you are planning to establish connections over another intermediate host, you can use XPipe's gateway feature:
 
-![](/images/ssh-gateway.png)
-
-By default, when a gateway is used, XPipe will tunnel the host address and port over the gateway host to localhost. This requires the gateway SSH server to have port forwarding enabled with `AllowTcpForwarding=yes`.
-
-This functionality is different from jump servers with `ProxyJump` by default. You can, however, use proper jump server behavior as well by designating the gateway system as a jump server in its configuration:
-
 ![](/images/ssh-jump.png)
 
-This might be required in case the jump server is a restricted system where no port forwarding or system shell is available.
+This will use the system as a jump server with `ProxyJump` by default.
+
+As an alternative, e.g. for troubleshooting, you can also disable the jump server usage. Then, XPipe will tunnel the host address and port over the gateway host to localhost. This requires the gateway SSH server to have port forwarding enabled with `AllowTcpForwarding=yes`. The advantage of disabling the jump server usage setting, is that any eventual connection errors are much clearer than with jump servers as XPipe will connect to the gateway system and the target system separately.
 
 This gateway system also supports chained gateways and jump servers. This means that if you set a system as a gateway, which already itself has configured a gateway (and so on), the connection will effectively go through 2 intermediate systems before reaching your target system. To properly make use of chained gateways, make sure that you don't mix between gateways configured as jump servers vs non-jump servers. Either set all gateways to be jump servers or none of them, depending on which gateway type you want to use.
 
@@ -166,7 +194,7 @@ This will import connections from the registry. If your connections are not save
 
 The imported data is not fully complete though. Passwords aren't imported and ppk keys can't be imported due to the format incompatibility.
 
-## .ppk keys
+### .ppk keys
 
 PuTTY has its own non-standard SSH key file format with .ppk files. This poses a challenge as these are not supported by OpenSSH, nor can they be automatically converted to the standardized .pem format. The best that you can do is manually export them into the correct format from PuTTY as shown in the [documentation](https://www.puttygen.com/convert-pem-to-ppk).
 
@@ -184,13 +212,7 @@ This option will show up if VSCode is installed and the SSH connection can be la
 
 ## Windows SSH servers
 
-Since Windows 10, Microsoft has been shipping an OpenSSH client and server with Windows that you can use. You just have to enable the OpenSSH server feature for your Windows installation as shown [here](https://learn.microsoft.com/en-us/windows-server/administration/openssh/openssh_install_firstuse?tabs=gui&pivots=windows-server-2022).
-
-The older Windows 10 OpenSSH server has some issues, which might make the initial connection fail. The server on Windows 11 doesn't have these issues. You might run into errors like `client_loop: send disconnect: Connection reset` or `client_loop: send disconnect: Broken pipe` when establishing a connection for Windows 10 servers.
-
-With older installations, Microsoft ships an old version of SSH as well. This server version, however, has a few bugs which commonly cause issues with SSH clients in general, so also with XPipe. If you are planning on setting up an SSH server on Windows, make sure that your SSH version is relatively recent. Any SSH version of `v9.x` should work fine. If you have an older version installed, you can install the latest version from [here](https://github.com/PowerShell/Win32-OpenSSH/wiki/Install-Win32-OpenSSH).
-
-### Administrator keys
+Since Windows 10, Microsoft has been shipping an OpenSSH client and server with Windows that you can use. You just have to enable the OpenSSH server feature for your Windows installation as shown [here](https://learn.microsoft.com/en-us/windows-server/administration/openssh/openssh_install_firstuse?tabs=gui&pivots=windows-server-2022). On the latest Windows 11 systems, it might already be preinstalled.
 
 If you are planning on configuring key-based authentication for your SSH server instead of just password authentication, note that Windows SSHD has an additional layer of complexity involved when adding authorized keys for users which have administrator privileges. You have to add public keys for these users into a separate `administrators_authorized_keys` file as explained [here](https://learn.microsoft.com/en-us/windows-server/administration/openssh/openssh_keymanagement#administrative-user).
 
