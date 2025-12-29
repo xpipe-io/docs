@@ -169,15 +169,25 @@ If, at a later date, you want to change the passphrase / group secrets of a vaul
 
 You can also delete a user / group. This will perform the same operation with the main difference that all personal / group-only connections will be encrypted with the generic vault key again, meaning that they will be accessible to everyone.
 
-### Considerations
+### Additional considerations
+
+A team vault is essentially just a git repository consisting out of files that are encrypted with various keys. There is no database or other service involved. This introduces a few limitations that it is good to be aware of.
+
+#### Trust
 
 This authentication system for encryption and decryption is not the most complex system you will find when compared to other solutions. It is designed to be relatively simple and robust. Each team member has full control over all connection entries they have been granted access for, meaning that they can modify them, delete them, and inspect the used passwords and keys for them. There is no fine-grained permission system akin to an administrator only granting something like read-only permissions to certain connections. Each team member has to be trusted with the connection access that they are given. If you are looking to minimize possible leaks of secrets in this scenario, using security keys like Yubikeys for server authentication is the best option. This will prevent the possibility of any used private keys being leaked when an individual user's system is compromised.
 
+#### Scaling limits
+
 Furthermore, this vault sync system is not designed for an arbitrary number of users. The maximum amount of users who can share a vault is often limited by git itself. If you have something like 50 users working on one shared vault with the same connections, there will probably be a lot of continuous pushing and pulling going on, including a lot of merge conflicts at some point. The git workflow does not scale well when working on the same data, this is also true for other normal repositories.
 
-#### Workspaces
+### Multiple vaults
 
-A [workspace](guide/workspaces) is a completely separate data storage location, independent of others. It lives in its own directory on your local machine and has its own connections, settings, and vault. For fine-grained access control, like a few team members having access to a few specific connections outside of the normal group borders, you can try using multiple workspaces. In many cases, a separate workspace with a separate sync repository configured is the best option to solve these cases. Separate workspaces also work well when reducing the aforementioned increasing load on git repositories when more and more users start syncing to it.
+A workspace is a completely separate data storage location, independent of others. It lives in its own directory on your local machine and has its own connections, settings, and vault. They can be created in the settings menu:
+
+![](/images/workspaces.png)
+
+For fine-grained access control, like a few team members having access to a few specific connections outside of the normal group borders, you can try using multiple workspaces. In many cases, a separate workspace with a separate sync repository configured is the best option to solve these cases. Separate workspaces also work well when reducing the aforementioned increasing load on git repositories when more and more users start syncing to it.
 
 ### Merge conflicts
 
@@ -189,7 +199,7 @@ In most cases, you won't have to do anything as it can be handled automatically.
 
 ### Example setups
 
-This is how team bald authentication could look like.
+This is how each variant of the team vault authentication could look like for group-based authentication.
 
 ![](/images/group-auth-options.png)
 
@@ -203,7 +213,7 @@ For details on how to use password managers in XPipe, see the [password manager 
 
 If your secret is not stored in a password manager, and instead at the central location with built-in access control like an Azure Key Vault, the command option is probably the right one for you. It will simply execute a command and read the secret from stdout. Assuming that the necessary CLI tools are available on your system, this gives you a lot of flexibility on how and where to retrieve the secret from.
 
-For example, you could follow this [guide to create an Azure Secret Vault](https://learn.microsoft.com/en-us/azure/key-vault/secrets/quick-create-cli) and retrieve the command with the [Azure CLI](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Many CLI tools like the Azure CLI return json output. You can extract the raw values using a tool like [jq](https://jqlang.org/download/). For example, if you create a new key vault called `xpipe-auth-vault` and the secret called `my-group-secret`, you can then pass the secret to XPipe by specifying the following command with the jq extraction for the raw value:
+For example, you could follow this [guide to create an Azure Key Vault](https://learn.microsoft.com/en-us/azure/key-vault/secrets/quick-create-cli) and retrieve the command with the [Azure CLI](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Many CLI tools like the Azure CLI return json output. You can extract the raw values using a tool like [jq](https://jqlang.org/download/). For example, if you create a new key vault called `xpipe-auth-vault` and the secret called `my-group-secret`, you can then pass the secret to XPipe by specifying the following command with the jq extraction for the raw value:
 
 ```bash
 az keyvault secret show --name "my-group-secret" --vault-name "xpipe-auth-vault" | jq -r .value

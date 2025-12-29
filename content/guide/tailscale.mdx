@@ -5,17 +5,13 @@ description: Accessing your tailscale systems
 
 ## Introduction
 
-XPipe supports connecting to your systems that are added to your tailnet in Tailscale. For that it uses the `tailscale` commandline tool. [Searching for available connections](/guide/connection-search) on a system should make tailscale connections show up if the `tailscale` tool is added to the PATH on that system. If you have not installed the `tailscale` tool, you can find installation instructions [here](https://tailscale.com/kb/1080/cli).
+XPipe supports connecting to your systems that are added to your tailnet in Tailscale. For that it uses the `tailscale` commandline tool. [Searching for available connections](/guide/connection-search) on the local system should make tailscale connections show up if the `tailscale` tool is added to the PATH on that system. If you have not installed the `tailscale` tool, you can find installation instructions [here](https://tailscale.com/kb/1080/cli).
 
 ![](/images/tailscale.png)
 
-## Tailscale SSH
+## Daemon
 
-For reference, the tailscale integration of XPipe concerns the [Tailscale SSH feature](https://tailscale.com/kb/1193/tailscale-ssh). Tailscale SSH is a feature where the tailscale daemon also handles authentication and authorization of SSH on your systems. It is a step-up compared to the normal VPN functionality. Any systems that should use this functionality must be added to the tailnet via `tailscale up --ssh`. They will show up with the SSH tag if added correctly:
-
-![](/images/tailscale-ssh.png)
-
-The reason the integration only supports Tailscale SSH is that you can just add systems via SSH normally to XPipe if Tailscale is only handling the networking in the background and not the authentication as well. Just entering the hostname of the system in Tailscale as a normal [SSH connection](/guide/ssh) will make it work as well.
+The local tailscale daemon application must be running for the integration to work. If it is running, it will typically show up in the system tray. If it is not running, you can quickly start the Tailscale application, that will also start the daemon.
 
 ## Tailnets and accounts
 
@@ -25,13 +21,21 @@ You can add multiple accounts to your tailscale client at the same time without 
 
 <Callout type="info">Interacting with multiple tailnets requires a Professional license. Such a setup is typically used for switching between personal and work VPN connections.</Callout>
 
-## Daemon
+### Refreshing connections
 
-The local tailscale daemon application must be running for the integration to work. If it is running, it will typically show up in the system tray. If it is not running, you can quickly start the Tailscale application, that will also start the daemon.
-
-## Refreshing connections
-
-XPipe can automatically refresh all available connections by clicking on the refresh button. This is useful if you recently added or removed systems from the tailnet. For the refresh to succeed, you need to be logged in into your tailnet and your login must not be expired. If you are not logged incorrectly, you will get an error message about that or a login window will popup automatically.
+XPipe can automatically refresh all available connections by clicking on the refresh button. This is useful if you recently added or removed systems from the tailnet. For the refresh to succeed, you need to be logged in into your tailnet and your login must not be expired. If you are not logged incorrectly, you will get an error message about that or a login window will pop up automatically.
 
 <Callout type="info">On a Linux system, tailscale requires root permissions to access all tailnets and accounts. XPipe will prompt you for your sudo password if needed.</Callout>
+
+## Tailscale authentication
+
+You have the choice between two different authentication methods. Either normal SSH auth, where you have to provide your passwords / keys to authenticate, or tailscale auth.
+
+The integrated Tailscale authentication, which is available with the [Tailscale SSH feature](https://tailscale.com/kb/1193/tailscale-ssh), is a feature where the tailscale daemon also handles authentication and authorization of SSH on your systems. It is a step-up compared to the normal VPN functionality. Any systems that should use this functionality must be added to the tailnet via `tailscale up --ssh`. They will show up with the SSH tag if added correctly:
+
+![](/images/tailscale-ssh.png)
+
+You can control which authentication method to use when configuring the tailscale device:
+
+![](/images/tailscale-auth.png)
 
