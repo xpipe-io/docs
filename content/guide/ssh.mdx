@@ -128,13 +128,27 @@ The process of changing the authentication configuration of a system is not alwa
 
 If you are planning to establish connections over another intermediate host, you can use XPipe's gateway feature:
 
-![](/images/ssh-jump.png)
+![](/images/gateway-choice.png)
 
-This will use the system as a jump server with `ProxyJump` by default.
+In the dropdown below, you have the choice between using the gateway via a gateway tunnel or as jump server with `ProxyJump`.
 
-As an alternative, e.g. for troubleshooting, you can also disable the jump server usage. Then, XPipe will tunnel the host address and port over the gateway host to localhost. This requires the gateway SSH server to have port forwarding enabled with `AllowTcpForwarding=yes`. The advantage of disabling the jump server usage setting, is that any eventual connection errors are much clearer than with jump servers as XPipe will connect to the gateway system and the target system separately.
+### Gateway tunnels
 
-This gateway system also supports chained gateways and jump servers. This means that if you set a system as a gateway, which already itself has configured a gateway (and so on), the connection will effectively go through 2 intermediate systems before reaching your target system. To properly make use of chained gateways, make sure that you don't mix between gateways configured as jump servers vs non-jump servers. Either set all gateways to be jump servers or none of them, depending on which gateway type you want to use.
+This is the default setting. XPipe will tunnel the host address and port over the gateway host to localhost. This requires the gateway SSH server to have port forwarding enabled with `AllowTcpForwarding=yes`.
+
+The advantage of not using the usual jump server usage setting is that any eventual connection errors are much clearer than with jump servers as XPipe will connect to the gateway system and the target system separately.
+
+Furthermore, this setting enables you to resolve any DNS names via the gateway system, not from your local machine. In case any address can only be resolved from the gateway system, this setting is required for it to connect successfully.
+
+### Jump servers
+
+This will use the system as a jump server with `ProxyJump`. This option is required if your gateway system is a more restricted system or specially built to only function as a jump server. These kinds of systems often only work with `ProxyJump` as that is usually the standard way of using jump servers. If gateway tunnels do not work, a jump server gateway should.
+
+### Chaining
+
+This gateway system also supports chained gateways and jump servers. This means that if you set a system as a gateway, which already itself has configured a gateway (and so on), the connection will effectively go through 2 intermediate systems before reaching your target system.
+
+To properly make use of chained gateways, make sure that you don't mix between gateways configured as jump servers vs non-jump servers. Either set all gateways to be jump servers or none of them, depending on which gateway type you want to use.
 
 ## Limited / embedded systems
 
