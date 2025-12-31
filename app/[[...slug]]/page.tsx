@@ -8,12 +8,9 @@ import {
 import { notFound } from 'next/navigation';
 import defaultMdxComponents from 'fumadocs-ui/mdx';
 import { Callout } from 'fumadocs-ui/components/callout';
-import { InlineTOC } from 'fumadocs-ui/components/inline-toc';
-import { openapi } from '@/lib/source';
+import {Metadata} from "next/types";
 
-export default async function Page(props: {
-  params: Promise<{ slug?: string[] }>;
-}) {
+export default async function Page(props: PageProps<'/[[...slug]]'>) {
   const params = await props.params;
   const page = source.getPage(params.slug);
   if (!page) notFound();
@@ -29,12 +26,12 @@ export default async function Page(props: {
       owner: 'xpipe-io',
       repo: 'docs',
       sha: 'master',
-      path: `content/${page.file.path}`,
+      path: `content/${page.path}`,
     }}>
       <DocsTitle>{page.data.title}</DocsTitle>
       <DocsDescription>{page.data.description}</DocsDescription>
       <DocsBody>
-        <MDX components={{ ...defaultMdxComponents, Callout, InlineTOC, APIPage: openapi.APIPage }} />
+        <MDX components={{ ...defaultMdxComponents, Callout }} />
       </DocsBody>
     </DocsPage>
   );
@@ -44,18 +41,16 @@ export async function generateStaticParams() {
   return source.generateParams();
 }
 
-export async function generateMetadata(props: {
-  params: Promise<{ slug?: string[] }>;
-}) {
-  const params = await props.params;
-  const page = source.getPage(params.slug);
-  if (!page) notFound();
+export async function generateMetadata(props: PageProps<'/[[...slug]]'>): Promise<Metadata> {
+    const params = await props.params;
+    const page = source.getPage(params.slug);
+    if (!page) notFound();
 
-  return {
-    title: page.data.title,
-    description: page.data.description,
-      openGraph: {
-          url: `/${page.slugs.join('/')}`,
-      },
-  };
+    return {
+        title: page.data.title,
+        description: page.data.description,
+        openGraph: {
+            url: `/${page.slugs.join('/')}`,
+        },
+    };
 }

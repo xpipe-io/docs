@@ -1,5 +1,5 @@
 import './global.css';
-import { RootProvider } from 'fumadocs-ui/provider';
+import { RootProvider } from 'fumadocs-ui/provider/base';
 import { Inter } from 'next/font/google';
 import type { ReactNode } from 'react';
 import {DocsLayout} from "fumadocs-ui/layouts/docs";
@@ -8,12 +8,14 @@ import {baseOptions} from "@/app/layout.config";
 import { Analytics } from "@vercel/analytics/react";
 import {Viewport} from "next";
 import { baseUrl, createMetadata } from '@/lib/metadata';
+import {Metadata} from "next/types";
+import {NextProvider} from "fumadocs-core/framework/next";
 
 const inter = Inter({
   subsets: ['latin'],
 });
 
-export const metadata = createMetadata({
+export const metadata: Metadata = createMetadata({
     title: {
         template: '%s | XPipe Docs',
         default: 'XPipe Docs',
@@ -34,11 +36,13 @@ export default function Layout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" className={inter.className} suppressHydrationWarning>
       <body className="flex flex-col min-h-screen">
+      <NextProvider>
         <RootProvider>
             <DocsLayout tree={source.pageTree} {...baseOptions}>
                 {children}
             </DocsLayout>
         </RootProvider>
+      </NextProvider>
         <Analytics />
       </body>
     </html>
