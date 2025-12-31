@@ -5,18 +5,13 @@ description: Accessing systems via SSH
 
 ## Introduction
 
-The SSH integration in XPipe is a core component as most remote connections to your servers are probably going to use SSH. The SSH integration in XPipe basically supports all the functionality of your command-line OpenSSH client, and you don't have to get used to anything new.
+The SSH integration in XPipe is a core component as most remote connections to your servers are probably going to use SSH.
 
 ![](/images/ssh.png)
 
-## Your SSH client
+When establishing connections, XPipe delegates any form of connection and shell handling to your existing command-line SSH client available in the `PATH`, which is most likely the OpenSSH client. Therefore, the capabilities of the SSH integration depend on your installed SSH client.
 
-When establishing connections, XPipe delegates any form of connection and shell handling to your existing command-line SSH client available in the `PATH`. XPipe does not come with any remote handling capabilities of its own. Therefore, the capabilities and security of the established SSH connection depend on your installed SSH client.
-
-If, for example, your ssh command-line client is outdated and does not support certain features, then XPipe can't support these as well. This can concern newly introduced SSH config options or new key exchange methods that are only available in the latest SSH versions. If you want to make use of such features, make sure to upgrade your installed OpenSSH client on your local system.
-
-If your client is outdated and susceptible to newly discovered exploits or vulnerable in any other way, there is no way for XPipe to guarantee that data can be transferred securely. It is your responsibility to use external programs that XPipe interacts with in a secure environment and keep them up to date with security patches and more. Connections established with XPipe can only be as secure as your underlying command-line SSH client itself. Always make sure to upgrade your installed packages.
-
+If, for example, your `ssh` command-line client is outdated and does not support certain features, then XPipe can't support these as well. This can concern newly introduced SSH features like hardware security key support or new key exchange methods that are only available in the latest SSH versions. If you want to make use of such features, make sure to upgrade your installed OpenSSH client on your local system.
 
 ## Key-based authentication
 
