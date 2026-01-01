@@ -27,8 +27,6 @@
     "guide/python-api",
     "---Integrations---",
     "guide/ssh",
-    "guide/ssh-config",
-    "guide/ssh-tunnels",
     "guide/docker",
     "guide/proxmox",
     "guide/aws",

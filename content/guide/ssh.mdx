@@ -13,81 +13,107 @@ When establishing connections, XPipe delegates any form of connection and shell 
 
 If, for example, your `ssh` command-line client is outdated and does not support certain features, then XPipe can't support these as well. This can concern newly introduced SSH features like hardware security key support or new key exchange methods that are only available in the latest SSH versions. If you want to make use of such features, make sure to upgrade your installed OpenSSH client on your local system.
 
-## Key-based authentication
+## Adding connections
+
+There are multiple different ways of adding SSH connections.
+
+If you are already using an SSH config, you can use the connection entry is defined in it in XPipe by [searching for available connections](/guide/connection-search) on the local machine.
+
+If you are using PuTTY, see the [PuTTY section](#putty) on how to import connections from there.
+
+If you are using something like tailscale or netbird, see the [tailscale docs](/guide/tailscale) or [netbird docs](/guide/netbird) on how to list all systems automatically.
+
+If most of your servers are hosted at a supported cloud provider like [aws](/guide/aws) or [Hetzner](/guide/hcloud), see the respective docs.
+
+If you want to add devices in your network, see the network scan feature at `New` -> `Network scan`.
+
+In any other case, you can add new SSH connections at `New` -> `Remote host`.
+
+## Configuration
+
+The configuration starts with supplying the address. For various types of connections, this is already automatically filled, e.g. when using a cloud provider. On the right of the address field, you can add multiple different addresses to be able to quickly switch between later on.
+
+The next part is the identity, which consists out of the username, optional password, and an optional key. You can either specify these authentication details for this connection only in-place, or also create a new reusable identity with the button to the right of the username field. These identities can then be assigned to other connections as well.
+
+![](/images/ssh-configuration.png)
+
+### Password authentication
+
+To supply a password for the SSH authentication, you can choose out of multiple different password types:
+
+![](/images/ssh-passwords.png)
+
+Selecting none will disable password authentication. You can choose to specify a password in-place, it is then stored in the [XPipe vault](/reference/security#managed-secrets). Alternatively, you can choose to supply the password at runtime, meaning that XPipe will ask you for the password on the first login. For a more managed approach, you can also retrieve passwords from your password manager. See the [password manager](/guide/password-manager) documentation on how to configure this. The last option gives you the ability to run a custom command to retrieve the password, which can be useful if you have a self-built system for passwords.
+
+### Key-based authentication
 
 XPipe supports all established key-based authentication methods for SSH:
 
 ![](/images/ssh-keys.png)
 
-### None
+By default, your selection will override any external sources. If you have a local SSH agent running, XPipe will prevent it from supplying its keys unless you select the agent option here. This is to guarantee reliability when authenticating.
 
-If selected, XPipe will not supply any identities. This will also prevent any external sources like agents from providing keys.
+Many key selections also support passphrases. For passphrases, you have the same retrieval options as for passwords.
 
-### Key file
+XPipe supports all types of keys, including FIDO2.
 
-You can also specify a key file with an optional passphrase.
-This option is the equivalent of `ssh -i <file>`.
-All kinds of keys, including FIDO2, are supported.
+#### Key
 
-Note that you should select the *private* key, not the public one.
-If you mix that up, ssh will only give you cryptic error messages.
+With this option, you can store a private key in text form in the XPipe vault. With the keygen button at the right, you can also create new keys to store here.
 
-You also have to specify any potential passphrase the key has. If you want to enter the passphrase manually, you can choose the prompt option for the passphrase.
+#### Local key file
 
-### OpenSSH agent
+You can also specify a key file. This option is the equivalent of `ssh -i <file>`.
 
-In case your identities are stored in the SSH-Agent, the ssh executable can use them if the agent is started. The agent socket is retrieved from the environment variables passed to XPipe or set in the local shell init files. On Windows, XPipe will automatically start the agent process if it is not running yet.
+#### OpenSSH agent
 
-Note that XPipe attempts to use the OpenSSH agent if it can find it. If you are using any other agent, for example from a password manager, you can use the custom SSH agent option instead.
+In case your identities are stored in the OpenSSH agent, XPipe can automatically use them if the agent is correctly configured in the environment. The agent socket location is retrieved from the environment variables passed to XPipe or set in the local shell init files.
 
-### Custom agent
+On Windows, XPipe will automatically start the agent process if it is not running yet. On other operating systems, you have to ensure that the agent is running.
+
+If you are using any other agent, for example from a password manager, you can use the custom SSH agent option instead.
+
+#### Custom agent
 
 On Linux and macOS, you will also have access to the custom agent option as on these systems, any custom agent will use a different location for the socket. The custom socket location can be configured in the settings menu:
 
 ![](/images/ssh-agent-custom.png)
 
-If you are using a password manager with an SSH agent functionality, you can choose to use it here. XPipe will verify it doesn't conflict with any other agent configuration. XPipe, however, can't start this agent by itself, you have to ensure that it is running.
+If you are using a password manager with an SSH agent functionality, you can choose to use it here. XPipe will verify that it doesn't conflict with any other agent configuration. XPipe, however, can't start this agent by itself, you have to ensure that it is running.
 
 For more information, see [password manager page](guide/password-managers).
 
-### GPG Agent
+#### GPG Agent
 
-If you have configured a smartcard with GPG keys that support authentication, you can choose to provide them to the SSH client via the `gpg-agent`.
-This option requires GPG to be installed on your local system and will automatically enable SSH support of the agent if not enabled yet and restart the GPG agent daemon with the correct settings.
+If you have configured GPG keys that support authentication, you can choose to provide them to the SSH client via the `gpg-agent`.
+
+This option requires `gpg` to be installed on your local system. XPipe will automatically enable SSH support for the gpg agent if not enabled yet and restart the gpg agent daemon with the correct settings.
 
 This option will only show up if you have the GPG agent installed on your local system.
 
-### Pageant
+#### Pageant
 
-In case you are using pageant on Windows, XPipe will check whether pageant is running first.
-Due to the nature of pageant, it is your responsibility to have it
-running as you manually have to specify all keys you would like to add every time.
-If it is running, XPipe will pass the proper named pipe via
-`-oIdentityAgent=...` to ssh, you don't have to include any custom config files.
+Pageant is the agent of PuTTY. If you have a lot of keys stored in the .ppk format, this option might bridge the incompatibilities between .ppk keys and OpenSSH. For more details, see the [PuTTY section](#putty).
 
-On Linux and macOS, in case your identities are stored in pageant, the ssh executable can use them if the agent is started.
-XPipe will automatically start the agent process if it is not running yet and pass the socket to SSH.
+On Windows, due to the nature of pageant, it is your responsibility to have it running correctly as you manually have to specify all keys you would like to add every time it starts. If it is running, XPipe will pass the proper named pipe via `-oIdentityAgent=...` to ssh, you don't have to include any custom config files.
+
+On Linux and macOS, in case your identities are stored in pageant, the ssh executable can use them if the agent is started. XPipe will automatically start the agent process if it is not running yet and pass the socket to SSH.
 
 This option will only show up if you have pageant installed on your local system.
 
-### Yubikey PIV
+#### Yubikey PIV
 
-If your identities are stored with the PIV smartcard function of the Yubikey, you can retreive
-them with Yubico's YKCS11 library, which comes bundled with [Yubico PIV Tool](https://developers.yubico.com/yubico-piv-tool/).
+If your identities are stored with the PIV smartcard function of the Yubikey, you can retreive them with Yubico's YKCS11 library, which comes bundled with [Yubico PIV Tool](https://developers.yubico.com/yubico-piv-tool/).
 
-Note that you also need an up-to-date build of OpenSSH in order to use this feature as this is a relatively recent feature not supported in older versions.
-
-### Custom PKCS#11 library
+#### Custom PKCS#11 library
 
 This will instruct the OpenSSH client to load the specified shared library file, which will handle the authentication.
 
-Note that you need an up-to-date build of OpenSSH in order to use this feature.
-
-### Other external agent
+#### Other external agent
 
 This option will permit any external running identity provider to supply its keys to the SSH client. You should use this option if you are using a password manager agent on Windows or any other agent to manage your SSH keys. XPipe will not interact with any external agent in this case, it will just allow any program to supply keys to the SSH client. You will have to make sure that the agent you want to use is running beforehand and configured correctly.
 
-## Generating keys
+### Generating keys
 
 If you don't have an existing key at hand and instead want to configure a new key for a system to authenticate with, you can create one in the keygen menu, which you can find at the keygen button:
 
@@ -99,7 +125,7 @@ This will open a dialog where you can configure the generation parameters for a 
 
 Once the key is generated, it will be automatically placed in the open connection configuration.
 
-## Public key handling
+### Public key handling
 
 While you only need a private key for authentication, keeping track of the associated public keys is important as well. Especially when you want to add this keypair as an authorized key to another system. You can automatically generate and store the public key for any supplied private key automatically with the generate button in the public key field:
 
@@ -107,7 +133,7 @@ While you only need a private key for authentication, keeping track of the assoc
 
 This might prompt you for your passphrase if the key has one.
 
-## Applying identities
+### Applying identities
 
 When you create an identity entry that includes your keys, you can apply this identity automatically to a system:
 
@@ -119,7 +145,7 @@ The process of changing the authentication configuration of a system is not alwa
 
 ![Identity Apply Dialog](/images/id-apply-dialog.png)
 
-## Gateways and jump servers
+### Gateways and jump servers
 
 If you are planning to establish connections over another intermediate host, you can use XPipe's gateway feature:
 
@@ -127,7 +153,7 @@ If you are planning to establish connections over another intermediate host, you
 
 In the dropdown below, you have the choice between using the gateway via a gateway tunnel or as jump server with `ProxyJump`.
 
-### Gateway tunnels
+#### Gateway tunnels
 
 This is the default setting. XPipe will tunnel the host address and port over the gateway host to localhost. This requires the gateway SSH server to have port forwarding enabled with `AllowTcpForwarding=yes`.
 
@@ -135,17 +161,17 @@ The advantage of not using the usual jump server usage setting is that any event
 
 Furthermore, this setting enables you to resolve any DNS names via the gateway system, not from your local machine. In case any address can only be resolved from the gateway system, this setting is required for it to connect successfully.
 
-### Jump servers
+#### Jump servers
 
 This will use the system as a jump server with `ProxyJump`. This option is required if your gateway system is a more restricted system or specially built to only function as a jump server. These kinds of systems often only work with `ProxyJump` as that is usually the standard way of using jump servers. If gateway tunnels do not work, a jump server gateway should.
 
-### Chaining
+#### Chaining
 
 This gateway system also supports chained gateways and jump servers. This means that if you set a system as a gateway, which already itself has configured a gateway (and so on), the connection will effectively go through 2 intermediate systems before reaching your target system.
 
 To properly make use of chained gateways, make sure that you don't mix between gateways configured as jump servers vs non-jump servers. Either set all gateways to be jump servers or none of them, depending on which gateway type you want to use.
 
-## Limited / embedded systems
+### Limited / embedded systems
 
 XPipe works by detecting the shell type of the connection and then interacting with the active shell. This approach only works, however, when the shell type is known and supports a certain number of actions and commands. All common shells like `bash`, `cmd`, `powershell`, and more, are supported. If you are connecting to a system that does not run a known command shell, e.g., a router, link, or some other embedded device, XPipe will be unable to detect the shell type and error out after some time.
 
@@ -154,6 +180,136 @@ To work around these cases, you can explicitly designate a system as such:
 ![](/images/ssh-limited.png)
 
 When this setting is enabled, XPipe will not attempt to identify the shell type and launch the shell as-is. This allows you to open the connection without errors, but many features, e.g., the file browser, scripting, subconnections, and more, will not be supported for this connection.
+
+### X11 Forwarding
+
+XPipe supports X11 forwarding for SSH connections. You can enable this in the advanced SSH configuration for a connection:
+
+![](/images/ssh-x11.png)
+
+When this option is enabled, the SSH connection will be started with X11 forwarding set up. On Linux, this will usually work out of the box and does not require any setup. On macOS, you need an X11 server like [XQuartz](https://www.xquartz.org/) to be running on your local machine.
+
+#### X11 on Windows
+
+XPipe allows you to use the WSL2 X11 capabilities for your SSH connection. The only thing you need for this is a [WSL2](https://learn.microsoft.com/en-us/windows/wsl/install) distribution installed on your local system. XPipe will automatically choose a compatible installed distribution if possible, but you can also use another one in the settings menu:
+
+![](/images/ssh-x11-settings.png)
+
+This means that you don't need to install a separate X11 server on Windows. However, if you are using one already, XPipe will detect and use the currently running X11 server.
+
+#### X11 connections as desktops
+
+Any SSH connection that has X11 forwarding enabled can be used as a desktop host. This means that you can launch desktop applications and desktop environments through this connection. When any desktop application is launched, this connection will automatically be started in the background to start the X11 tunnel.
+
+For more information, see the [desktop applications page](/guide/desktop-applications).
+
+## Config files
+
+XPipe fully supports using connections defined in SSH config files. In contrast to many other tools, this is not an import functionality where the config data is converted to internal data. Instead, the config file stays the backing store of the connection information. Any changes you make later on will be reflected in XPipe upon refresh.
+
+![](/images/ssh-config.png)
+
+Your local SSH configs apply to all SSH connections in XPipe, even if your config file is not added to XPipe or you created SSH connections within XPipe itself. This is important to keep in mind in case any wildcard options defined in your local config file affect other unrelated SSH connections in XPipe.
+
+### Adding files
+
+XPipe can load all hosts and apply all settings that you have configured in the selected file. By specifying a configuration option on either a global or host-specific basis, it will automatically be applied to the connection established by XPipe.
+
+[Searching for available connections](/guide/connection-search) on a system will automatically add the default SSH config file at `~/.ssh/config` if it exists. You can also add configs from other locations at `New -> Remote Host -> SSH config file`. XPipe supports wildcard definitions and include statements of other files as well, meaning that you will get a one-to-one application of your entire config in XPipe. It is exactly applied as it would if you use the `ssh` command-line client.
+
+If you want to learn more about how to use SSH configs, you can use `man ssh_config` or read this [guide](https://www.ssh.com/academy/ssh/config).
+
+### Text-based connections
+
+If you want to create a fully customized SSH connection with more options than you can find in the simple SSH connection creation dialog, you can take a look at customized SSH connections. These allow you to specify an SSH connection in-place using the SSH config syntax you know. It is essentially a way to create SSH config connections without having to go through dealing with creating config files. This is recommended if you are an advanced user and know what you're doing.
+
+Note that most features can be realized through [simple SSH connections](/guide/ssh) already. Things like ProxyJump chains, additional SSH options, and more can already be used with simple SSH connection entries. Custom SSH connections are only really necessary for very specific use cases.
+
+#### Format
+
+You can specify connection details just as in an SSH config. The main difference is that you don't need to include an explicit host declaration. For example, the following definitions are semantically equivalent:
+
+```
+User user
+HostName example.com
+```
+
+```
+Host myhost
+    User user
+    HostName example.com
+```
+
+#### Identities
+
+Note that you can also specify an `IdentityFile` option in here. If any identity is specified in here, any otherwise specified identity later down below will be ignored.
+
+#### X11 forwarding
+
+If any options for X11 forwarding are specified here like `ForwardX11`, XPipe will automatically attempt to set up X11 forwarding. For more information. see TODO.
+
+#### Jump hosts
+
+You can also define multiple hosts if you need additional hosts to be used for certain options like `ProxyJump`. For example, you can also define the following 2 hosts for a custom SSH connection:
+
+```
+Host myhost
+    User user
+    HostName example.com
+    ProxyJump jump
+
+Host jump
+    User jumpuser
+    HostName jump.example.com
+```
+
+In the case of multiple host definitions, XPipe will always choose the first one as the target host. Therefore, you have to take care of providing the hosts in the correct order, otherwise it will try to connect to an intermediate host. In this case, the ProxyJump option does not need the hosts to be defined in order.
+
+![](/images/ssh-order.png)
+
+Note that it is recommended to use a proper SSH config file for ProxyJump chains like this as it is not possible for custom SSH connections to specify multiple different authentication credentials. Custom SSH connections are therefore mostly intended for simpler types of hosts and not complex jump chains.
+
+### Adding SSH options
+
+Simple SSH connections can be augmented with SSH config options if needed. This bridges the gap between basic SSH connections and fully custom SSH connections, which might be overkill for some cases. If you are just looking to add a simple option for a connection, like accepting a deprecated host key algorithm, you can add this in the advanced configuration:
+
+![](/images/ssh-options.png)
+
+Similar to custom SSH connections, you don't need to specify a `Host` header, only the raw options itself.
+
+One common case for this is to, for example, allow deprecated SSH algorithms that are still used by older servers but not accepted by newer clients. To add the old `ssh-rsa` algorithm for a server, you can add the `HostKeyAlgorithms +ssh-rsa` option.
+
+## Tunnels
+
+You have full access to SSH tunnel capabilities in XPipe. You are able to create local, remote, and dynamic tunnels that can be toggled on/off at any time. Tunnels can be created for any SSH-based connections. This includes VM connections, tailscale connections, teleport connections, and more.
+
+![](/images/ssh-tunnels-menu.png)
+
+![](/images/ssh-tunnels.png)
+
+### Local tunnels
+
+If you are looking for a more user-friendly experience for tunnels, check out [services](/guide/services) instead. Raw SSH local tunnels it only makes sense to use instead of services if you want to use more advanced tunnel bindings.
+
+![](/images/ssh-tunnel-local.png)
+
+The binding information you provide is passed straight to the `ssh` client as follows: `-L [origin_address:]origin_port:remote_address:remote_port`. By default, the origin will bind to the loopback interface if not specified otherwise. You can also make use of any address wildcards, e.g. setting the address to `0.0.0.0` in order to bind to all network interfaces accessible via IPv4. When you completely omit the address, the wildcard `*`, which allows connections on all network interfaces, will be used. Note that some network interfaces notation might not be supported on all operating systems. Windows servers for example don't support the wildcard `*`.
+
+### Remote tunnels
+
+Remote tunnels cannot be instantiated via any other means like services, so if you're looking to create one, you will have to use the remote tunnels.
+
+![](/images/ssh-tunnel-remote.png)
+
+The binding information you provide is passed straight to the `ssh` client as follows: `-R [remote_source_address:]remote_source_port:origin_destination_address:origin_destination_port`. By default, the remote source address will bind to the loopback interface. You can also make use of any address wildcards, e.g. setting the address to `0.0.0.0` in order to bind to all network interfaces accessible via IPv4. When you completely omit the address, the wildcard `*`, which allows connections on all network interfaces, will be used. Note that some network interfaces notation might not be supported on all operating systems. Windows servers for example don't support the wildcard `*`.
+
+### Dynamic tunnels
+
+Dynamic tunnels set up a connection that will forward traffic to a remote server, irrespective of the destination port. You can effectively use it as a [SOCKS5](https://en.wikipedia.org/wiki/SOCKS) proxy server.
+
+![](/images/ssh-tunnel-dynamic.png)
+
+The binding information you provide is passed straight to the `ssh` client as follows: `-D [address:]port`. By default, the address will bind to the loopback interface. You can also make use of any address wildcards, e.g. setting the address to `0.0.0.0` in order to bind to all network interfaces accessible via IPv4. When you completely omit the address, the wildcard `*`, which allows connections on all network interfaces, will be used. Note that some network interfaces notation might not be supported on all operating systems. Windows servers for example don't support the wildcard `*`.
 
 ## SFTP sessions
 
@@ -168,28 +324,6 @@ You can see in the tab name whether you are using an SFTP session or not:
 ![](/images/sftp-tabs.png)
 
 Note that SFTP sessions are limited compared to shell-based sessions in terms of features as no commands can be executed.
-
-## X11 Forwarding
-
-XPipe supports X11 forwarding for SSH connections. You can enable this in the advanced SSH configuration for a connection:
-
-![](/images/ssh-x11.png)
-
-When this option is enabled, the SSH connection will be started with X11 forwarding set up. On Linux, this will usually work out of the box and does not require any setup. On macOS, you need an X11 server like [XQuartz](https://www.xquartz.org/) to be running on your local machine.
-
-### X11 on Windows
-
-XPipe allows you to use the WSL2 X11 capabilities for your SSH connection. The only thing you need for this is a [WSL2](https://learn.microsoft.com/en-us/windows/wsl/install) distribution installed on your local system. XPipe will automatically choose a compatible installed distribution if possible, but you can also use another one in the settings menu:
-
-![](/images/ssh-x11-settings.png)
-
-This means that you don't need to install a separate X11 server on Windows. However, if you are using one already, XPipe will detect and use the currently running X11 server.
-
-### X11 connections as desktops
-
-Any SSH connection that has X11 forwarding enabled can be used as a desktop host. This means that you can launch desktop applications and desktop environments through this connection. When any desktop application is launched, this connection will automatically be started in the background to start the X11 tunnel.
-
-For more information, see the [desktop applications page](/guide/desktop-applications).
 
 ## PuTTY
 
