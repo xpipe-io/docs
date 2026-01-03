@@ -5,15 +5,17 @@ description: Tunneling or opening remote services
 
 ## Introduction
 
-The service integration is a core component of XPipe. It is essentially a way to open and securely tunnel any kind of remote ports to your local machine over an existing shell connection. In most cases, these shell connections are SSH-based, so XPipe will use the tunneling features of SSH to establish these tunnels. In some other cases, it tries to do the same using other tools if they support it. You can also choose to not tunnel a remote service port and instead just open it normally, for example, in your web browser.
+The service integration is a core component of XPipe. It is essentially a way to open and securely tunnel any kind of remote ports to your local machine over an existing shell connection. In most cases, these shell connections are SSH-based, so XPipe will use the tunneling features of SSH to establish these tunnels. In some other cases, it tries to do the same using other tools if they support it.
+
+Once a tunnel is established, you can choose how to open it as well. For example, in your web browser if you tunneled an HTTP service.
 
 ![](/images/service.png)
 
 ## Tunnels
 
-If you have not used SSH tunnels before, it can be explained quite simple. You have a remote application running on a server on `localhost:8080` and you want to access this service in your local web browser. If you don't want to make this service public or open its port, you can use a tool like SSH to build a tunnel that forwards any local requests from a local port to this remote port. If you, for example, map the local port `5000` to that remote port `8080`, you will have access to that service in your local web browser at `localhost:5000` as long as the tunnel is active.
+If you have not used SSH tunnels before, it can be explained quite simple. You have a remote application running on a server on `localhost:8080` and you want to access this service in your local web browser. Since this service is only listening on localhost in this case, you can't reach it from the outside (which is a good thing by default). If you don't want to make this service public or open its port, you can use a tool like SSH to build a tunnel that forwards any local requests from a local port to this remote port. If you, for example, map the local port `5000` to that remote port at `localhost:8080`, you will have access to that service in your local web browser at `localhost:5000` as long as the tunnel is active.
 
-Compared to raw SSH tunnels, which are also supported in XPipe like this, the added benefit of services is that:
+Compared to raw SSH tunnels, which are also supported in XPipe, the added benefit of services is that:
 
 - Many service ports, like the ones in containers, are detected and added automatically
 - It supports chained tunnels. E.g., if you are using a gateway or multiple hops, XPipe will automatically chain tunnels together
@@ -25,7 +27,7 @@ But deep down, services are just regular tunnels managed by XPipe.
 
 ## Configuration
 
-You can create a new service manually at `New` -> `Service ...`. You can configure the necessary service information plus a few additional properties. The exact configuration options depend on how you intend to use the service: Tunnel a remote port on an existing host to your local machine or just open a remote service without tunneling involved. Whether you have control over the tunneling settings depends on the nature of the service and whether there is a gateway involved or not.
+You can create a new service manually at `New` -> `Service ...`. You can configure the necessary service information plus a few additional properties. Which configuration options are available depends on how you intend to use the service: Tunnel a remote port on an existing host to your local machine or just open a remote service without tunneling involved. Whether you have control over the tunneling settings depends on the nature of the service and whether there is a gateway involved or not.
 
 Here is how tunneling a remote HTTP service port for an existing host would look like:
 
@@ -47,5 +49,5 @@ Many integrations, for example docker, support automatically adding all availabl
 
 ![](/images/services.png)
 
-They just work as normal services and are automatically updated on refresh.
+They just work as normal services and are automatically updated on refresh. To detect services for a container, click on the `Add services` button for the container entry.
 

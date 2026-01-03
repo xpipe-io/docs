@@ -7,38 +7,38 @@ description: Synchronizing connection data cross multiple systems
 
 XPipe can synchronize all connection configuration data across multiple installations. It uses your own remote Git repository for that purpose. You can synchronize with this repository in all XPipe application instances. Every change you make in one instance will be reflected in the repository. This approach means that you have full control over your data, as you can freely choose how and where to host this repository.
 
-First of all, you need to create a remote repository with your Git provider of choice. This repository must be private. Next, copy and paste the URL into the XPipe remote repository setting.
+## Setup
 
-![sync](/images/sync.png)
+To start off, you need to create an empty git repository with your git provider of choice. This repository should be private:
+
+![](/images/github-create.png)
+
+Next, copy and paste the URL into the XPipe remote repository setting:
+
+![](/images/sync.png)
+
+You can check if the configuration works by clicking on the `Test` button.
 
 <Callout type="warn">Ensure that your repository visibility is set to private to prevent data leakage.</Callout>
 
-<Callout type="info">You don't have to link a remote repository. Just enabling git sync without one will create and maintain a local repository. This can be useful if you're looking for having a local history.</Callout>
+<Callout type="info">You don't have to link a remote repository. Just enabling git sync without one will create and maintain a local repository. This can be useful if you're just looking for having a local history.</Callout>
 
-You also need to have a locally installed `git` client ready on your local machine. You can try running `git --help` in a local terminal to check.
-If you don't have one, you can visit [https://git-scm.com](https://git-scm.com/) to install git.
+You also need to have a locally installed `git` client ready on your local machine. You can try running `git --help` in a local terminal to check. If you don't have one, you can visit [https://git-scm.com](https://git-scm.com/) to install git.
 
-## Authentication
+There are multiple ways to authenticate. Most repositories use the git over HTTPS scheme where you have to specify a username and password / token. Some providers also support the SSH protocol, which is supported as well by XPipe.
 
-There are multiple ways to authenticate. Most repositories use HTTPS where you have to specify a username and password.
-Some providers also support the SSH protocol, which is also supported by XPipe.
-If you use an SSH URL for git, you probably know how to configure it, so this section will cover HTTPS only.
+### Password / token auth
 
-You need to set up your git CLI to be able to authenticate with your remote git repository via HTTPS. There are multiple ways to do that.
-You can check if that is already done by clicking on the `Test` button below the remote repository URL in XPipe.
+For the usual password / token authentication when using an HTTPS git URL, you will need to provide credentials. If no credentials are configured, XPipe will ask you for your credentials when they are required. If you have already configured your git CLI to store your credentials, then XPipe should pick them up automatically. If you haven't done that yet, you probably don't want to enter your credentials every single time in XPipe.
 
-### Credentials
-
-If no credentials are configured, XPipe will ask you for your credentials on startup. To automate this, there are multiple ways to store your git credentials and handle authentication.
-
-Many special tools like the [GitHub CLI](https://cli.github.com/) handle the whole authentication automatically for you when installed.
+To automate the authentication process in the git CLI in general, there are multiple ways to store your git credentials and handle authentication. Many special tools like the [GitHub CLI](https://cli.github.com/) handle the whole authentication automatically for you when installed.
 Some newer git client versions can also authenticate via special web services where you just have to log in into your account in your browser.
 These approaches will store your credentials for your git client using a credential helper.
 For more information, see:
-- [git credential helpers](https://git-scm.com/doc/credential-helpers)
 - [GitHub credential manager](https://docs.github.com/en/get-started/getting-started-with-git/caching-your-github-credentials-in-git)
+- [git credential helpers](https://git-scm.com/doc/credential-helpers)
 
-Alternatively, if no credentials are configured for your local git client yet, you have the option to specify them in XPipe itself:
+Alternatively, if no credentials are configured for your local git client yet, you have the option to specify them in XPipe itself without making them available to the entire git CLI client:
 
 ![](/images/sync-auth.png)
 
@@ -48,14 +48,26 @@ You can find common PAT pages here:
 - **GitLab**: [Personal access token](https://docs.gitlab.com/ee/user/profile/personal_access_tokens.html)
 - **BitBucket**: [Personal access token](https://support.atlassian.com/bitbucket-cloud/docs/access-tokens/)
 - **Gitea**: `Settings -> Applications -> Manage Access Tokens section`
-Set the token permission for repository to Read and Write. The rest of the token permissions can be set as Read. XPipe just needs enough permissions to commit changes to the private vault repository.
+Set the token permission for repository to Read and Write. The rest of the token permissions can be set as Read. XPipe just needs enough permissions to commit changes to the private repository.
 
-If everything works out, XPipe should push an initial commit to your remote repository.
+### SSH auth
+
+As an alternative to this password / token authentication, git also supports the SSH protocol. With such a setup, you can authenticate to your remote git repository using an SSH key. For this, you can use the full functionality of XPipe's key handling, including advanced key retrieval methods such as agents. XPipe will automatically detect if you enter an SSH git URL and show additional options for authentication:
+
+![](/images/sync-ssh.png)
+
+You can find common SSH docs pages here:
+- **GitHub**: [Adding a new SSH key to your GitHub account](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account)
+- **GitLab**: [Use SSH keys to communicate with GitLab](https://docs.gitlab.com/user/ssh/)
+- **BitBucket**: [Provide Bitbucket Cloud with your public key](https://support.atlassian.com/bitbucket-cloud/docs/set-up-personal-ssh-keys-on-windows/#Provide-Bitbucket-Cloud-with-your-public-key)
+
+### First commits
+
+If everything works out, XPipe should push an initial commit to your remote repository once you restart XPipe with a valid git configuration.
+
+By default, no connection categories are set to sync so that you have explicit control on what connections to sync. So at the start, your remote repository will be empty, which is intentional. You can start syncing connections and categories by marking them explicitly to sync.
 
 ## Syncing categories
-
-By default, no connection categories are set to sync so that you have explicit control on what connections to commit.
-So at the start, your remote repository will be empty.
 
 To have your connections of a category put inside your git repository, you first need to change its sync configuration.
 In your `Connections` tab under the category overview on the left side, you can open the category configuration menu either by right-clicking the category or click on the `⚙️` icon when hovering over the category, and then clicking on the `🔧` configure button.
@@ -70,13 +82,11 @@ The sync settings for a category are inherited by default from its parent if not
 
 ## Adding files to git
 
-When everything is set up, you have the option to add any additional files such as SSH keys to git as well.
-Next to every file choice is a git button that will add the file to the git repository.
+When everything is set up, you have the option to add any additional files such as SSH keys, identities, and various other data files to git as well. Next to every file chooser is a git button that will add the file to the git repository:
 
 ![sync-file](/images/sync-file.png)
 
-These files are then added to the git vault data directory and committed in encrypted form.
-This means that any files you add to git, such as keys, are only committed encrypted just as other secrets.
+These files are then added to the git vault data directory and committed in encrypted form. This means that any files you add to git, such as keys, are only committed in encrypted form just as other secrets.
 
 ## Local connections
 
@@ -86,7 +96,9 @@ Certain connections that are based on a local file, for example, SSH configs, ca
 
 ## GPG signing
 
-If you have enabled GPG signing of your git commits, then this should work as expected. The only more complicated case is on Windows where you can have potentially two `gpg` executables with the git bash gpg and the native [Gpg4win](https://www.gpg4win.org/) executable. By default, XPipe will choose the gpg client which has keys configured in it, under the assumption that you only use one of the two clients. If you switch between using both gpg clients, make sure that your git GPG key is available in gpg4win, as this client will be used if both clients have keys added.
+If you have enabled GPG signing of your git commits, then this should work as expected as XPipe use this the same configuration as your git CLI that you normally use.
+
+The only more complicated case is on Windows where you can have potentially two `gpg` executables with the git bash gpg and the native [Gpg4win](https://www.gpg4win.org/) executable. By default, XPipe will choose the gpg client which has keys configured in it, under the assumption that you only use one of the two clients. If you switch between using both gpg clients, make sure that your git GPG key is available in gpg4win, as this client will be used if both clients have keys added.
 
 ## Local repositories
 
@@ -144,6 +156,8 @@ Each member has their own passphrase to either remember or stored in a password 
 #### Group-based authentication
 
 Each member can be assigned a group, which requires a group secret to unlock. With vault groups, this secret can be queried automatically, e.g. via commands, HTTP requests, password manager, and more. It is essentially the right type of authentication for larger teams where an organization administrator can configure the group assignments from a central location.
+
+It is essentially what many people refer to as role-based access control (RBAC), however, that name was not chosen, to distinguish it from that as each member can only be a member of one group. There is not a flexible system of multiple roles that can be assigned to each user.
 
 That administrator can, for example, hook up the vault authentication to an Azure Key Vault and manage access via Azure Active Directory permissions and the Azure CLI.
 

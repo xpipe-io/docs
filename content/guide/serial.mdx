@@ -24,25 +24,25 @@ If that check is successful, the selected tool will launch.
 
 The notation for serial ports depends on the operating system of the target system.
 
-## Windows
+### Windows
 
 On Windows systems you typically refer to serial ports via `COM<index>`.
 XPipe also supports just specifying the index without the `COM` prefix.
 To address ports greater than 9, you have to use the UNC path form with `\\.\COM<index>`.
 
-## WSL
+### WSL
 
 If you have a WSL1 distribution installed, you can also reference the serial ports from within the WSL distribution via `/dev/ttyS<index>`.
 This does not work with WSL2 though, only WSL1 distributions support this.
 If you have a WSL1 distribution installed, you can use it as the host for this serial connection and use the tty notation to access it with XPipe.
 
-## Linux
+### Linux
 
 On Linux systems you can typically access the serial ports via `/dev/ttyS<index>`.
 If you know the ID of the connected device but don't want to keep track of the serial port, you can also reference them via `/dev/serial/by-id/<device id>`.
 You can list all available serial ports with their IDs by running `ls /dev/serial/by-id/*`.
 
-## macOS
+### macOS
 
 On macOS, the serial port names can be pretty much anything, but usually have the form of `/dev/tty.<id>` where the id the internal device identifier.
 Running `ls /dev/tty.*` should find available serial ports.

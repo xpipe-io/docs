@@ -9,14 +9,14 @@ XPipe supports connecting to and managing your VMware VMs running in VMware Play
 
 ![](/images/vmware.png)
 
-<Callout type="info">Linked remote VMs like remote VMware ESXi or VMware vCenter Server instances are not supported.</Callout>
+<Callout type="info">Linked remote VMs like remote VMware ESXi or VMware vCenter Server instances are not supported. Since VMware is going down the drain, this support is also not planned to be added in the future.</Callout>
 
 <Callout type="info">Interacting with VMware VMs requires at least the Homelab plan.</Callout>
 
 ## Connecting to VMs
 
 To successfully establish a shell connection to a guest VM, two main things need to be working:
-- The VM has to be able to advertise its IP via the VMware tools/open-vm-tools
+- The VM has to be able to advertise its IP via the VMware tools/open-vm-tools (or you need to provide a manual IP override)
 - An SSH server must be available on the system as XPipe uses SSH to connect to the VM
 
 ### Guest agent
@@ -31,6 +31,10 @@ The same applies to the networking stack, it takes a few seconds to initialize a
 
 If you are using a custom networking setup or firewall, the automatic IP detection might fail. See the [custom networking section](#custom-networking) for handling this configuration.
 
+You can figure out which IP XPipe has determined for the VM at any time with the `Copy IP` action in the connection context menu:
+
+![](/images/proxmox-actions.png)
+
 ### SSH server
 
 The actual shell connections to a guest VM are then established using SSH. This means that you need to have an SSH server installed and configured in the guest so that you can log in as your user with whatever authentication method you prefer. XPipe uses the VMware host system as an SSH gateway, meaning that your guest VM does not have to be reachable from the outside on the SSH port. It will fully work only using internal networking.
@@ -41,10 +45,9 @@ For a proper setup of an SSH server to be used with XPipe, including on systems 
 
 ### Custom networking
 
-To have increased control over the networking of the host and guest systems and to increase security, you can configure a more custom networking setup for the VMware host. This might be something like using an additional firewall like pfSense or opnSense. In these cases, the automatic detection of the guest VM IP address via the guest agent might not always work out and the connection will fail as XPipe is using the wrong IP.
+To have increased control over the networking of the host and guest systems and to increase security, you can configure a more custom networking setup for the VMware host. This might be something like using an additional firewall like pfSense or opnSense. In these cases, the automatic detection of the guest VM IP address via the guest agent might not always work out and the connection will fail as XPipe is using the wrong IP. Alternatively, if your guest system does not have the guest agent installed, you will need to provide the custom network information.
 
 For advanced cases like this, XPipe gives you the option to specify a custom IP address for a VM entry. That way, no automatic IP detection is run, and only that fixed IP address is used for the SSH connection. This IP address should be the one that can be used to reach the VM from within the VMware host system.
 
 ![](/images/proxmox-advanced.png)
 
-This should fix any connection issues, assuming that everything else is properly configured.

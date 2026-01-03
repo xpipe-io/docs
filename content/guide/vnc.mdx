@@ -5,9 +5,11 @@ description: Accessing your systems with VNC
 
 ## Introduction
 
-VNC is commonly used in server administration to access servers in a graphical manner. While it is an outdated protocol, it still is solid enough to fulfill its task. XPipe comes with its own integration for VNC because the existing landscape of external VNC clients is difficult to provide integrations for.
+VNC is commonly used in server administration to access servers in a graphical manner. While it is an outdated protocol, it still is solid enough to fulfill its task. XPipe comes with its own integration for VNC but also supports external VNC clients.
 
 ![](/images/vnc-connection.png)
+
+## VNC clients
 
 While XPipe has its own built-in VNC support, it is not as extensive as other dedicated VNC clients. If you're missing certain features or authentication methods, you can also use your own VNC client in combination with XPipe and its tunneling capabilities. You can change the default VNC in the settings menu:
 
@@ -21,7 +23,7 @@ The main type of VNC connections are tunneled VNC connections where essentially 
 
 These tunnels bind to localhost on the remote system. This means that, for the connection to work, the VNC server must listen on localhost. Some servers do not do that by default. For more information on SSH tunnels, see also the [local SSH tunnels page](/guide/ssh-tunnels#local-tunnels).
 
-## Direct RDP connections
+## Direct VNC connections
 
 Of course, you can also create direct VNC connections to a system without an SSH tunnel to the target system itself:
 

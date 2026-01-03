@@ -7,11 +7,11 @@ description: Accessing systems via SSH
 
 The SSH integration in XPipe is a core component as most remote connections to your servers are probably going to use SSH.
 
-![](/images/ssh.png)
-
 When establishing connections, XPipe delegates any form of connection and shell handling to your existing command-line SSH client available in the `PATH`, which is most likely the OpenSSH client. Therefore, the capabilities of the SSH integration depend on your installed SSH client.
 
 If, for example, your `ssh` command-line client is outdated and does not support certain features, then XPipe can't support these as well. This can concern newly introduced SSH features like hardware security key support or new key exchange methods that are only available in the latest SSH versions. If you want to make use of such features, make sure to upgrade your installed OpenSSH client on your local system.
+
+![](/images/ssh.png)
 
 ## Adding connections
 
@@ -313,9 +313,9 @@ The binding information you provide is passed straight to the `ssh` client as fo
 
 ## SFTP sessions
 
-By default, any session opened in the file browser will use an SSH shell-based session, to allow for more flexibility by running commands. However, a side effect of this is that transfer speeds are a bit slower and some connections might fail if the target system only allows for pure SFTP and no SSH shells.
+By default, any session opened in the file browser will use an SSH shell-based session to allow for more flexibility by running commands. However, a side effect of this is that transfer speeds are a bit slower and some connections might fail if the target system only allows for pure SFTP and no SSH shells.
 
-To open an SFTP session to a system in the file browser, you can either mark the system as limited/embedded. This will automatically attempt to open an SFTP session and these kinds of systems often do not support shells. Alternatively, you can switch to pure SFTP in any SSH-based file browser session in the context menu for a directory:
+To open an SFTP session to a system in the file browser, you can either mark the system as limited/embedded. This will automatically attempt to open an SFTP session as these kinds of systems often do not support shells. Alternatively, you can switch to pure SFTP in any SSH-based file browser session in the context menu for a directory:
 
 ![](/images/sftp-open.png)
 

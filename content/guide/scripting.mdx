@@ -14,22 +14,20 @@ XPipe's scripting functionality for shells allows you to extend and customize yo
 
 ### Shell compatibility
 
-Each remote system you connect to has a specific login shell dialect. This can be anything like cmd, powershell, bash, etc. Any scripts you create will also be bound to that shell dialect. For example, if you write a bash script, it won't run on a powershell-based connection. Therefore, the first choice you have to make is which shell dialect you are creating a script for:
+Each remote system you connect to has a specific login shell type. This can be something like cmd, powershell, bash, etc. Any scripts you create will also be bound to that shell dialect. For example, if you write a bash script, it won't run on a powershell-based connection. Therefore, the first choice you have to make is which shell dialect you are creating a script for:
 
 ![script-dialects](/images/script-dialects.png)
 
 Any script declared as a `sh` script will be able to run in any posix-related shell environment, such as `bash` or `zsh`.
-If you intend to run a basic script on many different systems, then using only `sh` syntax scripts is the best solution.
-
-Scripts that are declared as normal `powershell` scripts can also run in `pwsh` environments.
+If you intend to run a basic script on many different systems, then using only `sh` syntax scripts is the best solution. Scripts that are declared as normal `powershell` scripts can also run in `pwsh` environments.
 
 ### Enabled state
 
-Each script has a toggle that you can use to enable or disable a script. A script must first be enabled for it to appear anywhere in XPipe. This toggle allows you to control which scripts you want to use at the moment, so you can ignore the ones you don't need at the moment without having to delete them. You can also enable whole groups of scripts by toggling the group itself.
+Each script has a toggle that you can use to enable or disable a script. A script must first be enabled for it to appear anywhere in XPipe. This toggle allows you to control which scripts you want to use at the moment, so you can ignore the ones you don't need without having to delete them. You can also enable whole groups of scripts by toggling the group itself:
 
 ![script-toggle](/images/script-toggle.png)
 
-It is important to always check if a script is enabled if it does not appear in the menus as expected.
+It is usually a good idea to check if a script is actually enabled if it is not run or does not appear in the menus as expected.
 
 ## Authoring scripts
 
@@ -41,11 +39,13 @@ You can also check multiple boxes for a script's execution types if you want to 
 
 ### Editing
 
-You can either edit scripts in-place in the text box or use the external edit button in the top right corner to launch an external text editor. Any changes you make in this external editor will be automatically applied when you save.
+You can either edit scripts in-place in the text box or use the external edit button in the top right corner to launch an external text editor:
 
 ![script-content](/images/script-content.png)
 
-When creating scripts, you don't need to specify a shebang line for shells that support it, one will be added automatically with the appropriate shell type you specified earlier. Adding a shebang line won't break the script, but it's unnecessary here.
+Any changes you make in the launched external editor will be automatically applied when you save. Using an editor is recommended to have full support for any shell syntax you want to use. The file extension is applied automatically, meaning that your external editor should pick up what kind of script do you are creating.
+
+When creating scripts, a shebang line for shells that support it is not necessary, one will be added automatically with the appropriate shell type you specified earlier if needed.
 
 ### Dependencies
 
@@ -53,9 +53,9 @@ For more complex scripting tasks, it is also possible to create multiple indepen
 
 ![script-dependencies](/images/script-dependencies.png)
 
-### Groups
+### Script groups
 
-For organization purposes, you can assign scripts to a certain group.
+For organization purposes, you can assign scripts to a certain group:
 
 ![script-group](/images/script-group.png)
 
@@ -64,6 +64,8 @@ This allows you to have a menu available when choosing which script to run:
 ![script-browser-menu](/images/script-browser-menu.png)
 
 If you have not created a script group yet, you can do so at `New` -> `Script` -> `Script group`.
+
+## Script types
 
 ### Init scripts
 
@@ -79,31 +81,13 @@ As a simple example, you can create a script like this
 
 to have your aliases available in your remote shells.
 
-#### Advanced example
-
-Of course, you can create much more advanced init scripts. For example, if you want to have the starship prompt configured in all of your remote terminal sessions, you can use this script:
-
-```bash
-dir="/tmp/xpipe/$USER/scriptdata/starship"
-export PATH="$PATH:$dir"
-which starship > /dev/null 2>&1
-if [ "$?" != 0 ]; then
-    mkdir -p "$dir" && \
-    which curl > /dev/null && \
-    curl -sS https://starship.rs/install.sh | sh /dev/stdin -y --bin-dir "$dir" > /dev/null
-fi
-eval "$(starship init bash)"
-```
-
-This script also checks to see if it is already installed. If not, starship will be dynamically downloaded and installed on the system. Using such scripts allows you to implement complex initialization routines on your remote shells.
-
 #### Shell environments
 
 As an alternative to having all enabled init scripts run whenever a remote shell session is started, you can also create shell environment configurations to use only a selected subset of scripts specific to this environment. These don't even need to be enabled to run.
 
 ![script-env](/images/script-env.png)
 
-This is also important if you're looking to run scripts as root. Shell environments provide the ability to launch them elevated via sudo, so any scripts you run in them will also be run as root.
+This is also useful if you're looking to run scripts as a different user, e.g. as root. Shell environments provide the ability to launch them elevated via sudo, so any scripts you run in them will also be run as root.
 
 ### Runnable scripts
 
@@ -111,13 +95,11 @@ Scripts can also be run on demand on any system from the connection hub. Any scr
 
 ![scripts-hub](/images/scripts-hub.png)
 
-This is useful for actions you want to perform at any time. In this example, a simple
+This is useful for actions you want to perform at any time. In this example, you can create a simple script for a frequently performed action, e.g.:
 
 ```bash
 sudo apt update && sudo apt upgrade
 ```
-
-script for a frequently performed action.
 
 ### File browser scripts
 
@@ -129,7 +111,7 @@ Any script that is enabled, compatible with the file browser session shell, and 
 
 #### Arguments
 
-One of the core features of file scripts is the support of arguments, which are provided by the file browser selection. So if you have one or more files selected in the file browser, they are automatically passed as arguments to the script as normal. Essentially, it is the same as simply running `myscript.sh "<file 1>" "<file 2>"`. The behavior of passing arguments is the same for all shells, so if you're implementing a cmd script instead, you can refer to it with `~%1`, `~%2`, and so on. The arguments are ordered by the time of selection.
+One of the core features of file scripts is the support of arguments, which are provided by the file browser selection. So if you have one or more files selected in the file browser, they are automatically passed as arguments to the script as normal. This is the same as simply running `myscript.sh "<file 1>" "<file 2>"` manually. The behavior of passing arguments is the same for all shells, so if you're implementing a cmd script instead, you can refer to it with `~%1`, `~%2`, and so on. The arguments are ordered by the time of selection.
 
 Note that there is currently no verification for arguments, so if you have a different number of files selected than your script actually requires, you will still be able to call the script from the menu. So to avoid any mishaps, it is recommended to validate the script arguments to have the correct amount. This also applies to file types, so a script that takes a directory as input should check to see if it was not accidentally called on a file instead.
 
@@ -143,7 +125,7 @@ For example, if you want to create a script that diffs two files, using the scri
 
 will allow you to do this by running the script with two files selected.
 
-The working directory of the scripts will also be the current directory you are in the file browser. So it also makes sense to have scripts that don't take arguments and only work in the working directory.
+The working directory of the scripts will also be the current directory you are in the file browser. So it can also make sense to have scripts that don't take arguments and only work on the current working directory.
 
 ### Shell session scripts
 
@@ -153,4 +135,4 @@ For example, with a simple shell script like
 
 ![script-shell](/images/script-shell.png)
 
-you can run it on any compatible system with `git-push.sh "<message>"` in a terminal session if the script is enabled. The script file will be automatically created by XPipe in the background on the target system and added to the terminal session PATH so that you can run it immediately.
+you can run the commands on any compatible system with `git-push.sh "<message>"` in a terminal session if the script is enabled. The script file will be automatically created by XPipe in the background on the target system and added to the temporary terminal session PATH so that you can run it immediately.

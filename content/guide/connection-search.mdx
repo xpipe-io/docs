@@ -1,19 +1,21 @@
 ---
 title: Connection search
-description: Adding supported connections on remote systems
+description: Automatically adding connections on remote systems
 ---
 
 ## Introduction
 
-The automatic connection search is a fundamental part of XPipe. XPipe is designed around automatic detection without any manual configuration. For this reason, many integrations will detect automatically whether a supported component is installed on a remote system, and there is no way to manually configure the integration. If you're not sure how to add a certain type of connection for an integration, the automatic connection search is usually the first place to look.
+The automatic connection search is a fundamental part of XPipe as everything is designed around automatic detection without any manual configuration. For this reason, many integrations will detect automatically whether a supported component is installed on a remote system, and there is no need to manually configure the integration.
 
-## Searching
+If you're not sure how to add a certain type of connection for an integration, the automatic connection search is usually the first place to look.
 
-You can find the connection search dialog either in the `New ...` menu:
+## Adding connections
+
+You can find the connection search dialog either in the `New` menu:
 
 ![](/images/connection-search-menu.png)
 
-or for any shell connection:
+or for any shell connection in the button bar:
 
 ![](/images/connection-search-button.png)
 
@@ -21,15 +23,15 @@ Clicking on the button will automatically start the search for available and sup
 
 ![](/images/connection-search-dialog.png)
 
-Clicking on ok will proceed to add the selected connections. This will, depending on the integration, either add sub connections automatically or not. For some integrations, you will still have to refresh parent entry to update the list of available children. This is, for example, the case with `docker` containers.
+Clicking on ok will proceed to add the selected connections. This will, depending on the integration, either add sub connections automatically or not. For some integrations, you will still have to click on refresh to update the list of available children. Furthermore, some newly added integrations require something like a login or registration in order to work.
 
-## License
+## License requirements
 
-Any integrations that require a license are still shown in the list, but are denoted as requiring a license. You can still add these connections and interact with them somewhat without a license. Only certain actions like opening a terminal session are not supported. This way, you are able to verify whether everything is detected correctly and works before considering upgrading to a paid license plan.
+Any integrations that require a license are still shown in the list, but are denoted as requiring a license. You can add these connections and interact with them somewhat without a license. Only certain actions like opening a terminal session are not supported. That way, you are able to verify whether everything is detected correctly and works before considering upgrading to a paid plan.
 
 ## Configuration
 
-Just because in integration was found does not mean that it will work and is configured correctly. XPipe mainly checks for the existence of a certain installation, e.g., the presence of a certain executable like `docker` on the system. Whether your docker system in this case is running, configured correctly, and will work upon refresh, is not certain.
+Just because an integration was found does not mean that it will work and is configured correctly. When adding connections, XPipe mainly checks for the existence of a certain installation, e.g., the presence of a certain executable like `docker` on the system. Whether your docker daemon in this case is running, configured correctly, and will work upon refresh, is not certain.
 
 If a certain integration is not showing up as expected or is not working correctly even though it should, check out the individual integration guides to learn about the requirements of the integration to work in XPipe.
 

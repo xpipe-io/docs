@@ -7,9 +7,9 @@ description: Grouping individual connections together without shell access
 
 XPipe usually attempts to connect to a remote system via some form of shell connection to be able to detect general system information like operating system, shell ,etc. to realize many of its features. However, this might not always be possible for various reasons. Either your system is an embedded/limited system that does not offer full SSH support, or you are connecting to a system which typically it does not put emphasis on shell connections, e.g. Windows servers with RDP being the main form of connection.
 
-![](/images/abstract-host.png)
+Abstract hosts in XPipe have the goal of still giving you all the organization features in the connection hub without requiring a shell-connection-based parent entry. For example, if you have a remote system which only accepts RDP connections and has multiple web dashboard services, you can add all of these under an abstract host entry so they will be grouped under it.
 
-The concept of abstract hosts in XPipe has the goal of still giving you all the organization features in the connection hub without requiring a shell-connection-based parent entry. For example, if you have a remote system which accepts RDP connections and has multiple web dashboard services, you can add all of these under an abstract host entry so they will be grouped under it.
+![](/images/abstract-host.png)
 
 ## Configuration
 

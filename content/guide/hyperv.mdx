@@ -5,7 +5,7 @@ description: Accessing your Hyper-V hypervisors
 
 ## Introduction
 
-XPipe supports connecting to and managing your Hyper-V VMs running on a Windows host. For that it uses the Hyper-V PowerShell tools available on a system. Adding the host system as a connection to XPipe, usually via SSH, and then [searching for available connections](/guide/connection-search) on the added system will make Hyper-V VMs show up.
+XPipe supports connecting to and managing your Hyper-V VMs running on a Windows host, locally and remote. For that, it uses the Hyper-V PowerShell tools available on a system. Adding the host system as a connection to XPipe, usually via SSH, and then [searching for available connections](/guide/connection-search) on the added system will make Hyper-V VMs show up.
 
 ![](/images/hyperv.png)
 
@@ -31,10 +31,9 @@ For non-Windows system, you need to have an SSH server installed and running on 
 
 ## Custom networking
 
-To have increased control over the networking of the host and guest systems and to increase security, you can configure a more custom networking setup for the Hyper-V host. This might be something like using an additional firewall. In these cases, the automatic detection of the guest VM IP address via the guest agent might not always work out and the connection will fail as XPipe is using the wrong IP.
+To have increased control over the networking of the host and guest systems and to increase security, you can configure a more custom networking setup for the Hyper-V host. This might be something like using an additional firewall. In these cases, the automatic detection of the guest VM IP address via the guest agent might not always work out and the connection will fail as XPipe is using the wrong IP. Alternatively, if your guest system does not have the guest agent installed, you will need to provide the custom network information.
 
 For advanced cases like this, XPipe gives you the option to specify a custom IP address for a VM entry. That way, no automatic IP detection is run, and only that fixed IP address is used for the SSH connection. This IP address should be the one that can be used to reach the VM from within the Hyper-V host system.
 
 ![](/images/proxmox-advanced.png)
 
-This should fix any connection issues, assuming that everything else is properly configured.

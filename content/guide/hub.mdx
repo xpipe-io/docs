@@ -7,32 +7,6 @@ description: Using and navigating the connection hub
 
 The connection hub is the central component of XPipe and the place for managing and accessing all your connections. While the basic usage should be pretty self-explanatory, this page covers some of the more advanced topics, which will come in handy when dealing with an ever-growing collection of connections.
 
-## Ordering
-
-As your connection grows, ordering individual connections in relative to their siblings will improve your user experience. By default, XPipe has two sorting mechanisms that work sequentially:
-- Each connection has an individual order index that you can set explicitly. The smaller the index, the more on top a connection will be shown. By default, every connection has an order index of 0
-- In case the primary order indices are not set, XPipe will use a default order. This can either be a last access date timestamp or an alphabetical order. By default, XPipe uses the last access timestamp order, meaning that connections will go on top of the list as soon as you access them
-
-You can see the currently active ordering mode in the status bar:
-
-![](/images/order-status.png)
-
-In the screenshot, you can see that the primary index-based order is set to ascending, and that the default order is set to ascending last access. You can toggle the orders between ascending and descending by clicking on them.
-
-![](/images/order-status-inv.png)
-
-In this case, the primary order is set to index-based descending, and the default order is set to alphabetical ascending.
-
-You can assign these primary order indices in the order menu:
-
-![](/images/order-menu.png)
-
-Move to first/last will assign the next smallest/largest index value so that the connection is shown on top. Keep to first/last will assign the smallest/largest possible index, so that the connection will stay on top/bottom all the time, regardless of what other indices you set for other connections.
-
-Explicitly assigned indices will show up next to the connection name like this:
-
-![](/images/order-list.png)
-
 ## Batch mode
 
 To perform actions on multiple systems, you can enable the batch mode:
@@ -119,6 +93,32 @@ If you have multiple clients and want to separate everything, partitioning the t
 
 ![](/images/category-setup-client.png)
 
+## Ordering
+
+As your connection grows, ordering individual connections in relative to their siblings will improve your user experience. By default, XPipe has two sorting mechanisms that work sequentially:
+- Each connection has an individual order index that you can set explicitly. The smaller the index, the more on top a connection will be shown. By default, every connection has an order index of 0
+- In case the primary order indices are not set, XPipe will use a default order. This can either be a last access date timestamp or an alphabetical order. By default, XPipe uses the last access timestamp order, meaning that connections will go on top of the list as soon as you access them
+
+You can see the currently active ordering mode in the status bar:
+
+![](/images/order-status.png)
+
+In the screenshot, you can see that the primary index-based order is set to ascending, and that the default order is set to ascending last access. You can toggle the orders between ascending and descending by clicking on them.
+
+![](/images/order-status-inv.png)
+
+In this case, the primary order is set to index-based descending, and the default order is set to alphabetical ascending.
+
+You can assign these primary order indices in the order menu:
+
+![](/images/order-menu.png)
+
+Move to first/last will assign the next smallest/largest index value so that the connection is shown on top. Keep to first/last will assign the smallest/largest possible index, so that the connection will stay on top/bottom all the time, regardless of what other indices you set for other connections.
+
+Explicitly assigned indices will show up next to the connection name like this:
+
+![](/images/order-list.png)
+
 ## Compact mode
 
 The connection hub interface will compact itself in situations where the window width is small. This gives you more space for your connections.
@@ -139,8 +139,6 @@ You can assign a custom icon to a connection by either clicking on the connectio
 
 ![](/images/icons-dialog.png)
 
-The first time you open this dialog, it will show a button to refresh the icon sources first.
-
 ### Icon sources
 
 Custom icons are not shipped with XPipe directly. Instead, there is the possibility to configure custom icon sources in the settings menu. This can either be a local directory or a remote git repository containing .svg files. XPipe only supports .svg icons, so it will only pick up those from any sources. Icon sources can be added, removed, and also disabled:
@@ -151,7 +149,7 @@ By default, XPipe ships with a git icon source for https://github.com/selfhst/ic
 
 Furthermore, there is also a synced custom icon directory available if you are using [git sync](/guide/sync). This helps you have access to all your custom icon files on any synced system.
 
-If you want to use other repositories or directories of icons, you can easily add them. Once you change the icon sources, make sure to also refresh the icon database to render all the .svg files. Otherwise, your changes might not apply.
+If you want to use other repositories or directories of icons, you can easily add them. The first time you open icon choice dialog, it will show a button to refresh the icon sources first. Whenever you modify the sources list, you will also have to refresh the icon storage again. XPipe does not automatically pull changes from icon repositories as this can be a time-consuming operation.
 
 For more inspiration, see the following repositories you can add:
 - [Simple Icons](https://github.com/simple-icons/simple-icons)
