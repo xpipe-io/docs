@@ -1,4 +1,4 @@
-import { source } from '@/lib/source';
+import {openapi, source} from '@/lib/source';
 import {
   DocsPage,
   DocsBody,
@@ -9,11 +9,14 @@ import { notFound } from 'next/navigation';
 import defaultMdxComponents from 'fumadocs-ui/mdx';
 import { Callout } from 'fumadocs-ui/components/callout';
 import {Metadata} from "next/types";
+import NotFound from "next/dist/client/components/builtin/not-found";
 
 export default async function Page(props: PageProps<'/[[...slug]]'>) {
   const params = await props.params;
   const page = source.getPage(params.slug);
-  if (!page) notFound();
+  if (!page) return (<NotFound />)
+
+    const { APIPage } = await import('@/components/api-page');
 
   const MDX = page.data.body;
 
@@ -31,7 +34,7 @@ export default async function Page(props: PageProps<'/[[...slug]]'>) {
       <DocsTitle>{page.data.title}</DocsTitle>
       <DocsDescription>{page.data.description}</DocsDescription>
       <DocsBody>
-        <MDX components={{ ...defaultMdxComponents, Callout }} />
+        <MDX components={{ ...defaultMdxComponents, Callout, APIPage }} />
       </DocsBody>
     </DocsPage>
   );
