@@ -1,6 +1,7 @@
 @import 'tailwindcss';
 @import 'fumadocs-ui/css/black.css';
 @import 'fumadocs-ui/css/preset.css';
+@import 'fumadocs-openapi/css/preset.css';
 
 @tailwind base;
 @tailwind components;
@@ -92,18 +93,14 @@ body {
     @apply py-1 pl-1;
 }
 
-#nd-page {
-}
-
 h1, h2, h3, h4, h5, h6 {
-
     @apply text-teal-700 dark:text-teal-400;
 }
 
-button[type=submit] {
-    @apply dark:bg-teal-800 bg-teal-300 border border-teal-500;
+button[type=submit], button[type=button][role=combobox] {
+    @apply dark:bg-teal-900 bg-teal-100 border border-teal-300 dark:border-teal-600 dark:text-white text-gray-900 cursor-pointer opacity-80;
 }
 
-button[type=button][role=combobox] {
-    @apply dark:bg-teal-900 bg-teal-200 border border-teal-700 mt-4;
+#nd-sidebar span.text-xs {
+    @apply !text-teal-700 dark:!text-teal-300 opacity-80;
 }
