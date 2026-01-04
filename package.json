@@ -9,26 +9,26 @@
     "postinstall": "fumadocs-mdx"
   },
   "dependencies": {
-    "@vercel/analytics": "^1.5.0",
-    "fumadocs-core": "14.7.7",
-    "fumadocs-mdx": "11.3.1",
-    "fumadocs-openapi": "^6.3.0",
-    "fumadocs-ui": "14.7.7",
-    "next": "15.4.8",
-    "react": "^19.1.2",
-    "react-dom": "^19.1.2",
-    "shiki": "^3.4.2"
+    "@vercel/analytics": "1.6.1",
+    "fumadocs-core": "16.4.2",
+    "fumadocs-mdx": "14.2.4",
+    "fumadocs-ui": "16.4.2",
+    "fumadocs-openapi": "10.2.3",
+    "lucide-react": "^0.562.0",
+    "next": "16.1.1",
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3"
   },
   "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.18",
     "@types/mdx": "^2.0.13",
-    "@types/node": "22.10.7",
-    "@types/react": "^19.1.4",
-    "@types/react-dom": "^19.1.5",
-    "autoprefixer": "^10.4.21",
-    "eslint": "^8",
-    "eslint-config-next": "15.1.5",
-    "postcss": "^8.5.3",
-    "tailwindcss": "^3.4.17",
-    "typescript": "^5.8.3"
+    "@types/node": "^24.10.2",
+    "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.2.3",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^4.1.18",
+    "typescript": "^5.9.3",
+    "eslint-config-next": "16.1.1",
+    "eslint": "^9.39.2"
   }
 }

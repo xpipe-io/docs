@@ -1,6 +1,53 @@
+@import 'tailwindcss';
+@import 'fumadocs-ui/css/black.css';
+@import 'fumadocs-ui/css/preset.css';
+@import 'fumadocs-openapi/css/preset.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@theme {
+    --color-fd-background: hsl(0, 0%, 98%);
+    --color-fd-foreground: hsl(0, 0%, 3.9%);
+    --color-fd-muted: hsl(220, 0%, 96.1%);
+    --color-fd-muted-foreground: hsl(0, 0%, 20.1%);
+    --color-fd-popover: hsl(0, 0%, 98%);
+    --color-fd-popover-foreground: hsl(0, 0%, 15.1%);
+    --color-fd-card: hsl(220, 0%, 100%);
+    --color-fd-card-foreground: hsl(0, 0%, 3.9%);
+    --color-fd-border: hsl(220, 0%, 75.8%);
+    --color-fd-primary: hsl(175, 90%, 25.2%);
+    --color-fd-primary-foreground: hsl(0, 0%, 98%);
+    --color-fd-secondary: hsl(220, 0%, 100%);
+    --color-fd-secondary-foreground: hsl(0, 0%, 9%);
+    --color-fd-accent: hsl(170, 0%, 94.1%);
+    --color-fd-accent-foreground: hsl(0, 0%, 9%);
+    --color-fd-ring: hsl(170, 100%, 63.9%);
+}
+
+.dark {
+    --color-fd-background: hsl(0, 0%, 0%);
+    --color-fd-foreground: hsl(220, 60%, 94.5%);
+    --color-fd-muted: hsl(170, 0%, 10%);
+    --color-fd-muted-foreground: hsl(170, 0%, 75%);
+    --color-fd-popover: hsl(220, 0%, 10%);
+    --color-fd-popover-foreground: hsl(170, 0%, 65%);
+    --color-fd-card: hsl(170, 0%, 10%);
+    --color-fd-card-foreground: hsl(170, 60%, 94.5%);
+    --color-fd-border: hsl(205, 0%, 25%);
+    --color-fd-primary: hsl(170 65% 50%);
+    --color-fd-primary-foreground: hsl(0 0% 9%);
+    --color-fd-secondary: hsl(170 0% 20%);
+    --color-fd-secondary-foreground: hsl(170 80% 90%);
+    --color-fd-accent: hsla(170 0% 20%);
+    --color-fd-accent-foreground: hsl(170 80% 90%);
+    --color-fd-ring: hsl(170 100% 85%);
+}
+
+#nd-page a {
+    @apply font-normal decoration-1;
+}
 
 .video-wrapper {
     position: relative;
@@ -27,7 +74,7 @@ body {
 }
 
 #nd-sidebar {
-    @apply bg-[#fffb] dark:bg-[#101215ee];
+    @apply bg-[#fffb] dark:bg-[#101215ee] max-w-[275px];
 }
 
 #nd-sidebar p {
@@ -39,25 +86,21 @@ body {
 }
 
 #nd-sidebar p.mt-8 {
-    @apply mt-5 !important;
+    @apply mt-5;
 }
 
 #nd-sidebar button.flex-row {
     @apply py-1 pl-1;
 }
 
-#nd-page {
-}
-
 h1, h2, h3, h4, h5, h6 {
-
-    @apply text-teal-700 dark:text-teal-400 !important;
+    @apply text-teal-700 dark:text-teal-400;
 }
 
-button[type=submit] {
-    @apply dark:bg-teal-800 bg-teal-300 border border-teal-500;
+button[type=submit], button[type=button][role=combobox] {
+    @apply dark:bg-teal-900 bg-teal-100 border border-teal-300 dark:border-teal-600 dark:text-white text-gray-900 cursor-pointer opacity-80;
 }
 
-button[type=button][role=combobox] {
-    @apply dark:bg-teal-900 bg-teal-200 border border-teal-700 mt-4;
+#nd-sidebar span.text-xs {
+    @apply !text-teal-700 dark:!text-teal-300 opacity-80;
 }
