@@ -57,15 +57,15 @@ Many key selections also support passphrases. For passphrases, you have the same
 
 XPipe supports all types of keys, including FIDO2.
 
-#### Key
+#### Key [!toc]
 
 With this option, you can store a private key in text form in the XPipe vault. With the keygen button at the right, you can also create new keys to store here.
 
-#### Local key file
+#### Local key file [!toc]
 
 You can also specify a key file. This option is the equivalent of `ssh -i <file>`.
 
-#### OpenSSH agent
+#### OpenSSH agent [!toc]
 
 In case your identities are stored in the OpenSSH agent, XPipe can automatically use them if the agent is correctly configured in the environment. The agent socket location is retrieved from the environment variables passed to XPipe or set in the local shell init files.
 
@@ -73,7 +73,7 @@ On Windows, XPipe will automatically start the agent process if it is not runnin
 
 If you are using any other agent, for example from a password manager, you can use the custom SSH agent option instead.
 
-#### Custom agent
+#### Custom agent [!toc]
 
 On Linux and macOS, you will also have access to the custom agent option as on these systems, any custom agent will use a different location for the socket. The custom socket location can be configured in the settings menu:
 
@@ -83,7 +83,7 @@ If you are using a password manager with an SSH agent functionality, you can cho
 
 For more information, see [password manager page](guide/password-managers).
 
-#### GPG Agent
+#### GPG Agent [!toc]
 
 If you have configured GPG keys that support authentication, you can choose to provide them to the SSH client via the `gpg-agent`.
 
@@ -91,7 +91,7 @@ This option requires `gpg` to be installed on your local system. XPipe will auto
 
 This option will only show up if you have the GPG agent installed on your local system.
 
-#### Pageant
+#### Pageant [!toc]
 
 Pageant is the agent of PuTTY. If you have a lot of keys stored in the .ppk format, this option might bridge the incompatibilities between .ppk keys and OpenSSH. For more details, see the [PuTTY section](#putty).
 
@@ -101,15 +101,15 @@ On Linux and macOS, in case your identities are stored in pageant, the ssh execu
 
 This option will only show up if you have pageant installed on your local system.
 
-#### Yubikey PIV
+#### Yubikey PIV [!toc]
 
 If your identities are stored with the PIV smartcard function of the Yubikey, you can retreive them with Yubico's YKCS11 library, which comes bundled with [Yubico PIV Tool](https://developers.yubico.com/yubico-piv-tool/).
 
-#### Custom PKCS#11 library
+#### Custom PKCS#11 library [!toc]
 
 This will instruct the OpenSSH client to load the specified shared library file, which will handle the authentication.
 
-#### Other external agent
+#### Other external agent [!toc]
 
 This option will permit any external running identity provider to supply its keys to the SSH client. You should use this option if you are using a password manager agent on Windows or any other agent to manage your SSH keys. XPipe will not interact with any external agent in this case, it will just allow any program to supply keys to the SSH client. You will have to make sure that the agent you want to use is running beforehand and configured correctly.
 
