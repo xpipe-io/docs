@@ -3,27 +3,27 @@ title: Managed installation
 description: Automating the installation of XPipe on your systems
 ---
 
-If you're looking for options to install XPipe across multiple systems either using some endpoint management tools, package managers, or your own scripts, this page contains the necessary information.
+## Introduction
+
+If you're looking for options to install XPipe on systems either using some package manager, endpoint management tool, or your own scripts, this page contains the necessary information.
 
 ## Windows
 
-The .msi installer is flexible and supports managed installations as well. This includes standard .msi properties to control the installation.
+### Winget
 
-You can install it quietly with just as other normal installers:
-
-```powershell
-$RawArch = [System.Runtime.InteropServices.RuntimeInformation,mscorlib]::OSArchitecture.ToString().ToLower();
-$Arch = If ($RawArch -eq "x64") {"x86_64"} Else {"arm64"}
-Start-Process -FilePath "msiexec.exe" -ArgumentList "/i `"https://github.com/xpipe-io/xpipe/releases/latest/download/xpipe-installer-windows-$($Arch).msi`" /qn" -Wait -PassThru
-```
-
-It also supports the property `ALLUSERS` to control whether it should be installed only for the current user or all users on a system. If you run the following command with Administrator privileges, it will install for all users:
+There is a winget package available that uses the .msi installer. It can be installed for your current user with the following command:
 
 ```powershell
-$RawArch = [System.Runtime.InteropServices.RuntimeInformation,mscorlib]::OSArchitecture.ToString().ToLower();
-$Arch = If ($RawArch -eq "x64") {"x86_64"} Else {"arm64"}
-Start-Process -Verb runAs -FilePath "msiexec.exe" -ArgumentList "/i `"https://github.com/xpipe-io/xpipe/releases/latest/download/xpipe-installer-windows-$($Arch).msi`" /qn ALLUSERS=1" -Wait -PassThru
+winget install xpipe-io.xpipe --source winget
 ```
+
+If you want to install the package for all users, you can do so by passing the machine scope and running the command as an Administrator:
+
+```powershell
+winget install xpipe-io.xpipe --source winget --scope machine
+```
+
+Note that due to the manual winget package PR approval process, new versions might take 1-2 days to become available in winget.
 
 ### Chocolatey
 
@@ -33,37 +33,42 @@ There is also a [choco package](https://community.chocolatey.org/packages/xpipe)
 choco install xpipe
 ```
 
-If you want to install the package for all users, you can do so by passing the ALLUSERS property:
+If you want to install the package for all users, you can do so by passing the ALLUSERS property and running the command as an Administrator:
 
 ```powershell
 choco install xpipe --install-arguments="'ALLUSERS=1'"
 ```
 
-### Winget
+### Scoop
 
-Furthermore, there is also a winget package available that provides the same .msi installers. It can be installed with the following command:
+There is also a [scoop package](https://github.com/ScoopInstaller/Extras/blob/master/bucket/xpipe.json) in the extras bucket that provides the same .msi installers. You first have to make sure that the extras bucket is enabled with `scoop bucket add extras`. XPipe can then be installed for your current user with the following command:
 
 ```powershell
-winget install xpipe-io.xpipe --source winget
+scoop install extras/xpipe
 ```
 
+If you want to install the package for all users, you can do so by using the `--global` option and running the command as an Administrator:
 
-
-## macOS
-
-The macOS [.pkg installer](https://github.com/xpipe-io/xpipe/releases/latest/download/xpipe-installer-macos-arm64.pkg) can be called from the command line as well to install XPipe silently:
-
-```bash
-curl --output xpipe-installer-macos-arm64.pkg https://github.com/xpipe-io/xpipe/releases/latest/download/xpipe-installer-macos-arm64.pkg
-sudo installer -verboseR -pkg xpipe-installer-macos-arm64.pkg -target /
+```powershell
+scoop install extras/xpipe --global
 ```
 
-### Homebrew
+### PowerShell
 
-There is also a [homebrew tap](https://github.com/xpipe-io/homebrew-tap) that can be used to install XPipe as a cask. It can be installed with the following command:
+You can install the .msi quietly just as other normal installers:
 
-```bash
-brew install --cask xpipe-io/tap/xpipe
+```powershell
+$RawArch = [System.Runtime.InteropServices.RuntimeInformation,mscorlib]::OSArchitecture.ToString().ToLower();
+$Arch = If ($RawArch -eq "x64") {"x86_64"} Else {"arm64"}
+Start-Process -FilePath "msiexec.exe" -ArgumentList "/i `"https://github.com/xpipe-io/xpipe/releases/latest/download/xpipe-installer-windows-$($Arch).msi`" /qn" -Wait -PassThru
+```
+
+It also supports the property `ALLUSERS` to control whether it should be installed only for the current user or all users on a system. If you run the following command with Administrator privileges, it will be installed for all users:
+
+```powershell
+$RawArch = [System.Runtime.InteropServices.RuntimeInformation,mscorlib]::OSArchitecture.ToString().ToLower();
+$Arch = If ($RawArch -eq "x64") {"x86_64"} Else {"arm64"}
+Start-Process -Verb runAs -FilePath "msiexec.exe" -ArgumentList "/i `"https://github.com/xpipe-io/xpipe/releases/latest/download/xpipe-installer-windows-$($Arch).msi`" /qn ALLUSERS=1" -Wait -PassThru
 ```
 
 ## Linux
@@ -72,9 +77,7 @@ The rpm releases are signed with the GPG key https://xpipe.io/signatures/crschni
 
 ### Debian-based distros
 
-XPipe provides an apt repository at https://apt.xpipe.io. You can add this repository as an additional source to apt to be able to install XPipe through apt directly. An apt upgrade operation will also install the latest XPipe release automatically.
-
-If you are looking for early access builds for new releases, you can replace the package name `xpipe` with `xpipe-ptb` to install the PTB build of XPipe from the repository.
+XPipe provides an apt repository at https://apt.xpipe.io. You can add this repository as an additional source to apt to be able to install XPipe through apt directly. The releases are signed with the GPG key https://xpipe.io/signatures/crschnick.gpg. This command will perform the setup steps automatically:
 
 ```bash
 sudo apt install wget gpg
@@ -85,13 +88,13 @@ sudo sh -c 'echo "deb [signed-by=/etc/apt/keyrings/xpipe.gpg] https://apt.xpipe.
 sudo apt update && sudo apt install xpipe
 ```
 
+If you are looking for early access builds for new releases, you can replace the package name `xpipe` with `xpipe-ptb` to install the PTB build of XPipe from the repository.
+
 ### RHEL-based distros
 
 XPipe provides an rpm repository at https://rpm.xpipe.io. You can add this repository as an additional source to your rpm-based package manager (yum, dnf, zypper, rpm, etc.) to be able to install XPipe through it directly. An upgrade operation will also install the latest XPipe release automatically.
 
 The rpm releases are signed with the GPG key https://xpipe.io/signatures/crschnick.asc. You can import it via `rpm --import https://xpipe.io/signatures/crschnick.asc` to allow your package manager to verify the release signature.
-
-If you are looking for early access builds for new releases, you can replace the package name `xpipe` with `xpipe-ptb` to install the PTB build of XPipe from the repository.
 
 You can use the repository as follows:
 
@@ -112,7 +115,7 @@ sudo dnf config-manager --add-repo https://rpm.xpipe.io/xpipe.repo
 sudo dnf install xpipe
 ```
 
-#### DNF 5
+#### DNF 5+
 
 ```bash
 sudo dnf config-manager addrepo --from-repofile=https://rpm.xpipe.io/xpipe.repo
@@ -125,4 +128,23 @@ sudo dnf install xpipe
 sudo rpm --import https://xpipe.io/signatures/crschnick.asc
 sudo zypper ar -f https://rpm.xpipe.io xpipe
 sudo zypper install xpipe
+```
+
+If you are looking for early access builds for new releases, you can replace the package name `xpipe` with `xpipe-ptb` to install the PTB build of XPipe from the repository.
+
+## macOS
+
+The macOS [.pkg installer](https://github.com/xpipe-io/xpipe/releases/latest/download/xpipe-installer-macos-arm64.pkg) can be called from the command line as well to install XPipe silently:
+
+```bash
+curl --output xpipe-installer-macos-arm64.pkg https://github.com/xpipe-io/xpipe/releases/latest/download/xpipe-installer-macos-arm64.pkg
+sudo installer -verboseR -pkg xpipe-installer-macos-arm64.pkg -target /
+```
+
+### Homebrew
+
+There is also a [homebrew tap](https://github.com/xpipe-io/homebrew-tap) that can be used to install XPipe as a cask. It can be installed with the following command:
+
+```bash
+brew install --cask xpipe-io/tap/xpipe
 ```

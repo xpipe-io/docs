@@ -7,9 +7,7 @@ description: Accessing systems via SSH
 
 The SSH integration in XPipe is a core component as most remote connections to your servers are probably going to use SSH.
 
-When establishing connections, XPipe delegates any form of connection and shell handling to your existing command-line SSH client available in the `PATH`, which is most likely the OpenSSH client. Therefore, the capabilities of the SSH integration depend on your installed SSH client.
-
-If, for example, your `ssh` command-line client is outdated and does not support certain features, then XPipe can't support these as well. This can concern newly introduced SSH features like hardware security key support or new key exchange methods that are only available in the latest SSH versions. If you want to make use of such features, make sure to upgrade your installed OpenSSH client on your local system.
+When establishing connections, XPipe delegates any form of connection and shell handling to your existing command-line SSH client available in the PATH, which is most likely the OpenSSH client. XPipe does not come with its own SSH implementation or other connection handling. Everything is fully realized on top of your installed CLI programs.
 
 ![](/images/ssh.png)
 
