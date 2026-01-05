@@ -123,7 +123,15 @@ Alternatively, there are also AppImages available:
 
 XPipe can also be run in the Windows Subsystem for Linux with graphics support. If you follow the instructions for [WSL2g GUIs](https://learn.microsoft.com/en-us/windows/wsl/tutorials/gui-apps), installing XPipe on the WSL system via one of the available Linux installers will make XPipe run in your WSL environment.
 
-Note that as WSL is only a minimal installation, it is strongly recommended to use an installer to also install any neither dependencies for XPipe. The portable versions don't declared dependencies and might not run properly if any dependency is missing.
+Note that as WSL is only a minimal installation, it is strongly recommended to use an installer to also install any neither dependencies for XPipe. The portable versions don't declare dependencies and might not run properly if any dependency is missing.
 
-Running XPipe in WSL can be useful to have full native access to your WSL connections, e.g. any SSH config connections if you are normally using the WSL OpenSSH version for any kind of SSH related tasks instead of the native Windows OpenSSH port.
+Running XPipe in WSL can be useful to have full native access to your WSL connections, e.g. if you are normally using the WSL OpenSSH version for any kind of SSH related tasks instead of the native Windows OpenSSH port.
+
+### Android Linux Terminal
+
+If you are running an up-to-date Android system with support for AVF, you can take a look at the new [Android Linux Terminal](https://www.zdnet.com/article/how-to-use-the-new-linux-terminal-on-android/) app. This official app essentially runs a full debian VM on your phone and does not require any sideloading or jailbreaks. If you are running Android 16+ and your phone supports AVF (not all do, even newer ones), you can use it.
+
+XPipe can be run on this debian system by just installing it as a normal application as you would do on a regular Linux system. See the [debian install instruction](#debian-based-distros) for details.
+
+You can make use of all features on this VM, assuming that you have installed the necessary tools. As the basic VM image is pretty basic, you will need to install a proper text editor, terminal, RDP client, etc. But once you do, you will have the full feature set that you also get on normal desktop systems.
 
