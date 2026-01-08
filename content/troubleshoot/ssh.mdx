@@ -95,9 +95,11 @@ XPipe is able to automatically configure this for simple SSH connections. For ot
 
 ### Connection closed by remote host
 
-If you get a message like `kex_exchange_identification: Connection closed by remote host`, the SSH server explicitly disconnected your connection attempt. This can happen if, for example, rate limits are exceeded and too many users connect.
+If you get a message like `Connection closed` or `kex_exchange_identification: Connection closed by remote host`, the SSH server explicitly disconnected your connection attempt. This can happen if, for example, rate limits are exceeded and too many users connect.
 
-For example, if you find the output `debug1: kex_exchange_identification: banner line 0: Exceeded MaxStartups` in the debug output, this indicates that too many connection attempts were made in parallel. In practice, this is caused by bots probing SSH servers all the time. You can either increase the `MaxStartups` in the sshd config, improve your firewall, or just use another port for SSH to reduce bot spam.
+If you find the output `debug1: kex_exchange_identification: banner line 0: Exceeded MaxStartups` in the [debug output](#introduction), this indicates that too many connection attempts were made in parallel. In practice, this is caused by bots probing SSH servers all the time. You can either increase the `MaxStartups` in the sshd config, improve your firewall, or just use another port for SSH to reduce bot spam.
+
+If you find the output `debug1: kex_exchange_identification: banner line 0: Not allowed at this time` in the [debug output](#introduction), this indicates that too many connection attempts were made. New versions of the OpenSSH server introduce a penalty system for failed connections to prevent DDos and spamming. For more information, see [here](https://michael-prokop.at/blog/2025/04/13/openssh-penalty-behavior-in-debian-trixie-newintrixie/). You can modify the `PerSourcePenalties` setting in the sshd config to disable this.
 
 ### Bad file descriptor
 

@@ -15,6 +15,12 @@ You can easily list all mountpoints that are configured with the noexec flag wit
 findmnt -l | grep noexec
 ```
 
+or
+
+```bash
+mount | grep noexec
+```
+
 If the list it contains `/tmp`, for example, with something like this:
 
 ```
@@ -27,6 +33,6 @@ then you will need to change the temp director for XPipe to one that is not list
 
 To work around this issue, you can set the variable `XPIPE_TEMP` on the remote system to a switch to using another directory. This can, for example, be a directory like `~/.xpipe/scripts` or `/var/xpipe`, depending on the noexec limitations for other available directories.
 
-This variable has to be set on login, so usually in the `.bashrc` file with `export XPIPE_TEMP="<dir>"`. The directory has to exist on the file system, and the user should have access to it for XPipe to be able to use it.
+This variable has to be set on remote login, so usually in the `.bashrc` file with `export XPIPE_TEMP="<dir>"`. The directory has to exist on the remote file system, and the user should have access to it for XPipe to be able to use it.
 
-To properly apply the changes, restart XPipe and reconnect to the system.
+To properly apply the changes, restart XPipe to discard any old cached directory information and reconnect to the system.
