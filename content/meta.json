@@ -46,11 +46,11 @@
     "api/",
     "guide/python-api",
     "---Reference---",
-    "reference/security",
-    "reference/enterprise",
-    "reference/directories",
-    "cli/",
     "troubleshoot",
+    "reference/security",
+    "reference/directories",
+    "reference/enterprise",
+    "cli/",
     "legal"
   ]
 }
