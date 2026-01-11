@@ -43,12 +43,12 @@
     "guide/connection-launch",
     "guide/actions",
     "guide/mcp",
+    "api/",
     "guide/python-api",
     "---Reference---",
     "reference/security",
     "reference/enterprise",
     "reference/directories",
-    "api/",
     "cli/",
     "troubleshoot",
     "legal"
