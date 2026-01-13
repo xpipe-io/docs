@@ -44,19 +44,11 @@ error: Guest agent is not responding: QEMU guest agent is not connected
 
 ### Networking
 
-The same applies to the networking stack, it takes a few seconds to initialize all the network interfaces and to obtain an IP. If the libvirt daemon is unable to tell the guest VM IP address, the networking is not initialized yet, or you are running some kind of custom networking or firewall setup. See the [custom networking section](#custom-networking) for handling this configuration.
+The network stack on a guest system also takes a few seconds to initialize all the network interfaces and to obtain an IP. If the libvirt daemon is unable to tell the guest VM IP address, the guest agent is not running, the networking is not initialized yet, or you are running some kind of custom networking or firewall setup. See the [custom networking section](#custom-networking) for handling this configuration.
 
 You can figure out which IP XPipe has determined for the VM at any time with the `Copy IP` action in the connection context menu:
 
 ![](/images/proxmox-actions.png)
-
-### SSH server
-
-The actual shell connections to a guest VM are then established using SSH. This means that you need to have an SSH server installed and configured in the guest so that you can log in as your user with whatever authentication method you prefer. XPipe uses the KVM host as an SSH gateway, meaning that your guest VM does not have to be reachable from the outside on the SSH port. It will fully work only using internal networking.
-
-The SSH server in the guest does not have to be running, XPipe is able to start it automatically from the outside using the guest agent exec functionality. It should, however, be properly configured to allow for a login.
-
-For a proper setup of an SSH server to be used with XPipe, including on systems like Windows guests, see [here](/guide/ssh#windows-ssh-servers).
 
 ### Custom networking
 
@@ -67,6 +59,14 @@ For advanced cases like this, XPipe gives you the option to specify a custom IP 
 Furthermore, by default, XPipe always uses the hypervisor host system as an SSH gateway to connect to a guest. This is done because XPipe can't be sure whether your VM is reachable from outside the host system or not. This approach, however, breaks in cases where the networking is locked down and a guest VM is only reachable from the outside and not from the hypervisor host system itself. In this case, you can toggle the option `Don't use gateway` to connect directly to the VM IP address instead.
 
 ![](/images/proxmox-advanced.png)
+
+### SSH server
+
+The actual shell connections to a guest VM are then established using SSH. This means that you need to have an SSH server installed and configured in the guest so that you can log in as your user with whatever authentication method you prefer. XPipe uses the KVM host as an SSH gateway, meaning that your guest VM does not have to be reachable from the outside on the SSH port. It will fully work only using internal networking.
+
+The SSH server in the guest does not have to be running, XPipe is able to start it automatically from the outside using the guest agent exec functionality. It should, however, be properly configured to allow for a login.
+
+For a proper setup of an SSH server to be used with XPipe, including on systems like Windows guests, see [here](/guide/ssh#windows-ssh-servers).
 
 ## Serial access
 

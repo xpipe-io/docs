@@ -25,7 +25,7 @@ To successfully establish a shell connection to a Proxmox VM, two main things ne
 
 ### Guest agent
 
-The [QEMU guest agent](https://pve.proxmox.com/wiki/Qemu-guest-agent) is a daemon that should be installed in the guest VM to allow an outside hypervisor, in this case Proxmox, to exchange information with the guest VM. Without it, the hypervisor has no access to the current state of the VM. Having this state access is necessary to determine the IP address to use for SSH and to run shell commands from the outside within the guest VM.
+The [QEMU guest agent](https://pve.proxmox.com/wiki/Qemu-guest-agent) is a daemon that should be installed in the guest VM to allow an outside hypervisor, in this case Proxmox, to exchange information with the guest VM. Without it, the hypervisor has no access to the current state of the VM. Having this state access is necessary to automatically determine the IP address to use for SSH and to run shell commands from the outside within the guest VM.
 
 To use the IP autodetection, you should make sure that the guest agent is installed and running on a system. For installation instructions, see [here](https://pve.proxmox.com/wiki/Qemu-guest-agent). The guest agent daemon takes a few seconds to start up and initialize, so you might have to wait a few seconds after a VM is started before you can successfully connect to it in XPipe.
 
@@ -40,30 +40,18 @@ Is the VM fully started up yet?
 
 ### Networking
 
-The same applies to the networking stack, it takes a few seconds to initialize all the network interfaces and to obtain an IP. If Proxmox is unable to tell the guest VM IP address, you will receive the following error message:
+The network stack on a guest system also takes a few seconds to initialize all the network interfaces and to obtain an IP. If Proxmox is unable to tell the guest VM IP address, you will receive something like the following error message:
 
 ```
 Process returned exit code 255:
 Unable to determine external IP address for vmid <vmid> via network-get-interfaces
 ```
 
-In this case, the networking is not initialized yet, the network interface is buggy, or you are running some kind of custom networking or firewall setup.
-
-The network interface can become bugged after pausing and resuming a guest VMs, that is a known occasional Proxmox bug. In this case, restarting the VM should fix it.
-
-If you are using a custom networking setup or firewall, the automatic IP detection might fail. See the [custom networking section](#custom-networking) for handling this configuration.
+In this case, the networking is not initialized yet, the network interface is buggy, or you are running some kind of custom networking or firewall setup. If you are using a custom networking setup or firewall, the automatic IP detection might fail. See the [custom networking section](#custom-networking) for handling this configuration.
 
 You can figure out which IP XPipe has determined for the VM at any time with the `Copy IP` action in the connection context menu:
 
 ![](/images/proxmox-actions.png)
-
-### SSH server
-
-The actual shell connections to a guest VM are then established using SSH. This means that you need to have an SSH server installed and configured in the guest so that you can log in as your user with whatever authentication method you prefer. XPipe uses the Proxmox host as an SSH gateway, meaning that your guest VM does not have to be reachable from the outside on the SSH port. It will fully work only using internal networking.
-
-The SSH server in the guest does not have to be running, XPipe is able to start it automatically from the outside using the guest agent exec functionality. It should, however, be properly configured to allow for a login.
-
-For a proper setup of an SSH server to be used with XPipe, including on systems like Windows guests, see [here](/guide/ssh#windows-ssh-servers).
 
 ### Custom networking
 
@@ -74,6 +62,14 @@ For advanced cases like this, XPipe gives you the option to specify a custom IP 
 Furthermore, by default, XPipe always uses the hypervisor host system as an SSH gateway to connect to a guest. This is done because XPipe can't be sure whether your VM is reachable from outside the host system or not. This approach, however, breaks in cases where the networking is locked down and a guest VM is only reachable from the outside and not from the hypervisor host system itself. In this case, you can toggle the option `Don't use gateway` to connect directly to the VM IP address instead.
 
 ![](/images/proxmox-advanced.png)
+
+### SSH server
+
+The actual shell connections to a guest VM are then established using SSH. This means that you need to have an SSH server installed and configured in the guest so that you can log in as your user with whatever authentication method you prefer. XPipe uses the Proxmox host as an SSH gateway, meaning that your guest VM does not have to be reachable from the outside on the SSH port. It will fully work only using internal networking.
+
+The SSH server in the guest does not have to be running, XPipe is able to start it automatically from the outside using the guest agent exec functionality. It should, however, be properly configured to allow for a login.
+
+For a proper setup of an SSH server to be used with XPipe, including on systems like Windows guests, see [here](/guide/ssh#windows-ssh-servers).
 
 ## Dashboard access
 
