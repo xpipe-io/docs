@@ -135,6 +135,16 @@ The force push is required to overwrite the remote repository. Without the push,
 
 Note that if multiple instances are synced to this repository, you will have to perform the reset on all instance repositories. Otherwise, starting another XPipe instance where the local reset was not performed, will push the reverted changes again.
 
+## Sync frequency
+
+By default, XPipe will instantly commit and push changes to the remote when they are made. This guarantees that all information is always as up to date as possible, which comes in useful when you are running multiple XPipe instances at the same time or using a team vault with multiple team members.
+
+However, if you don't need this, and use the git sync primarily as a backup functionality, you can disable this in the settings menu:
+
+![](/images/sync-instantly.png)
+
+This will reduce the amount of pushed commits by squashing them. It will also reduce the amount of times changes are pushed to the remote.
+
 ## Team vaults
 
 The git synchronization also supports multiple different users or groups for when you are working with your team. It allows each team member to share access to systems that are designated to be available to all users, while also allowing each user or group to keep selected systems and authentication options private.

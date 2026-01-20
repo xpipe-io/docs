@@ -101,6 +101,10 @@ This is useful for actions you want to perform at any time. In this example, you
 sudo apt update && sudo apt upgrade
 ```
 
+#### Arguments
+
+If you are looking to execute your scripts with custom arguments, it is recommended to use them as [shell session scripts](#shell-session-scripts) instead. With them, you can call the same scripts with any custom set of arguments from your terminal session.
+
 ### File browser scripts
 
 All file browser sessions that work through shell connections also support the execution of arbitrary commands. In addition to the pre-existing actions found in the file context menu, you can add your own commands.
@@ -111,7 +115,7 @@ Any script that is enabled, compatible with the file browser session shell, and 
 
 #### Arguments
 
-One of the core features of file scripts is the support of arguments, which are provided by the file browser selection. So if you have one or more files selected in the file browser, they are automatically passed as arguments to the script as normal. This is the same as simply running `myscript.sh "<file 1>" "<file 2>"` manually. The behavior of passing arguments is the same for all shells, so if you're implementing a cmd script instead, you can refer to it with `~%1`, `~%2`, and so on. The arguments are ordered by the time of selection.
+One of the core features of file browser scripts is the support of arguments, which are provided by the file browser selection. So if you have one or more files selected in the file browser, they are automatically passed as arguments to the script as normal. This is the same as simply running `myscript.sh "<file 1>" "<file 2>"` manually. The behavior of passing arguments is the same for all shells, so if you're implementing a cmd script instead, you can refer to it with `~%1`, `~%2`, and so on. The arguments are ordered by the time of selection.
 
 Note that there is currently no verification for arguments, so if you have a different number of files selected than your script actually requires, you will still be able to call the script from the menu. So to avoid any mishaps, it is recommended to validate the script arguments to have the correct amount. This also applies to file types, so a script that takes a directory as input should check to see if it was not accidentally called on a file instead.
 
