@@ -10,6 +10,8 @@ import defaultMdxComponents from 'fumadocs-ui/mdx';
 import { Callout } from 'fumadocs-ui/components/callout';
 import {Metadata} from "next/types";
 import NotFound from "next/dist/client/components/builtin/not-found";
+import {ImageZoom} from "fumadocs-ui/components/image-zoom";
+import {Step, Steps} from "fumadocs-ui/components/steps";
 
 export default async function Page(props: PageProps<'/[[...slug]]'>) {
   const params = await props.params;
@@ -34,7 +36,13 @@ export default async function Page(props: PageProps<'/[[...slug]]'>) {
       <DocsTitle>{page.data.title}</DocsTitle>
       <DocsDescription>{page.data.description}</DocsDescription>
       <DocsBody>
-        <MDX components={{ ...defaultMdxComponents, Callout, APIPage }} />
+        <MDX components={{
+            ...defaultMdxComponents,
+            img: (props) => <ImageZoom {...(props as any)} />,
+            Callout,
+            Step,
+            Steps,
+            APIPage }} />
       </DocsBody>
     </DocsPage>
   );
