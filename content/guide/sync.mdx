@@ -1,6 +1,6 @@
 ---
 title: Synchronization
-description: Synchronizing connection data cross multiple systems
+description: Synchronizing connection data across multiple systems
 ---
 
 ## Introduction
@@ -38,7 +38,7 @@ For more information, see:
 - [GitHub credential manager](https://docs.github.com/en/get-started/getting-started-with-git/caching-your-github-credentials-in-git)
 - [git credential helpers](https://git-scm.com/doc/credential-helpers)
 
-Alternatively, if no credentials are configured for your local git client yet, you have the option to specify them in XPipe itself without making them available to the entire git CLI client:
+Alternatively, if no credentials are configured for your local git client yet, you also have the option to specify them in XPipe itself without making them available to the entire git CLI client:
 
 ![](/images/sync-auth.png)
 
@@ -104,6 +104,8 @@ The only more complicated case is on Windows where you can have potentially two 
 
 If you don't want to host your remote git repository on some server somewhere and instead prefer a local option, for example, a flash drive, to sync data between machines, you can do that as well.
 
+### Git repositories
+
 Git and XPipe support a `file://` URL as well in addition to the more commonly used https and SSH URLs. You can create a local sync repository as follows:
 
 ```bash
@@ -118,6 +120,24 @@ Then, you can configure a file URL in XPipe:
 ![](/images/sync-local.png)
 
 Note that the syntax for a file URL is `file://<absolute path>` where the absolute path on Windows has to be adjusted to use forward slashes and start with one as well. The path `/home/user/xpipe_repo` on Linux would become `file:///home/user/xpipe_repo` and the path `C:\Users\User\xpipe_repo` on Windows would become `file:///C:/Users/User/xpipe_repo`.
+
+### Plain directories
+
+As an alternative to a local git repository, you can also choose to just sync to a plain directory instead:
+
+![](/images/sync-directory.png)
+
+This will also sync to a directory, but without initializing a git repository. It is just a plain data directory. This option works, but lacks several more advanced features a git repository can offer like a version history for your data. It is only recommended to be used if you are already using another solution to sync your data.
+
+## Sync frequency
+
+By default, XPipe will instantly commit and push changes to the remote when they are made. This guarantees that all information is always as up to date as possible, which comes in useful when you are running multiple XPipe instances at the same time or using a team vault with multiple team members.
+
+However, if you don't need this, and use the git sync primarily as a backup functionality, you can choose to only sync once a session or even fully manually:
+
+![](/images/sync-mode.png)
+
+Reducing the sync frequency will reduce the amount of commits by squashing them. It will also reduce the amount of times changes are pushed to the remote.
 
 ## Reverting to a previous commit
 

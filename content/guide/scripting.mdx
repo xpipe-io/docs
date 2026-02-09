@@ -12,14 +12,19 @@ XPipe's scripting functionality for shells allows you to extend and customize yo
 - In the file browser, with selected file paths as script arguments
 - In an active terminal session opened from XPipe
 
-### Shell compatibility
+### Shell types
 
-Each remote system you connect to has a specific login shell type. This can be something like cmd, powershell, bash, etc. Any scripts you create will also be bound to that shell dialect. For example, if you write a bash script, it won't run on a powershell-based connection. Therefore, the first choice you have to make is which shell dialect you are creating a script for:
+Each remote system you connect to has only specific shells installed. This can include something like cmd, powershell, bash, etc. Any scripts you create will also be bound to a certain shell. For example, if you create a bash script, it won't run on a Windows system. If you create a zsh script but your system does not have zsh installed, then you won't be able to run the script there as well. Therefore, the first choice you have to make is which shell type you are creating a script for:
 
 ![script-dialects](/images/script-dialects.png)
 
-Any script declared as a `sh` script will be able to run in any posix-related shell environment, such as `bash` or `zsh`.
-If you intend to run a basic script on many different systems, then using only `sh` syntax scripts is the best solution. Scripts that are declared as normal `powershell` scripts can also run in `pwsh` environments.
+Any script declared as a `sh` script will be able to run in any posix-related system environment. If you intend to run a basic script on many different systems, then using only `sh` syntax for your scripts is the best solution. For Linux servers, focusing on bash scripts is also a good target for compatibility.
+
+#### Script sourcing
+
+By default, XPipe will attempt to source the script if possible. This means that it will run `. <script>.sh` if the script shell type is supported by the login shell of the system. Therefore, trying to achieve script compatibility of your scripts with the login shells of your systems is important if you want to be able to set stuff like environment variables from your scripts. Environment variables set in a script only persist to the rest of the shell session if the script can be sourced.
+
+A `sh` script can be sourced by `bash` or `zsh` login shell as those are compatible. A `zsh` login shell can't source a `bash` script however. A `fish` login shell only supports sourcing other `fish` scripts, so you will have to take this into consideration when choosing script types and login shells.
 
 ### Enabled state
 
@@ -101,6 +106,10 @@ This is useful for actions you want to perform at any time. In this example, you
 sudo apt update && sudo apt upgrade
 ```
 
+#### Arguments
+
+If you are looking to execute your scripts with custom arguments, it is recommended to use them as [shell session scripts](#shell-session-scripts) instead. With them, you can call the same scripts with any custom set of arguments from your terminal session.
+
 ### File browser scripts
 
 All file browser sessions that work through shell connections also support the execution of arbitrary commands. In addition to the pre-existing actions found in the file context menu, you can add your own commands.
@@ -111,7 +120,7 @@ Any script that is enabled, compatible with the file browser session shell, and 
 
 #### Arguments
 
-One of the core features of file scripts is the support of arguments, which are provided by the file browser selection. So if you have one or more files selected in the file browser, they are automatically passed as arguments to the script as normal. This is the same as simply running `myscript.sh "<file 1>" "<file 2>"` manually. The behavior of passing arguments is the same for all shells, so if you're implementing a cmd script instead, you can refer to it with `~%1`, `~%2`, and so on. The arguments are ordered by the time of selection.
+One of the core features of file browser scripts is the support of arguments, which are provided by the file browser selection. So if you have one or more files selected in the file browser, they are automatically passed as arguments to the script as normal. This is the same as simply running `myscript.sh "<file 1>" "<file 2>"` manually. The behavior of passing arguments is the same for all shells, so if you're implementing a cmd script instead, you can refer to it with `~%1`, `~%2`, and so on. The arguments are ordered by the time of selection.
 
 Note that there is currently no verification for arguments, so if you have a different number of files selected than your script actually requires, you will still be able to call the script from the menu. So to avoid any mishaps, it is recommended to validate the script arguments to have the correct amount. This also applies to file types, so a script that takes a directory as input should check to see if it was not accidentally called on a file instead.
 

@@ -25,6 +25,20 @@ Clicking on the button will automatically start the search for available and sup
 
 Clicking on ok will proceed to add the selected connections. This will, depending on the integration, either add sub connections automatically or not. For some integrations, you will still have to click on refresh to update the list of available children. Furthermore, some newly added integrations require something like a login or registration in order to work.
 
+## Adding connections in bulk
+
+Especially when starting out with XPipe, you might have to search for available connections on many new systems that were just added. For these cases, it is recommended to first turn off the setting to automatically show the search dialog when adding a new connection:
+
+![](/images/connection-search-setting.png)
+
+Then, you can use the [batch mode](/guide/hub#batch-mode) to search on multiple systems within one dialog:
+
+![](/images/connection-search-batch.png)
+
+This will show all available types of connections joined together. Ticking a certain connection type will add it for all systems where the connection type is supported:
+
+![](/images/connection-search-multi-dialog.png)
+
 ## License requirements
 
 Any integrations that require a license are still shown in the list, but are denoted as requiring a license. You can add these connections and interact with them somewhat without a license. Only certain actions like opening a terminal session are not supported. That way, you are able to verify whether everything is detected correctly and works before considering upgrading to a paid plan.
