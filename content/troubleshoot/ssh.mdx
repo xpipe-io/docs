@@ -55,6 +55,12 @@ The error message `no route to host` indicates a DNS resolution failure or netwo
 
 On macOS, this issue might also occur if you don't allow XPipe network access. You can explicitly allow network access for XPipe in the system settings -> `Security and privacy` -> `Local network`.
 
+### Connection reset
+
+The error `connection reset` indicates that the connection was abruptly interrupted. This can happen if the connection is unstable, the SSH server abruptly terminates, or the SSH server is misconfigured.
+
+If you receive a `connection reset` right upon the initial connection to the server, the SSH server might be running into trouble. For example, the server configuration file might be invalid, a module could not be loaded, or something similar.
+
 ### Client loop: send disconnect / connection reset / broken pipe
 
 Since Windows 10, Microsoft has been shipping an OpenSSH client and server with Windows that you can use. You just have to enable the OpenSSH server feature for your Windows installation as shown [here](https://learn.microsoft.com/en-us/windows-server/administration/openssh/openssh_install_firstuse?tabs=gui&pivots=windows-server-2022).
