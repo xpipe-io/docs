@@ -73,7 +73,7 @@ By default, a docker container does not have access to the network tunnel driver
 
 If you are planning to use networking tools like tailscale in the webtop, you will have to pass the TUN device to the container and run it with privileged network permissions. Otherwise, the tailscale daemon won't be able to start. You can do this by passing the following arguments to the container:
 
-`--cap-add=NET_ADMIN --priviliged`
+`--cap-add=NET_ADMIN --privileged`
 
 ### Installation commands
 
@@ -109,7 +109,7 @@ docker run -d \
   --name=xpipe-webtop \
   -e SUBFOLDER=/ `#optional, to run in a subfolder reverse proxy` \
   --cap-add=NET_ADMIN `#optional, to enable tailscale` \
-  --priviliged `#optional, to enable tailscale` \
+  --privileged `#optional, to enable tailscale` \
   -p 127.0.0.1:3000:3000 \
   -p 127.0.0.1:3001:3001 \
   -v /path/to/data:/config \

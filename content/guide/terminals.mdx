@@ -11,6 +11,34 @@ However, the amount of features for each individual integration depends on how m
 
 This page intends to cover all the things to watch out for when using various terminals and how to configure them so that they can work with XPipe in the most optimal fashion. Note that this page does not list all supported terminals, it only covers important ones that might need additional context.
 
+## Terminal docking
+
+On Windows, you can dock terminals to the XPipe application window. When enabled, XPipe will then manage and resize the terminal window to fit into the connection hub:
+
+![Dock](/images/dock.png)
+
+A docked terminal is fixed to the XPipe window but can also be detached from it. If you move the terminal window away manually, e.g. by dragging it or using keyboard shortcuts, it enters a detached state where XPipe no longer manages the terminal.
+
+You can also minimize the terminal normally, plus also toggle the terminal with the terminal dock button that will show up at the bottom right when a terminal is active:
+
+![Dock toggle](/images/dock-toggle.png)
+
+The dock button will also change the icon depending on the terminal state, e.g. when it is detached or mininized.
+
+If you want to disable the terminal docking completely, you can do so in the settings menu:
+
+![Dock setting](/images/dock-setting.png)
+
+### Window focus
+
+The terminal dock might feel a little weird at first due to how it works with controlling the terminal window. The main thing to keep in mind is that XPipe manages the terminal window, not the other way around. This means that if you want to move the windows to another position, you will have to drag the XPipe window, not the terminal window. The XPipe window then automatically moves the terminal for you if it is attached.
+
+To control both XPipe and terminal with other operations like keyboard shortcuts, you will first have to make sure that the XPipe window has focus. If the terminal window has focus, the XPipe window will not receive those shortcuts and the terminal becomes detached.
+
+In this example, you can see that the left XPipe window has focus, so it will receive any input. The right XPipe window does not have focus as the window frame is greyed out, meaning that the terminal will receive input:
+
+![](/images/dock-focus.png)
+
 ## Multiplexers
 
 XPipe comes with integrated support for the terminal multiplexers [tmux](https://github.com/tmux/tmux/wiki), [zellij](https://zellij.dev/), and [GNU screen](https://www.gnu.org/software/screen/). Using terminal multiplexers allows you to make proper use of terminals that don't support opening new tabs from XPipe. So if your favorite terminal here is listed as not recommended as it does not support tabs, using a multiplexer can fix this limitation.
@@ -110,7 +138,7 @@ It is almost impossible to fully clean complex terminal output with lots of form
 
 Some terminals, for example Warp, also run various commands in your shell to realize their own functionality, such as advanced auto-completion. These commands, which are normally hidden in your terminal session, will show up when using logging and will clutter your output. Since you can't fully turn this behavior of in some terminals, it is recommended to switch to a more conservative terminal that does not implement custom functionality on top of shell sessions.
 
-Furthermore, as mentioned before in the Windows section, you should use a WSL terminal environment on Windows to improve the quality of the output. 
+Furthermore, as mentioned before in the Windows section, you should use a WSL terminal environment on Windows to improve the quality of the output.
 
 ## Noteworthy integrations
 
