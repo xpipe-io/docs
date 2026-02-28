@@ -119,6 +119,28 @@ Explicitly assigned indices will show up next to the connection name like this:
 
 ![](/images/order-list.png)
 
+## Connection notes
+
+For each connection, you have the ability to add custom notes. This can be any kind of information that you want to keep track of for certain systems. To add notes, you can use this option in the context menu of a connection:
+
+![](/images/notes-add.png)
+
+A dialog will then open were you the current connection notes are previewed as markdown:
+
+![](/images/notes-dialog.png)
+
+The notes can be edited via your text editor by clicking on the edit button in the top right corner of the markdown content:
+
+![](/images/notes-dialog-edit.png)
+
+Existing notes can be shown later on by clicking on the notes button which is visible if a connection entry contains notes:
+
+![](/images/notes-edit.png)
+
+If you are rendering complex markdown syntax which is not considered the universal standard, some elements might not be rendered correctly. This can, for example, be a markdown-based diagram. In that case, it makes sense to open the markdown content straight in an external text editor that supports those advanced rendering features in a markdown preview. You can open the editor without showing the notes dialog within XPipe by shift-clicking the notes button instead.
+
+If you're looking to securely store the notes content, you can take a look at the different [vault encryption](/guide/sync#vault-encryption) methods.
+
 ## Compact mode
 
 The connection hub interface will compact itself in situations where the window width is small. This gives you more space for your connections.

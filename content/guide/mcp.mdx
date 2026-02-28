@@ -17,17 +17,15 @@ First, you will have to enable the MCP server feature in the settings menu as it
 
 Note that there is a separate option for potentially destructible functionality. By default, only read-only functionality is exposed by the MCP server, for example, the ability to read the contents of a remote file. To also give your MCP client access to write files and more, you will have to enable the mutation tool setting. When starting out, it is best to start with read-only tools first to prevent any accidents.
 
-When the MCP server is enabled, it will show the connection information in the standard `mcp.json` format that you can just copy-paste into your client (if it supports the format):
+When the MCP server is enabled, it will show the connection information various different common formats that you can just copy-paste into your client:
 
-![](/images/mcp-config.png)
-
-If your client does not support the `mcp.json` format, you will have to configure it manually with the connection information provided.
+![](/images/mcp-instructions.png)
 
 Once your client is configured, reloading the MCP integrations should recognize the XPipe MCP server and its provided capabilities:
 
 ![](/images/mcp-cursor-settings.png)
 
-Note that the streamable HTTP transport protocol is required. This is relatively new and might not be supported by all clients yet. If your MCP client only supports the SSE transport, then you won't be able to connect to the XPipe MCP server. If you can only enter the URL and do not have an option to choose between different protocols, it is likely that only SSE is supported. XPipe will show an error message if a client attempts to connect via SSE.
+Note that the streamable HTTP transport protocol is required. This is relatively new and might not be supported by all clients yet. If your MCP client only supports the SSE transport, then you won't be able to connect to the XPipe MCP server. XPipe will show an error message if a client attempts to connect via SSE.
 
 ## The first prompt
 
@@ -85,6 +83,16 @@ In a session without this context, however, it will look completely different:
 ![](/images/mcp-context-no.png)
 
 On the same note, your agent can remember all the other MCP tool call results as well. If you list the files in a directory, for example, your client will be able to take into account the files that exist in the directory. You then don't need to provide exact paths anymore. If there is only one docker compose config file in a directory, your client will understand the prompt `Check the compose config file for configuration errors` as it knows the exact path to the file you refer to.
+
+### Passing additional context
+
+To pass additional global context to the MCP client, for example, information about your network details, you can use the MCP context setting:
+
+![](/images/mcp-context.png)
+
+Individual [connection notes](/guide/hub#connection-notes) that were added to a system are also available to the agent as well. This allows you to configure individual context information for a connection, e.g. individual connection properties or guidelines:
+
+![](/images/mcp-notes.png)
 
 ## MCP schema reference
 
