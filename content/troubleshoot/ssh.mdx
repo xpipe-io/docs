@@ -21,7 +21,19 @@ Here is a compiled list of common issues and potential fixes.
 
 By default, OpenSSH requires that all key files should only be accessible by your current user. This behavior can't be changed, so you will have the same permission requirements with XPipe.
 
-On Windows, since file-based permissions are rather untypical, so OpenSSH requires your key file to be located somewhere in your user home director at `C:\Users\User`. If your key is not located there, there is still the option to modify file-based permissions to make the file only accessible by your current user. XPipe will offer you the option to attempt to do this, however, this might not always work due to the complexities of Windows file permissions and how strict OpenSSH is. If the automatic permission change in XPipe doesn't work, which happens for keys located on some external flash drive, the best option is to just copy the file into your user directory.
+#### Windows systems
+
+On Windows, since file-based permissions are rather untypical, OpenSSH requires your key file to be located somewhere in your user home directory at `C:\Users\User`. If your key is not located there, there is still the option to modify file-based permissions to make the file only accessible by your current user.
+
+XPipe will offer you the option to attempt to modify file permissions, however, this might not always work due to the complexities of Windows file permissions and how strict OpenSSH is. If the automatic permission change in XPipe doesn't work, which can happen for keys located on some external flash drive for example, the best option is to just copy the file into your user directory.
+
+Note that if your file system permissions for your user directory are altered and allow access of other users, then even having keys in the user home directory will fail with the same error message. You can check whether this is the case by looking at the security tab of the home folder:
+
+![](/images/windows-perms.png)
+
+If another user is listed there, removing the access permissions for the directory and the subdirectories should fix the problem.
+
+#### Unix-based systems
 
 On Unix-based operating systems, this is enforced by requiring a key file to have no permissions for anything other than the current user, e.g. `400` or `600` permissions. XPipe will automatically attempt to adjust permissions on these platforms if the permissions are too open. This might fail if the key is stored on a different file system that prevents these kinds of modifications, like a formatted flash drive. In that case, you have to make sure that the permissions are correct.
 
