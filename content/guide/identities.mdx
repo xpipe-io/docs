@@ -1,0 +1,78 @@
+---
+title: Identities
+description: Managing identities to connect to remote systems
+---
+
+## Introduction
+
+An identity in the context of XPipe is a combination of a username, a password, and an SSH key where each part is optional. Which parts are required depend on the connection type and the authentication configuration of the remote system.
+
+The credentials of an identity are used in various contexts, it is not only used for authentication. They are also used for elevation like for sudo when a password is required. For example, if you authenticate to a system via SSH with a user and key, it might still it makes sense to specify a password in the identity if the user requires that for sudo elevation. Then, XPipe can use this automatically without prompting you for the password.
+
+Any connection configuration dialog which takes an identity will have the option to either create a new identity or select an existing one:
+
+![](/images/id-select.png)
+
+## Inline identities
+
+In cases where you don't need to reuse an identity for multiple systems, it might make sense to just specify the identity inline. You can do this by just starting to fill out the user identity text field with a username instead of selecting an existing identity or clicking on the button to create a new one:
+
+![](/images/id-inline.png)
+
+If, at a later point, you decide to make your inline identity a reusable one, you can do so by clicking on the identity creation button:
+
+![](/images/id-create.png)
+
+This will automatically create a reusable identity with your existing login details prefilled.
+
+## Local identities
+
+The most basic identities are local identities, which are just available on this local XPipe installation. This distinction is relevant in the context of git vaults where your vault content is shared across multiple systems and users.
+
+![](/images/id-local.png)
+
+If you are using a [git vault](/guide/sync), then local identities cannot be synced. If you want to sync those identities, there is a button for local identities to convert them to synced identities:
+
+![](/images/id-convert.png)
+
+## Synced identities
+
+A synced identity is designed to be included in a [git vault](/guide/sync). You can only create those types of identities if the vault sync setting is enabled.
+
+If the identity contains a key file, then this key file must be synced to the git vault as well. You can do this with the git button for the key file field:
+
+![](/images/id-sync.png)
+
+You can control whether this identity should be available only for your user or all users in a team vault. If you don't use a team vault, this option is greyed out.
+
+![](/images/id-personal.png)
+
+This property is visible in the connection hub where personal (= only available to your user) and global identities (= available to all users) have different descriptions:
+
+![](/images/id-scope.png)
+
+An identity that is not available to a user, e.g. if it belongs to another user and the identity is marked as personal, then the identity will not show up for the other user. Any connections using this identity will also not show up for the other user. This allows you to keep connections and identities for yourself, even in a shared team vault.
+
+## Password manager identities
+
+If you use a password manager to store credentials and maybe also SSH keys, then you can use password manager identities to retrieve this data directly. These identities can only be created if a [password manager](/guide/password-manager) is configured in the settings. Whether password manager identities also support SSH keys it depends on the individual password manager and whether the agent integration is enabled in the settings menu.
+
+![](/images/id-pwman.png)
+
+The first part, the credentials entry, specifies how to retrieve a username + password credentials entry from the password manager. Since identities are flexible, the username or password might be optional, depending on how the identity is used.
+
+If the password manager supports an SSH agent and the agent integration is enabled in the settings menu, you can specify either the public key or the name of the SSH key you want to use. The select button on the right of the agent key selector field it provides you with an easy-to-use dialog to autofill this information.
+
+You can also choose the user access similar to synced identities when you are using a team vault.
+
+For more information on how to connect your password manager to XPipe, see the [password manager docs](/guide/password-manager).
+
+## Multi identities
+
+In a team vault environment, different users might want to use different local identities to connect to the same system. Or you maybe just want to be able to quickly switch between different logins for a system. With multi identities, you can do this:
+
+![](/images/multi-identity.png)
+
+A multi identity contains a list of available identities. If any of those identities are marked as personal and are inaccessible to another user, then a multi identity will automatically filter those out. The same applies if a multi identity is synced but some individual identities are not.
+
+Every user will end up with a list of available identities, meaning that multi identities can automatically allow users in a team vault to log in with their own personal connection credentials. Just create a synced multi identity and let each user add their personal identity to it. Then, setting this multi identity for connections will automatically make it use the personal identity while keeping the same connection configuration for everyone in the shared vault.
