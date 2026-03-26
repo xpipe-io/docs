@@ -111,6 +111,12 @@ MACs +hmac-sha1
 
 XPipe is able to automatically configure this for simple SSH connections. For other types of SSH connections, you have to add this option by yourself. You can check which MACs your SSH client supports with `ssh -Q mac`.
 
+### Gateway tunnel / jump server failure
+
+If you configured a connection to use a [gateway](/guide/ssh#gateways-and-jump-servers) and receive errors like `Connection closed by 127.0.0.1 port 36825`, `Connection reset by 127.0.0.1 port 36825`, `stdio forwarding failed`, or `channel 0: open failed: administratively prohibited: open failed`, this usually indicates that the intermediate gateway host does not allow TCP forwarding and tunneling.
+
+You can check on the gateway system whether `AllowTcpForwarding no` is set in the sshd_config.
+
 ### Connection closed by remote host
 
 If you get a message like `Connection closed` or `kex_exchange_identification: Connection closed by remote host`, the SSH server explicitly disconnected your connection attempt. This can happen if, for example, rate limits are exceeded and too many users connect.
@@ -122,6 +128,12 @@ If you find the output `debug1: kex_exchange_identification: banner line 0: Not 
 ### Bad file descriptor
 
 The error message `ssh: connect to host port 22: Bad file descriptor` can occur if an invasive external monitoring program interferes with SSH connections. For example, if you are using [LittleSnitch](https://www.obdev.at/products/littlesnitch/index.html) or something similar
+
+### Agent refused operation
+
+If you receive the error message `signing failed: agent refused operation`, make sure that any private key setup is configured correctly. You can, for example, get this error message if any key file permissions or `.ssh` directory permissions are wrong or a hardware security key is not supported.
+
+A similar error message like `Error connecting to agent: Connecting refused` usually means that the agent is running but not accepting connections, e.g. when using a password manager SSH agent while the password manager is locked.
 
 ### Requested feature not supported
 
@@ -135,10 +147,8 @@ If you receive a generic `Permission denied` error without additional context wh
 
 ### Connection timeout
 
-An SSH connection timeout indicates that no connection to the target system's SSH server could be established at all. Make sure that you have to correct connection information and the system is reachable from your local system. Also make sure that no firewall is blocking connection attempts on the SSH server port and that the SSH server is running on the correct port.
+An SSH connection timeout indicates that no connection to the target system's SSH server could be established at all or the remote shell did not respond.
 
-### Shell timeout
+Make sure that you have to correct connection information and the system is reachable from your local system. Also make sure that no firewall is blocking connection attempts on the SSH server port and that the SSH server is running on the correct port.
 
-A shell init timeout error indicates that an SSH connection succeeded, but the remote shell did not respond in time. This can have multiple reasons:
-- The server is overloaded or just very slow
-- The server is not using a regular command shell such as cmd, bash, zsh, or otherwise. This is true for limited and embedded devices such as routers, links, etc. For information on how to connect to these systems, see [limited and embedded devices](/guide/ssh#limited--embedded-systems).
+In addition, this might also occur if the server is not using a regular command shell such as cmd, bash, zsh, or otherwise. This is true for limited and embedded devices such as routers, links, etc. For information on how to connect to these systems, see [limited and embedded devices](/guide/ssh#limited--embedded-systems)

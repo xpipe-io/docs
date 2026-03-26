@@ -45,7 +45,7 @@ For remote connections, the connected user account has to be given administrator
 
 ### Custom users
 
-On non-Windows system, you can enter a custom user to log in as. XPipe will then use sudo to switch to the specified user. This is done as only sudo supports all features required for this switch. As a result, you potentially have to enter your sudo password for this switch to succeed.
+On non-Windows system, you can enter a custom user to switch to. XPipe will then use `sudo -u` to switch to the specified user. This is done as only sudo supports all features required for this switch. As a result, you potentially have to enter your sudo password for this switch to succeed.
 
 The user also needs to support logins. If the target user's login shell is set to `nologin`, launching the shell environment will fail.
 

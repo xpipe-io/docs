@@ -157,7 +157,7 @@ For an SSH connection, it could, for example, look something like this if it ref
 ```json
 {
   "type" : "ssh",
-  "proxy" : "f0ec68aa-63f5-405c-b178-9a4454556d6b",
+  "gateway" : "f0ec68aa-63f5-405c-b178-9a4454556d6b",
   "host" : "myip.eu-central-1.compute.amazonaws.com",
   "port" : 22,
   "identity" : {
@@ -176,7 +176,7 @@ or something like this if it has encrypted credentials configured in-place:
 ```json
 {
   "type" : "ssh",
-  "proxy" : "f0ec68aa-63f5-405c-b178-9a4454556d6b",
+  "gateway" : "f0ec68aa-63f5-405c-b178-9a4454556d6b",
   "host" : "myip.eu-central-1.compute.amazonaws.com",
   "port" : 22,
   "identity" : {
@@ -273,7 +273,7 @@ client = Client()
 # The connection schema
 data = {
     "type": "ssh",
-    "proxy": "f0ec68aa-63f5-405c-b178-9a4454556d6b",
+    "gateway": "f0ec68aa-63f5-405c-b178-9a4454556d6b",
     "host" : "myip.eu-central-1.compute.amazonaws.com",
     "port" : 22,
      "identity" : {
@@ -310,7 +310,7 @@ client = Client()
 # The connection schema
 data = {
     "type": "ssh",
-    "proxy": "f0ec68aa-63f5-405c-b178-9a4454556d6b",
+    "gateway": "f0ec68aa-63f5-405c-b178-9a4454556d6b",
     "host" : "myip.eu-central-1.compute.amazonaws.com",
     "port" : 22,
      "identity" : {
@@ -324,7 +324,7 @@ data = {
 }
 ```
 
-This will make the connection creation much easier. You can also create identites through the same API and with the same encrypted values for the password and SSH key; however, it is easier to use in the GUI.
+This will make the connection creation much easier. You can also create identities through the same API and with the same encrypted values for the password and SSH key; however, it is easier to use in the GUI.
 
 ### Adding other connections
 
