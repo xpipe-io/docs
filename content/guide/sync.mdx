@@ -80,7 +80,7 @@ The sync settings for a category are inherited by default from its parent if not
 
 ![sync-add](/images/sync-add.png)
 
-## Adding files to git
+## Adding external files to git
 
 When everything is set up, you have the option to add any additional files such as SSH keys, identities, and various other data files to git as well. Next to every file chooser is a git button that will add the file to the git repository:
 
@@ -145,7 +145,7 @@ By default, only sensitive connection details like passwords are encrypted. Othe
 
 ![](/images/vault-encrypt-all.png)
 
-As explained, this will make individual commits for simple connection changes unreadable due to all information being encrypted.
+This will make individual commits for simple connection changes unreadable due to all information being encrypted. For further privacy, you can also choose to hide all the connection names from commit messages or README files to not expose any information about the types of connections in the vault.
 
 Which specific encryption key will be used depends on whether you have configured any vault users or a team vault. It is strongly recommended to use create a vault user with a custom password when enabling this setting to guarantee the strongest possible encryption for your data.
 

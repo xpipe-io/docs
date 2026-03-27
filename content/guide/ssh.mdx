@@ -71,15 +71,19 @@ On Windows, XPipe will automatically start the agent process if it is not runnin
 
 If you are using any other agent, for example from a password manager, you can use the custom SSH agent option instead.
 
+#### Password manager agent [!toc]
+
+If you are using a password manager with an SSH agent functionality, you can choose to use it here. XPipe will verify that it doesn't conflict with any other agent configuration. XPipe, however, can't start this agent by itself, you have to ensure that it is running.
+
+For more information, see [password manager page](guide/password-managers).
+
 #### Custom agent [!toc]
 
 On Linux and macOS, you will also have access to the custom agent option as on these systems, any custom agent will use a different location for the socket. The custom socket location can be configured in the settings menu:
 
 ![](/images/ssh-agent-custom.png)
 
-If you are using a password manager with an SSH agent functionality, you can choose to use it here. XPipe will verify that it doesn't conflict with any other agent configuration. XPipe, however, can't start this agent by itself, you have to ensure that it is running.
-
-For more information, see [password manager page](guide/password-managers).
+This is suitable if you are using a niche agent that is not supported out-of-the-box by XPipe.
 
 #### GPG Agent [!toc]
 
@@ -110,6 +114,15 @@ This will instruct the OpenSSH client to load the specified shared library file,
 #### Other external agent [!toc]
 
 This option will permit any external running identity provider to supply its keys to the SSH client. You should use this option if you are using a password manager agent on Windows or any other agent to manage your SSH keys. XPipe will not interact with any external agent in this case, it will just allow any program to supply keys to the SSH client. You will have to make sure that the agent you want to use is running beforehand and configured correctly.
+
+#### Other auth types
+
+In case your authentication method is not covered at all by the available predefined methods, you can still choose to use the [additional SSH options](#adding-ssh-options) field to supply any arbitrary auth config data to SSH.
+
+For example, if you are using something like [OpenBao](https://openbao.org/docs/secrets/ssh/signed-ssh-certificates/#client-ssh-authentication) to authenticate via SSH, you will have to use the additional options field to pass two key files:
+
+![](/images/ssh-openbao.png)
+
 
 ### Generating keys
 
@@ -219,9 +232,9 @@ If you want to learn more about how to use SSH configs, you can use `man ssh_con
 
 ### Text-based connections
 
-If you want to create a fully customized SSH connection with more options than you can find in the simple SSH connection creation dialog, you can take a look at customized SSH connections. These allow you to specify an SSH connection in-place using the SSH config syntax you know. It is essentially a way to create SSH config connections without having to go through dealing with creating config files. This is recommended if you are an advanced user and know what you're doing.
+If you want to create a fully customized SSH connection with more options than you can find in the normal SSH connection creation dialog, you can take a look at customized SSH connections. These allow you to specify an SSH connection in-place using the SSH config syntax you know. It is essentially a way to create SSH config connections without having to go through dealing with creating config files. This is recommended if you are an advanced user and know what you're doing.
 
-Note that most features can be realized through [simple SSH connections](/guide/ssh) already. Things like ProxyJump chains, additional SSH options, and more can already be used with simple SSH connection entries. Custom SSH connections are only really necessary for very specific use cases.
+Note that most features can be realized through normal SSH connections already. Things like ProxyJump chains, additional SSH options, and more can already be used with normal SSH connection entries. Custom SSH connections are only really necessary for very specific use cases.
 
 #### Format
 
@@ -269,7 +282,7 @@ Note that it is recommended to use a proper SSH config file for ProxyJump chains
 
 ### Adding SSH options
 
-Simple SSH connections can be augmented with SSH config options if needed. This bridges the gap between basic SSH connections and fully custom SSH connections, which might be overkill for some cases. If you are just looking to add a simple option for a connection, like accepting a deprecated host key algorithm, you can add this in the advanced configuration:
+SSH connections can be augmented with SSH config options if needed. This bridges the gap between basic SSH connections and fully custom SSH connections, which might be overkill for some cases. If you are just looking to add a simple option for a connection, like accepting a deprecated host key algorithm, you can add this in the advanced configuration:
 
 ![](/images/ssh-options.png)
 

@@ -74,7 +74,7 @@ body {
 }
 
 #nd-sidebar {
-    @apply bg-[#fffb] dark:bg-[#101215ee] max-w-[275px];
+    @apply bg-[#fffb] dark:bg-[#101215ee];
 }
 
 #nd-sidebar p {
