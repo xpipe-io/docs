@@ -81,18 +81,6 @@ This will create a new subcategory and automatically move all child connections 
 
 Whenever you refresh the parent, the default docker context, any new container entries are also added to the breakout category. You can also create further nested breakout categories on systems within a breakout category.
 
-### Common setups
-
-A common setup for categories is to separate each environment into, for example, development and production. In the production category, you can then configure that all modifications should require confirmation and that scripts are disabled for connections. This reduces the number of possible mistakes.
-
-As a visual indicator, you can assign different category colors for production and development environments. These colors are then shown for all connections of that category, both in the file browser and in the terminal (if supported).
-
-![](/images/category-setup.png)
-
-If you have multiple clients and want to separate everything, partitioning the top-level categories with all the different clients also makes sense:
-
-![](/images/category-setup-client.png)
-
 ## Ordering
 
 As your connection grows, ordering individual connections in relative to their siblings will improve your user experience. By default, XPipe has two sorting mechanisms that work sequentially:

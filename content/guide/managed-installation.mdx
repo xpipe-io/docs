@@ -13,13 +13,13 @@ If you're looking for options to install XPipe on systems either using some pack
 
 There is a winget package available that uses the .msi installer. It can be installed for your current user with the following command:
 
-```powershell
+```bash
 winget install xpipe-io.xpipe --source winget
 ```
 
 If you want to install the package for all users, you can do so by passing the machine scope and running the command as an Administrator:
 
-```powershell
+```bash
 winget install xpipe-io.xpipe --source winget --scope machine
 ```
 
@@ -29,13 +29,13 @@ Note that due to the manual winget package PR approval process, new versions mig
 
 There is also a [choco package](https://community.chocolatey.org/packages/xpipe) that provides the same .msi installers. It can be installed for your current user with the following command:
 
-```powershell
+```bash
 choco install xpipe
 ```
 
 If you want to install the package for all users, you can do so by passing the ALLUSERS property and running the command as an Administrator:
 
-```powershell
+```bash
 choco install xpipe --install-arguments="'ALLUSERS=1'"
 ```
 
@@ -43,13 +43,13 @@ choco install xpipe --install-arguments="'ALLUSERS=1'"
 
 There is also a [scoop package](https://github.com/ScoopInstaller/Extras/blob/master/bucket/xpipe.json) in the extras bucket that provides the same .msi installers. You first have to make sure that the extras bucket is enabled with `scoop bucket add extras`. XPipe can then be installed for your current user with the following command:
 
-```powershell
+```bash
 scoop install extras/xpipe
 ```
 
 If you want to install the package for all users, you can do so by using the `--global` option and running the command as an Administrator:
 
-```powershell
+```bash
 scoop install extras/xpipe --global
 ```
 

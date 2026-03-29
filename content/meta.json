@@ -23,6 +23,7 @@
     "guide/desktop-applications",
     "guide/abstract-hosts",
     "guide/mcp",
+    "guide/workspaces",
     "---Integrations---",
     "guide/ssh",
     "guide/docker",
