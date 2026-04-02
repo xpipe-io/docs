@@ -138,11 +138,25 @@ Once the key is generated, it will be automatically placed in the open connectio
 
 ### Public key handling
 
-While you only need a private key for authentication, keeping track of the associated public keys is important as well. Especially when you want to add this keypair as an authorized key to another system. You can automatically generate and store the public key for any supplied private key automatically with the generate button in the public key field:
+While you only need a private key for authentication, keeping track of the associated public keys is important as well.
+
+#### For identities
+
+If you want to add an identity with this keypair as an authorized key to another system, you will need the public key. You can automatically generate and store the public key for any supplied private key automatically with the generate button in the public key field:
 
 ![](/images/ssh-pubkeygen.png)
 
-This might prompt you for your passphrase if the key has one.
+This might prompt for your passphrase if the key has one.
+
+#### For agents [#agent-public-keys]
+
+Another important area where public keys are important is for SSH agents. Without specifying the key name or public key identifier of the key you want to use from the agent, the default behavior of an agent is to try all available keys one-by-one. This can lead to authentication failures if your agent contains too many keys. It can also leak your key to systems you didn't really intend to provide with a specific key.
+
+The solution to this is to specify the name or public key when using an agent in XPipe. This will force the agent to only use the one matching key and not accumulate unrelated authentication failures. Any agent configuration in XPipe contains a field for this, including a selector to quickly retrieve the key identifier from the list of available keys.
+
+![](/images/ssh-agent-selector.png)
+
+For password manager SSH agents, XPipe also might support the readable key name instead of the public key if the agent supports that. If it does, the automatic selector will fill in the name of the key.
 
 ### Applying identities
 

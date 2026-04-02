@@ -125,6 +125,18 @@ If you find the output `debug1: kex_exchange_identification: banner line 0: Exce
 
 If you find the output `debug1: kex_exchange_identification: banner line 0: Not allowed at this time` in the [debug output](#introduction), this indicates that too many connection attempts were made. New versions of the OpenSSH server introduce a penalty system for failed connections to prevent DDos and spamming. For more information, see [here](https://michael-prokop.at/blog/2025/04/13/openssh-penalty-behavior-in-debian-trixie-newintrixie/). You can modify the `PerSourcePenalties` setting in the sshd config to disable this.
 
+### Too many authentication failures
+
+The error message `Too many authentication failures` is often returned when an agent is used for SSH. By default, an agent will try out each available key one-by-one until one matches, or it will run out of authentication attempts as there is a max limit configured for a server.
+
+In practice, this means that even if your agent has the right key, it might still fail to authenticate if it also contains various other keys that are tried before the correct key.
+
+The solution to this is to specify the name or public key when using an agent in XPipe. This will force the agent to only use the one matching key and not accumulate unrelated authentication failures. Any agent configuration in XPipe contains a field for this, including a selector to quickly retrieve the key identifier from the list of available keys.
+
+![](/images/ssh-agent-selector.png)
+
+If you are not using an agent and still receiving this error, you have anything configured in your local SSH config file that might result in many failed authentication attempts.
+
 ### Bad file descriptor
 
 The error message `ssh: connect to host port 22: Bad file descriptor` can occur if an invasive external monitoring program interferes with SSH connections. For example, if you are using [LittleSnitch](https://www.obdev.at/products/littlesnitch/index.html) or something similar
