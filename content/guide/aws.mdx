@@ -23,6 +23,14 @@ The type of the profile is displayed next to it:
 
 If you modified any CLI profile config files, you can hit the refresh button on the top-level AWS entry to update any changes made to your profile configuration. To refresh the individual entries of profile, e.g. if you created a new EC2 instance in the region, you can hit the refresh button of the individual profile.
 
+## Synchronization
+
+If you want to [sync](/guide/synchronization) your AWS connections across multiple devices or share them with other team members, you will have to differentiate between internally managed profiles and external CLI config profiles. An internally managed profile can be synced automatically. A file-based profile requires the config file to be synced.
+
+To also sync the config file and its profiles, you will have to edit the configuration of the top-level AWS connections entry and toggle the sync button:
+
+![](/images/aws-sync.png)
+
 ## EC2 instances
 
 EC2 systems work just as any other remote system in XPipe. In addition to normal shell connection features, you can also control the instance state. The primary connection is always established through SSH, but there are two variants available.

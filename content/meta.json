@@ -32,6 +32,7 @@
     "guide/tailscale",
     "guide/netbird",
     "guide/teleport",
+    "guide/hcloud",
     "guide/lxc",
     "guide/kvm",
     "guide/vmware",
