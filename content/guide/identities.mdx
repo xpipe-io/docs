@@ -69,10 +69,46 @@ For more information on how to connect your password manager to XPipe, see the [
 
 ## Multi identities
 
-In a team vault environment, different users might want to use different local identities to connect to the same system. Or you maybe just want to be able to quickly switch between different logins for a system. With multi identities, you can do this:
+A multi identity contains a list of available identities. If any of those identities are marked as personal and are inaccessible to another user, then a multi identity will automatically filter those out. The same applies if a multi identity is synced but some individual identities, e.g. local ones, are not.
 
 ![](/images/multi-identity.png)
 
-A multi identity contains a list of available identities. If any of those identities are marked as personal and are inaccessible to another user, then a multi identity will automatically filter those out. The same applies if a multi identity is synced but some individual identities are not.
+It supports fast switching between individual identities, allowing for a flexible usage in various different scenarios. Below for possible usages.
 
-Every user will end up with a list of available identities, meaning that multi identities can automatically allow users in a team vault to log in with their own personal connection credentials. Just create a synced multi identity and let each user add their personal identity to it. Then, setting this multi identity for connections will automatically make it use the personal identity while keeping the same connection configuration for everyone in the shared vault.
+### Login switching
+
+If you, as a single XPipe user, frequently switch between multiple different user logins on the same system, then using multi identities will make your life much easier. They allow you to switch the active identity in one click and avoid having to manually change existing identities:
+
+![](/images/multi-identity-user.png)
+
+At any point later on, you can then switch the active identity:
+
+![](/images/multi-identity-switch.png)
+
+This will also automatically log out and reset any active background shell sessions to properly apply any user changes.
+
+### Team vaults
+
+In a team vault environment, different team members might want to use different identities to connect to the same system. In contrast to the manual user switching, this can be done automatically in team vaults. A multi identity contains a list of available identities, and if any of those identities are marked as personal and are inaccessible to another user, then a multi identity will automatically filter those out.
+
+By creating a synced multi identity and letting each user add their personal identity to it, a multi identity will automatically take care of applying the identity that is available to a user. It will use the available personal identity while keeping the same connection configuration for everyone in the shared vault.
+
+You can start by creating the multi identity for the first user:
+
+![](/images/multi-identity-team.png)
+
+Then, another user in the team vault can retrieve the team identity on a sync, but not the `team-user-1` identity, as it is marked as personal. The other user can then add their personal identity to the `team-identity` as well:
+
+![](/images/multi-identity-user2.png)
+
+Since the `team-user-1` identity is not available to the other user, it will be shown as `Unknown`. From the perspective of the other user, the multi identity will use their personal identity:
+
+![](/images/multi-identity-team2.png)
+
+### Local identities
+
+If you use local identities that are not synced, you can use a synced multi identity to choose a locally available identity on each XPipe installation:
+
+![](/images/multi-identity-local.png)
+
+In this example, it uses the local id_rsa key on installation 1 while also having another local key configured on installation 2. Since these are local key files and are not synced, only the locally available identity will show up in the list. Other unavailable ones will be shown as `Unknown`.

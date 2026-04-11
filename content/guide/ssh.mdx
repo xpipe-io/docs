@@ -111,9 +111,11 @@ If your identities are stored with the PIV smartcard function of the Yubikey, yo
 
 This will instruct the OpenSSH client to load the specified shared library file, which will handle the authentication.
 
-#### Other external agent [!toc]
+#### Other external auth [!toc]
 
-This option will permit any external running identity provider to supply its keys to the SSH client. You should use this option if you are using a password manager agent on Windows or any other agent to manage your SSH keys. XPipe will not interact with any external agent in this case, it will just allow any program to supply keys to the SSH client. You will have to make sure that the agent you want to use is running beforehand and configured correctly.
+This option will permit any external running identity provider to supply its keys to the SSH client. You should use this option if you are using any other type of password manager agent or other type of auth configured in your local SSH config file.
+
+XPipe will not interact with any external agent in this case, it will just allow any configured keys and external program to supply keys to the SSH client. You will have to make sure that the agent you want to use is running beforehand and configured correctly.
 
 #### Other auth types
 
