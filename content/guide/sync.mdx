@@ -243,6 +243,12 @@ When working in a team, an occasional merge conflict might occur when another us
 
 In most cases, you won't have to do anything as it can be handled automatically. However, if you and another team member modify the same connection configuration at the same time, you might receive a merge conflict error that can't be solved automatically. In this case, you can choose between either overriding your changes or the external changes.
 
+### Central API server
+
+By default, the nature of XPipe and the git vault is decentralized, meaning that there isn't a central backend server to manage your vault. This makes it a bit complicated in enterprise environments where server changes should be propagated to a synced vault automatically via the [HTTP API](/api), as there is no central server to send those vault update requests to.
+
+You can deploy the [XPipe Webtop container](/guide/webtop#usage-as-an-api-server) as an API server to have a central server that is linked to your vault and can handle connection updates via the API.
+
 ### Example setups
 
 This is how each variant of the team vault authentication could look like for group-based authentication.
