@@ -24,6 +24,7 @@
     "guide/abstract-hosts",
     "guide/mcp",
     "guide/workspaces",
+    "guide/team-vault",
     "---Integrations---",
     "guide/ssh",
     "guide/docker",
