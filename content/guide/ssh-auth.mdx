@@ -1,5 +1,5 @@
 ---
-title: SSH authentication
+title: SSH auth
 description: The full reference for SSH authentication
 ---
 
@@ -73,7 +73,7 @@ Any kind of key files are not added automatically to a repository and always req
 
 ### OpenSSH agent
 
-In case your identities are stored in the OpenSSH agent, XPipe can automatically use them if the agent is correctly configured in the environment. The agent socket location is retrieved from the environment variables passed to XPipe or set in the local shell init files. You have the option to automatically list all available keys in the agent:
+In case your keys are stored in the OpenSSH agent, XPipe can automatically use them if the agent is correctly configured in the environment. The agent socket location is retrieved from the environment variables passed to XPipe or set in the local shell init files. You have the option to automatically list all available keys in the agent:
 
 ![](/images/ssh-key-agent-list.png)
 
@@ -94,7 +94,7 @@ If you are using a password manager with an SSH agent functionality, you can cho
 Some password managers support referencing keys by their name while others do not, so you need to check for your individual password manager. The advantage of using key names is that if the keys are changed in the password manager, the changes are automatically applied to XPipe as well. When referencing an entry using the public key, you will have to update the public key manually in XPipe.
 
 <Callout type="info">
-    For more information on how to configure this, see the [password manager page](/guide/password-managers).
+    For more information on how to configure this, see the [password manager page](/guide/password-manager).
 </Callout>
 
 <Callout type="info">
@@ -135,7 +135,7 @@ In an enterprise environment, you might deal with certificate-based authenticati
 
 ![](/images/ssh-key-cert.png)
 
-In addition to the private key file, you have to specify the signed public certificate key. If your key his following standard naming procedure with the `-cert` suffix, this should be filled in automatically.
+In addition to the private key file, you have to specify the signed public certificate key. If your key is following standard naming procedure with the `-cert` suffix, this should be filled in automatically.
 
 <Callout type="info">Certificate auth for SSH is supported starting from the Professional plan.</Callout>
 
@@ -245,11 +245,11 @@ The process of changing the authentication configuration of a system is not alwa
 
 ![Identity Apply Dialog](/images/id-apply-dialog.png)
 
-## Two step connections
+## Two-step connections
 
 XPipe utilizes a two-step approach when connecting to a remote system. Essentially, the first connection will be opened in the background to set everything up with init scripts etc. This is also used to validate whether we can actually connect to the system in the first place. If everything is working correctly, and any init scripts are prepared, the first connection is closed, and then a second connection is opened in your terminal.
 
-## Consequences
+### Effects
 
 As a result of this approach, some authentication systems might prompt twice for any authentication if they do not support caching or reusing the same authentication tokens for a short period of time. An example would be an SSH connection setup with two-factor authentication. When opening such a connection with XPipe, it might ask you for an authentication code twice. If the authentication policy does not allow reusing authentication codes for a short period, you might have to wait until a new authentication code is generated.
 
