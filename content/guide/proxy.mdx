@@ -1,0 +1,51 @@
+---
+title: HTTP/SOCKS proxies
+description: Using your proxy with XPipe and SSH
+---
+
+## Introduction
+
+In many corporate environments, using an HTTP/SOCKS proxy might be required to use various tools. XPipe comes with full support for those types of proxies, both for the XPipe application itself and for SSH connections:
+
+![](/images/proxy-creation.png)
+
+A configuration for a proxy might look like this:
+
+![](/images/proxy-config.png)
+
+## Proxy for XPipe
+
+There are a couple of HTTP requests that XPipe itself sends to `https://api.xpipe.io` and other sites like `https://github.com`. This includes:
+
+- Update checks
+- License checks
+- Issue reports
+- Vault sync to the specified sync repository
+
+By default, XPipe will use the system proxy config for those requests if you have a proxy already configured in your local OS settings and your proxy does not additionally require authentication. If it does, or you want to specify a custom proxy within XPipe, you can do so in the settings menu:
+
+![](/images/proxy-settings.png)
+
+The test button below the selection helps you verify whether you have connectivity.
+
+### Custom TLS certificates
+
+If you use an HTTP proxy and this proxy is decrypting TLS traffic, you will receive error messages about connections failing as XPipe does not know about the custom TLS certificate yet:
+
+![](/images/proxy-trust.png)
+
+You can accept the certificate, which will automatically put it into the custom certificate store. You can browse the contents of this store in the settings menu:
+
+![](/images/proxy-browse.png)
+
+To temporarily troubleshoot issues with TLS certificates, you can choose to disable the certificate verification in the settings menu. This will allow all connections to go through, regardless of which certificate is used for HTTPS:
+
+![](/images/proxy-bypass.png)
+
+## Proxy for SSH
+
+In addition to using a proxy for XPipe itself, you also have the ability to use them as gateways for SSH connections. The gateway field supports entering proxies as well:
+
+![](/images/proxy-gateway.png)
+
+What this does is essentially route all SSH traffic via a netcat implementation over the specified proxy host. Both HTTP and SOCKS proxies support raw binary being transferred over them. Due to SSH using its own secure key exchange, any proxies that try to decrypt traffic will not be able to decrypt SSH traffic sent over them.

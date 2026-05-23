@@ -36,7 +36,8 @@ client = Client()
 client = Client(ptb=True)
 
 # To connect to a remote instance with an API key
-# This is a rather uncommon use case, but still possible nevertheless
+# To make an XPipe instance allow external connections, i.e. not on localhost,
+# you have to enable the "Allow external API requests" setting in the API settings menu
 client = Client(token="foo", base_url = "http://servername:21721")
 ```
 

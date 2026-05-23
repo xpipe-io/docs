@@ -120,6 +120,12 @@ docker run -d \
 
 <Callout type="info">The port bindings are explicitly only bound to the localhost interface in this sample to prevent you from accidentally exposing it to all public interfaces.</Callout>
 
+### Usage as an API server
+
+By default, the nature of XPipe and the git vault is decentralized, meaning that there isn't a central backend server to manage your vault. This makes it a bit complicated in enterprise environments where server changes should be propagated to a synced vault automatically, as there is no central server to send those vault update requests to.
+
+You can choose to utilize the webtop container as a sort of central API server that you can host to automatically update a synced git vault via API requests. To enable this, you will have to pass the environment variable `XPIPE_API_SERVER=true` to the container and map the port `21721` with `-p 21721:21721`. This makes the container listen on port 21721 to accept HTTP API requests. For more details on the API for automated connection and vault interaction, see the [API page](/api). The rest of the webtop will work normally, meaning that you will still have access to the graphical interface when the API server setting is enabled.
+
 ### Kasm Workspaces
 
 [Kasm Workspaces](https://kasmweb.com/docs/latest/install/single_server_install.html) provides browser-based access to on-demand containerized desktops and applications. It is essentially a system to run graphical web-based desktops like this with less setup than a manual docker setup would require. If you are using Kasm Workspaces, this image is also available in the [XPipe Kasm Registry](https://kasm.xpipe.io). You can add this registry to your registry list, which allows you to automatically retrieve XPipe Webtop in your Kasm Workspace. It is preconfigured, so it will run out-of-the-box.

@@ -73,15 +73,15 @@ Start-Process -Verb runAs -FilePath "msiexec.exe" -ArgumentList "/i `"https://gi
 
 ## Linux
 
-The rpm releases are signed with the GPG key https://xpipe.io/signatures/crschnick.asc. So please make sure so check any releases against this GPG key. This can be done automatically by your package manager if you import the key.
+The rpm releases are signed with the GPG key https://xpipe.io/signatures/0xDD3E0AD0.asc. So please make sure so check any releases against this GPG key. This can be done automatically by your package manager if you import the key.
 
 ### Debian-based distros
 
-XPipe provides an apt repository at https://apt.xpipe.io. You can add this repository as an additional source to apt to be able to install XPipe through apt directly. The releases are signed with the GPG key https://xpipe.io/signatures/crschnick.gpg. This command will perform the setup steps automatically:
+XPipe provides an apt repository at https://apt.xpipe.io. You can add this repository as an additional source to apt to be able to install XPipe through apt directly. The releases are signed with the GPG key https://xpipe.io/signatures/0xDD3E0AD0.gpg. This command will perform the setup steps automatically:
 
 ```bash
 sudo apt install wget gpg
-wget -qO- https://xpipe.io/signatures/crschnick.gpg > xpipe.gpg
+wget -qO- https://xpipe.io/signatures/0xDD3E0AD0.gpg > xpipe.gpg
 sudo install -D -o root -g root -m 644 xpipe.gpg /etc/apt/keyrings/xpipe.gpg
 rm xpipe.gpg
 sudo sh -c 'echo "deb [signed-by=/etc/apt/keyrings/xpipe.gpg] https://apt.xpipe.io/ stable main" > /etc/apt/sources.list.d/xpipe.list'
@@ -94,14 +94,14 @@ If you are looking for early access builds for new releases, you can replace the
 
 XPipe provides an rpm repository at https://rpm.xpipe.io. You can add this repository as an additional source to your rpm-based package manager (yum, dnf, zypper, rpm, etc.) to be able to install XPipe through it directly. An upgrade operation will also install the latest XPipe release automatically.
 
-The rpm releases are signed with the GPG key https://xpipe.io/signatures/crschnick.asc. You can import it via `rpm --import https://xpipe.io/signatures/crschnick.asc` to allow your package manager to verify the release signature.
+The rpm releases are signed with the GPG key https://xpipe.io/signatures/0xDD3E0AD0.asc. You can import it via `rpm --import https://xpipe.io/signatures/crschnick.asc` to allow your package manager to verify the release signature.
 
 You can use the repository as follows:
 
 #### Yum
 
 ```bash
-sudo rpm --import https://xpipe.io/signatures/crschnick.asc
+sudo rpm --import https://xpipe.io/signatures/0xDD3E0AD0.asc
 sudo yum install yum-config-manager
 sudo yum-config-manager --add-repo https://rpm.xpipe.io/xpipe.repo
 sudo yum install xpipe --refresh
@@ -110,7 +110,7 @@ sudo yum install xpipe --refresh
 #### DNF 4
 
 ```bash
-sudo rpm --import https://xpipe.io/signatures/crschnick.asc
+sudo rpm --import https://xpipe.io/signatures/0xDD3E0AD0.asc
 sudo dnf config-manager --add-repo https://rpm.xpipe.io/xpipe.repo
 sudo dnf install xpipe
 ```
@@ -125,7 +125,7 @@ sudo dnf install xpipe
 #### Zypper
 
 ```bash
-sudo rpm --import https://xpipe.io/signatures/crschnick.asc
+sudo rpm --import https://xpipe.io/signatures/0xDD3E0AD0.asc
 sudo zypper ar -f https://rpm.xpipe.io xpipe
 sudo zypper install xpipe
 ```

@@ -157,6 +157,10 @@ If you specified an IPv6 host address and are getting the SSH error `Network is 
 
 If you receive a generic `Permission denied` error without additional context when connecting to a server with an IPv6 address, check that the SSH server is accepting IPv6 connections. Furthermore, check if your local system is configured to support IPv6.
 
+### macOS FIDO2
+
+The native apple SSH client does not support FIDO2 and security keys for SSH. If you want to use those features, you will have to install OpenSSH, usually via homebrew. Running `brew install openssh libfido2` should fix any issues.
+
 ### Connection timeout
 
 An SSH connection timeout indicates that no connection to the target system's SSH server could be established at all or the remote shell did not respond.
