@@ -15,8 +15,6 @@ First, you will have to enable the MCP server feature in the settings menu as it
 
 ![](/images/mcp-settings.png)
 
-Note that there is a separate option for potentially destructible functionality. By default, only read-only functionality is exposed by the MCP server, for example, the ability to read the contents of a remote file. To also give your MCP client access to write files and more, you will have to enable the mutation tool setting. When starting out, it is best to start with read-only tools first to prevent any accidents.
-
 When the MCP server is enabled, it will show the connection information various different common formats that you can just copy-paste into your client:
 
 ![](/images/mcp-instructions.png)
@@ -52,23 +50,13 @@ You can experiment for yourself on how far you can push the agent to still provi
 
 You will have to use your own judgment on whether to trust and rely on all the operations that your agent performs. There is no guarantee that your MCP client does the right thing or interprets the results correctly. It is always required to verify that everything was done as expected.
 
-## Write operations
-
-Up until now, we only covered read-only tools such as reading files. If you enable them, write tools are also available. This includes things like writing files and executing shell commands on remote systems.
-
-With the added ability of running commands, the agent becomes much more flexible in its ability:
-
-![](/images/mcp-network.png)
-
-Note that these commands can potentially be destructive, especially if your agent is not running the right commands that you imagined. When first starting out with these tools, make sure that your MCP client is configured to confirm any external tool invocations:
+When first starting out with these tools, make sure that your MCP client is configured to confirm any external tool invocations:
 
 ![](/images/mcp-cursor-autorun.png)
 
 Later on, you can move onto unchecked tool invocations if you trust your agent enough:
 
 ![](/images/mcp-cursor-autorun-all.png)
-
-Please note that the various kinds of file protections your MCP client offers do not apply to operations performed through XPipe. Your agent is not able to implement these additional limitations on file operations for remote systems that are exposed via XPipe.
 
 ## Context management
 

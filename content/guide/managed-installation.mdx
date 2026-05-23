@@ -80,6 +80,7 @@ The rpm releases are signed with the GPG key https://xpipe.io/signatures/0xDD3E0
 XPipe provides an apt repository at https://apt.xpipe.io. You can add this repository as an additional source to apt to be able to install XPipe through apt directly. The releases are signed with the GPG key https://xpipe.io/signatures/0xDD3E0AD0.gpg. This command will perform the setup steps automatically:
 
 ```bash
+sudo apt update
 sudo apt install wget gpg
 wget -qO- https://xpipe.io/signatures/0xDD3E0AD0.gpg > xpipe.gpg
 sudo install -D -o root -g root -m 644 xpipe.gpg /etc/apt/keyrings/xpipe.gpg
