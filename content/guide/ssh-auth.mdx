@@ -9,6 +9,8 @@ The SSH integration in XPipe is a core component as most remote connections to y
 
 When establishing connections, XPipe delegates any form of connection and shell handling to your existing command-line SSH client available in the PATH, which is most likely the OpenSSH client. XPipe does not come with its own SSH implementation or other connection handling. Everything is fully realized on top of your installed CLI programs.
 
+All authentication is also going through the OpenSSH client. The detailed behaviour and error messages are therefore also the same, meaning that any guides or troubleshoot instructions you can find for OpenSSH will also apply to XPipe.
+
 ![](/images/ssh.png)
 
 ## Password authentication
@@ -29,15 +31,13 @@ To supply a password for the SSH authentication, you can choose out of multiple 
 
 ## Key-based authentication
 
-XPipe supports all established key-based authentication methods for SSH. Since it uses OpenSSH, any auth method supported by OpenSSH is also supported by XPipe. The detailed behaviour and error messages are also the same, meaning that any troubleshoot instructions you can find for OpenSSH will also apply to XPipe.
+XPipe supports all established key-based authentication methods for SSH. Since it uses OpenSSH, any auth method supported by OpenSSH is also supported by XPipe, this includes key types like FIDO2.
 
 ![](/images/ssh-keys.png)
 
 By default, your selection will override any externally configured key. For example, if you have a local SSH agent running, XPipe will prevent it from supplying its keys unless you select the agent option here. This is to guarantee reliability when authenticating.
 
 Many key selections also support passphrases. For passphrases, you have the same retrieval options as for passwords.
-
-XPipe supports all types of keys, including FIDO2.
 
 ### In-place key
 
