@@ -86,7 +86,7 @@ wget -qO- https://xpipe.io/signatures/0xDD3E0AD0.gpg > xpipe.gpg
 sudo install -D -o root -g root -m 644 xpipe.gpg /etc/apt/keyrings/xpipe.gpg
 rm xpipe.gpg
 sudo sh -c 'echo "deb [signed-by=/etc/apt/keyrings/xpipe.gpg] https://apt.xpipe.io/ stable main" > /etc/apt/sources.list.d/xpipe.list'
-sudo apt update && sudo apt install xpipe
+sudo apt clean && apt update && sudo apt install xpipe
 ```
 
 If you are looking for early access builds for new releases, you can replace the package name `xpipe` with `xpipe-ptb` to install the PTB build of XPipe from the repository.
