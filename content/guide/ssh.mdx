@@ -75,6 +75,15 @@ To work around these cases, you can explicitly designate a system as such:
 
 When this setting is enabled, XPipe will not attempt to identify the shell type and launch the shell as-is. This allows you to open the connection without errors, but many features, e.g., the file browser, scripting, subconnections, and more, will not be supported for this connection.
 
+### Connection timeout
+
+XPipe launches the ssh process and handles all authentication and more. It is however not aware of the current state of the authentication and login process. After some time has elapsed without any activity, XPipe will consider the connection attempt to be failed. This might cause problems when your authentication method takes a long time to continue, e.g. with a hardware security key, a fingerprint scanner, an external confirmation dialog.
+
+If connections from XPipe fail with a timeout error, you can try whether enabling this option makes a difference. You can find it in the advanced SSH configuration menu:
+
+![](/images/connection-timeout.png)
+
+
 ### X11 Forwarding
 
 XPipe supports X11 forwarding for SSH connections. You can enable this in the advanced SSH configuration for a connection:

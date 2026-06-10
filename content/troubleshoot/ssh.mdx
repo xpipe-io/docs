@@ -167,4 +167,6 @@ An SSH connection timeout indicates that no connection to the target system's SS
 
 Make sure that you have to correct connection information and the system is reachable from your local system. Also make sure that no firewall is blocking connection attempts on the SSH server port and that the SSH server is running on the correct port.
 
-In addition, this might also occur if the server is not using a regular command shell such as cmd, bash, zsh, or otherwise. This is true for limited and embedded devices such as routers, links, etc. For information on how to connect to these systems, see [limited and embedded devices](/guide/ssh#limited--embedded-systems)
+In addition, this might also occur if the server is not using a regular command shell such as cmd, bash, zsh, or otherwise. This is true for limited and embedded devices such as routers, links, etc. For information on how to connect to these systems, see [limited and embedded devices](/guide/ssh#limited--embedded-systems).
+
+If you are using an authentication method that takes a long time to succeed, e.g. a hardware security key, a fingerprint scanner, or an external confirmation dialog, XPipe might wrongfully consider the connection to be timeouted when it is not. See the [disable connection timeout setting](/guide/ssh#connection-timeout) for a fix.
