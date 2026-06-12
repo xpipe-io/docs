@@ -212,21 +212,51 @@ or something like this if it has encrypted credentials configured in-place:
 }
 ```
 
+When adding connections with credentials, it is preferred to create the identity within XPipe and then just reference it from the API. However, you can still create identities fully manually if you want, it just takes a bit more work as you have to encrypt the secrets first.
+
 ### Encrypting secrets
 
-Based on that information, you can create your own connections via the API. The challenge here is encrypting secrets so that they can be stored correctly. But this is also possible via the API:
+The challenge when adding identities via the API is encrypting secrets so that they can be stored correctly:
 
 ```python
-encrypted_password = client.secret_encrypt("passw0rd")
+encrypted_secret = client.secret_encrypt("passw0rd")
 # {'secret': {'type': 'locked', 'encryptedValue': '5Tqtd68uFhef8evQV8fKG9nXisgRb2wvfdgeV8LdbxB1V6qi'}, 'encryptedToken': {'token': 'xmz9eAjJ4ms4yqIv9lrYhnsm1RhJVw0AijOee1IZew=='}}
-print(encrypted_password)
+print(encrypted_secret)
 
-decrypted_password = client.secret_decrypt(encrypted_password)
+decrypted_secret = client.secret_decrypt(encrypted_secret)
 # passw0rd
-print(decrypted_password)
+print(decrypted_secret)
 ```
 
 Note that you can't decrypt the secrets of these samples yourself if you try it as your XPipe instance uses another unique encryption key. If you're also using a custom vault user passphrase, then the encryption key is unique to your user as well.
+
+### Encrypting password auth information
+
+When specifying information about any kind of password authentication, you will have to encrypt more than just a raw password. As XPipe supports many different ways of retrieving secrets for password authentication, you will have to include this information as well.
+
+```python
+# No password is used at all
+raw_password_auth = {
+    'type' : 'none'
+}
+
+encrypted_password_auth = client.secret_encrypt(json.dumps(raw_password_auth))
+# {'secret': {'type': 'locked', 'encryptedValue': '0N_LSNW_Gu_kz-HzBmNC5VcMY7kJuIN-Dam0bv370fSTgIJyGPENklzovp_9kCdvPS206m-giPr-fVfV6Q=='}, 'encryptedToken': {'token': 'bDTjRHsCMgvwPiXPEt5xF6JbLuj5UuaBSheF75pB5A=='}}
+print(encrypted_password_auth)
+```
+
+There are also other types of schemas for password auth available. For example, to use a specific in-place password, you would use the following schema and encrypt it:
+
+```python
+# Password is used
+raw_password_auth = {
+  'type': 'inPlace',
+  'value': client.secret_encrypt("passw0rd")
+}
+
+# {'secret': {'type': 'locked', 'encryptedValue': 'UhC-BIzAKx2NVNsUajnibzbctPEAIysJ9FqEcYTDG0ur-XroO-21RLUxgyxItkk3BqP8YsMLFUHYYVaEb5IsCbTD_A-M_9zj4lGBYVkFwLpdyLWXGp6m9CaNDoJv5-m4-DTzr_eS9HsDNb_hHmfAG9Vc8I4dSc6HdLbk4zF4DKvFgqN9JfljzHzmPDSnBafDIV9ZRbtKavOZ0ZvH2Ph7jO5Jr64cqX0GiPEXlU1IA95koiViLOjC2hXx4xxCxn8zvq3mHYjZLMKiGzrQqwGfAppwGE1hZbS0em9OUErG8mLKvhJCQkwEFYqJxw=='}, 'encryptedToken': {'token': 'Ifnc2k1nxdF2ZPQcn8zq6engoYi3nm1iKZ1UF3SDlg=='}}
+encrypted_password_auth = client.secret_encrypt(json.dumps(raw_password_auth))
+```
 
 ### Encrypting key information
 
@@ -277,15 +307,15 @@ data = {
     "gateway": "f0ec68aa-63f5-405c-b178-9a4454556d6b",
     "host" : "myip.eu-central-1.compute.amazonaws.com",
     "port" : 22,
-     "identity" : {
+    "identity" : {
         "type" : "inPlace",
         "identityStore" : {
-          "type" : "localIdentity",
-          "username" : "User",
-          "password" : encrypted_password,
-          "sshIdentity" : encrypted_key
+            "type" : "localIdentity",
+            "username" : "User",
+            "password" : encrypted_password_auth,
+            "sshIdentity" : encrypted_key
         }
-      },
+    },
     "dontInteractWithSystem" : False,
     "forwardX11" : False,
     "jumpServer" : False,
@@ -314,10 +344,10 @@ data = {
     "gateway": "f0ec68aa-63f5-405c-b178-9a4454556d6b",
     "host" : "myip.eu-central-1.compute.amazonaws.com",
     "port" : 22,
-     "identity" : {
+    "identity" : {
         "type" : "ref",
         "ref" : "34c7ea9a-b00d-45e1-a324-78ef0750acc2"
-      },
+    },
     "dontInteractWithSystem" : False,
     "forwardX11" : False,
     "jumpServer" : False,
