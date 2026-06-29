@@ -1,15 +1,37 @@
 ---
 title: Webtop
-description: Accessing XPipe remotely from your browser
+description: Accessing XPipe remotely
 ---
 
 ## Introduction
 
-XPipe is a desktop application first and foremost. It requires a full desktop environment with various installed applications such as terminals, editors, shells, CLI tools, and more to function. So there is not the possibility of creating a pure web-based interface for XPipe that comes with all features built into XPipe itself.
+XPipe is a desktop application first and foremost. It requires a full desktop environment with various installed applications such as terminals, editors, shells, CLI tools, and more to function. A pure web-based interface for XPipe therefore does not fit very to this approach.
 
-Since it makes sense to access your XPipe environment from the web, there is the so-called XPipe Webtop docker container image available. XPipe Webtop is a web-based desktop environment that can be run in a container and accessed from a browser via KasmVNC. The desktop environment comes with XPipe and various terminals, editors, and more tools preinstalled and configured.
+Since there is still demand to access your XPipe environment remotely for when you are not at your desktop, there exists the so-called **XPipe Webtop** for this. XPipe Webtop is a web-based desktop environment that can be run in a container and accessed from a browser or the mobile app. The desktop environment is based on KDE6 and comes with XPipe and various terminals, editors, and more tools preinstalled and configured. It also comes with an extension system to install necessary tools on-demand, for example, specific password managers or terminals.
 
 ![](/images/webtop.png)
+
+The container image is an OCI image, meaning that you can deploy it on any OCI-compatible container runtime. This includes docker, podman, and through the OCI compatibility layer also now Proxmox PVE 9+. You have the option to either use the [deployment wizward](#wizard) to easily create a deployment for you, or alternatively use this page as a reference to deploy the container fully manually.
+
+## Wizard
+
+![](/images/webtop-wizard-button.png)
+
+![](/images/webtop-wizard.png)
+
+
+### API server
+
+By default, the nature of XPipe and the git vault is decentralized, meaning that there isn't a central backend server to manage your vault. This makes it a bit complicated in enterprise environments where server changes should be propagated to a synced vault automatically, as there is no central server to send those vault update requests to.
+
+You can choose to utilize the webtop container as a central API server that you can host to automatically update a synced git vault via API requests.
+
+#### Internal updates
+
+#### External updates
+
+To enable this, you will have to pass the environment variable `XPIPE_API_SERVER=true` to the container and map the port `21721` with `-p 21721:21721`. This makes the container listen on port 21721 to accept HTTP API requests. For more details on the API for automated connection and vault interaction, see the [API page](/api). The rest of the webtop will work normally, meaning that you will still have access to the graphical interface when the API server setting is enabled.
+
 
 ## Setup
 
@@ -50,7 +72,7 @@ The web interface has the option for "IME Input Mode" in the settings, which wil
 
 ### DRI3 GPU Acceleration
 
-The webtop performance is decent even without any hardware acceleration. However, if you are looking for the maximum performance, utilizing hardware acceleration is a possibility.
+The webtop performance is decent even without any hardware acceleration. So using a dedicated GPU for the container isn't really necessary or noticeable. However, if you are looking for the maximum performance, utilizing hardware acceleration is a possibility.
 
 Render devices can be mounted into the container and leveraged by applications using:
 
@@ -64,16 +86,29 @@ This feature only supports **Open Source** GPU drivers:
 | AMD | AMDGPU, Radeon, and ATI drivers for AMD dedicated or APU chipsets |
 | NVIDIA | nouveau2 drivers only, closed source NVIDIA drivers lack DRI3 support |
 
-The `DRINODE` environment variable can be used to point to a specific GPU.
-Up to date information can be found [here](https://www.kasmweb.com/kasmvnc/docs/master/gpu_acceleration.html)
+The container should automatically detect and use a compatible render device when possible.
 
-### Networking, Tailscale, and Netbird
+### Networking
 
-By default, a docker container does not have access to the network tunnel driver ([TUN](https://en.wikipedia.org/wiki/TUN/TAP)) or the host system. For most types of connections this one is not needed, so it will work fine without it.
+By default, a docker container does not have access to the network tunnel driver ([TUN](https://en.wikipedia.org/wiki/TUN/TAP)) or the host system. For most types of connections, this one is not needed, so it will work fine without it. However, tools like Tailscale or Netbird require the TUN.
 
-If you are planning to use networking tools like tailscale in the webtop, you will have to pass the TUN device to the container and run it with privileged network permissions. Otherwise, the tailscale daemon won't be able to start. You can do this by passing the following arguments to the container:
+#### Netbird
+
+If you are planning to use Netbird in the container, you will have to pass the TUN device to the container and run it with privileged network permissions. Otherwise, the Netbird daemon won't be able to start. You can do this by passing the following arguments to the container:
 
 `--cap-add=NET_ADMIN --privileged`
+
+You will only have to log in once into Netbird in the container when prompted.
+
+#### Tailscale
+
+If you are planning to use Tailscale in the container, you will have the choice to either pass the TUN device to the container and run it with privileged network permissions or use user-level networking with Tailscale.
+
+If you assign privileges, everything will work automatically. You will only have to log in once into Tailscale in the container when prompted.
+
+If you don't assign privileges to the container with `--cap-add=NET_ADMIN --privileged`, XPipe will automatically detect this and switch to user-mode networking. This involves routing traffic over a local HTTP proxy managed by Tailscale. If you then use this proxy entry as a gateway for all connections within XPipe, all traffic will be routed over your Tailscale network as usual. When using external applications in the container, you will have to make sure that the application uses the proxy at `http://localhost:1055` as well.
+
+![](/images/webtop-proxy.png)
 
 ### Installation commands
 
@@ -154,9 +189,11 @@ If you want to have access to the system shell of the webtop container or access
 
 ## Updating
 
-The published images are static, versioned, and require an image update and container recreation to update it. Below are the instructions for updating containers.
+You can upgrade XPipe independently of the container image as usual in the settings menu or via the automatic updater prompt. An image update is only needed if there were changes made to the image. This information will be included in the changelog for XPipe updates.
 
-### docker-compose
+An image update requires a container recreation to update it. This will destroy the volume, excluding the bind mount at `/config` for the user data. Since all revelant configuration is stored in this directory, you won't lose any user data.
+
+Other system data, e.g. packages that you installed or upgraded yourself, will be discarded alongside the volume. XPipe itself will automatically install the latest version on relaunch. It will prompt you to reinstall any lost packages on relaunch, so after a few minutes, you will have the same system back again and working.
 
 Update image:
 ```bash
@@ -175,36 +212,6 @@ You can also remove the old dangling images:
 docker image prune
 ```
 
-### docker cli
-
-Update the image:
-
-```bash
-docker pull ghcr.io/xpipe-io/xpipe-webtop:latest
-```
-
-Stop the running container:
-
-```bash
-docker stop xpipe-webtop
-```
-
-Delete the container:
-
-```bash
-docker rm xpipe-webtop
-```
-
-You can also remove the old dangling images:
-
-```bash
-docker image prune
-```
-
-You can recreate the new container with the same docker run parameters as instructed above. If mapped correctly to a host folder, your `/config` folder and settings will be preserved.
-
-<Callout type="info">While you can technically also just update the packages and the XPipe installation in the container without having to recreate the whole container, you will miss out on many webtop enhancements if you do that. The installed package list, XPipe, and the container image are updated in a coordinated fashion to improve the workflow and synergies.</Callout>
-
 ## Contributing
 
 If you want to make local modifications to these images for development purposes or just to customize the logic:
@@ -212,8 +219,19 @@ If you want to make local modifications to these images for development purposes
 ```bash
 git clone https://github.com/xpipe-io/xpipe-webtop.git
 cd xpipe-webtop
-docker build \
-  --no-cache \
-  --pull \
-  .
+docker buildx build .
+```
+
+### Running
+
+#### Automated
+
+You can find 
+
+You can make use of a local development within the container by cloning the repository with `git clone https://github.com/xpipe-io/xpipe` and then passing a bind mount to `<path to repo dir>:/config/xpipe-dev`. This will then trigger a gradle build within the container. You can either run the development build in a terminal or also attach a debugger by passing the environment variable `XPIPE_DEBUG=1`. The started XPipe app will then listen for a remote JDWP debugger to attach at port `7857`.
+
+You can run the tests to check if all packages install correctly with
+
+```bash
+docker run --rm --entrypoint bash xpipe-webtop-test -l -c /apps/test.sh
 ```
