@@ -111,6 +111,16 @@ MACs +hmac-sha1
 
 XPipe is able to automatically configure this for simple SSH connections. For other types of SSH connections, you have to add this option by yourself. You can check which MACs your SSH client supports with `ssh -Q mac`.
 
+### No matching cipher found
+
+If your SSH server only offers outdated cipher algorithms that are not enabled by default in your local SSH client, you can manually add those to a specific connection via the additional SSH config options for SSH. For example, to support the algorithm `aes256-cbc`, add the following additional option:
+
+```
+Ciphers +aes256-cbc
+```
+
+XPipe is able to automatically configure this for simple SSH connections. For other types of SSH connections, you have to add this option by yourself. You can check which key exchange types your SSH client supports with `ssh -Q kex`.
+
 ### Gateway tunnel / jump server failure
 
 If you configured a connection to use a [gateway](/guide/ssh#gateways-and-jump-servers) and receive errors like `Connection closed by 127.0.0.1 port 36825`, `Connection reset by 127.0.0.1 port 36825`, `stdio forwarding failed`, or `channel 0: open failed: administratively prohibited: open failed`, this usually indicates that the intermediate gateway host does not allow TCP forwarding and tunneling.
