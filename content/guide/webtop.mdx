@@ -11,54 +11,103 @@ Since there is still demand to access your XPipe environment remotely for when y
 
 ![](/images/webtop.png)
 
-The container image is an OCI image, meaning that you can deploy it on any OCI-compatible container runtime. This includes docker, podman, and through the OCI compatibility layer also now Proxmox PVE 9+. You have the option to either use the [deployment wizward](#wizard) to easily create a deployment for you, or alternatively use this page as a reference to deploy the container fully manually.
+The container image is an OCI image, meaning that you can deploy it on any OCI-compatible container runtime. This includes docker, podman, and through the OCI compatibility layer also now Proxmox PVE 9+. You have the option to either use the [deployment wizard](#wizard) to easily create a deployment for you, or alternatively use this page as a reference to deploy the container fully manually.
 
 ## Wizard
 
+You can open the deployment wizard from within the XPipe application:
+
 ![](/images/webtop-wizard-button.png)
+
+To choose a valid deployment target, the server needs to be added to XPipe first. Then, you can choose it in the selector:
 
 ![](/images/webtop-wizard.png)
 
+There you can fill out all the configuration settings for the webtop and create a deployment template. This template can then be automatically deployed to create a container on the target system.
 
-### API server
+## Manual setup
 
-By default, the nature of XPipe and the git vault is decentralized, meaning that there isn't a central backend server to manage your vault. This makes it a bit complicated in enterprise environments where server changes should be propagated to a synced vault automatically, as there is no central server to send those vault update requests to.
+You can also choose to set up the container manually if you prefer. This section covers all the steps for docker. Note that for Proxmox, the wizard is strongly recommended as the manual deployment of OCI images in Proxmox is still not a very polished experience.
 
-You can choose to utilize the webtop container as a central API server that you can host to automatically update a synced git vault via API requests.
+The webtop image can be found at `ghcr.io/xpipe-io/xpipe-webtop:ptb`. All images can be found in the [webtop container registry](https://github.com/xpipe-io/xpipe-webtop/pkgs/container/xpipe-webtop).
 
-#### Internal updates
-
-#### External updates
-
-To enable this, you will have to pass the environment variable `XPIPE_API_SERVER=true` to the container and map the port `21721` with `-p 21721:21721`. This makes the container listen on port 21721 to accept HTTP API requests. For more details on the API for automated connection and vault interaction, see the [API page](/api). The rest of the webtop will work normally, meaning that you will still have access to the graphical interface when the API server setting is enabled.
-
-
-## Setup
-
-The webtop image can be found at `ghcr.io/xpipe-io/xpipe-webtop:latest`. All images can be found in the [webtop container registry](https://github.com/xpipe-io/xpipe-webtop/pkgs/container/xpipe-webtop). The webtop has the default ports to access the web interface at:
+The webtop has the default ports to access the web interface at:
 
 * http://localhost:3000/
 * https://localhost:3001/
 
-### Environment variables
+### Compose file
 
-There are additional environment variables and run configurations to enable or disable specific functionality:
+Docker compose is recommended to deploy the webtop environment.
 
-| Variable | Description |
-| :----: | --- |
-| CUSTOM_USER | HTTP Basic auth username, abc is default. |
-| PASSWORD | HTTP Basic auth password, abc is default. If unset there will be no auth |
-| SUBFOLDER | Subfolder for the application if running a subfolder reverse proxy, need both slashes IE `/subfolder/` |
-| LC_ALL | Set the Language for the container to run as IE `fr_FR.UTF-8` `ar_AE.UTF-8` |
+<Callout type="info">The webtop image is available for both `linux/amd64` and `linux/arm64` platforms.</Callout>
 
-### Authentication
+```yaml
+services:
+  webtop:
+    image: ghcr.io/xpipe-io/xpipe-webtop:ptb
+    container_name: xpipe-webtop
+    hostname: xpipe-webtop
+    cap_add:
+      - NET_ADMIN # Optional, see the network section below
+    privileged: true # Optional, see the network section below
+    shm_size: 256mb # Some apps in the webtop use a lot of shared memory, so increase it to this
+    environment:
+      - LC_ALL=en_US.UTF-8
+      - TZ=Europe/Berlin
+      - PUID=1000 # Set this to your user id to make the mounted volume use the same owner as your local user
+      - PGID=1000 # Set this to your user group id to make the mounted volume use the same owner as your local user group
+    volumes:
+      - /local/path/to/data:/config # Where to store the user data of the container
+    ports:
+      - 127.0.0.1:3000:3000 # HTTP, only accessible on localhost. When accessed not from localhost, it will complain about an insecure connection
+      - 127.0.0.1:3001:3001 # HTTPS
+      - 127.0.0.1:21222:21222 # SSH (optional, see below)
+      - 127.0.0.1:21721:21721 # API (optional, see below)
+    restart: unless-stopped
+```
 
-The authentication layer setup has to be done by you. By default, there is no authentication enabled and the webtop will be available to everyone.
-So you have to be careful not to publicly expose it in that state.
+<Callout type="info">The port bindings are explicitly only bound to the localhost interface in this sample to prevent you from accidentally exposing it to all public interfaces.</Callout>
 
-As seen above, there are options to use basic HTTP authentication to restrict access with the `CUSTOM_USER` and `PASSWORD` environment variables.
-However, this might also not be considered very secure, and it is recommended to use a proper separate authentication solution in front of the actual webtop environment.
-This can be your own VPN, where the webtop is only available within. Alternatively, you can use authentication providers like Authelia, Authentik, KeyCloak, and others.
+### Authentication and access
+
+By default, there is no authentication enabled and the webtop will be available to anyone who can access the container. So you have to be careful not to publicly expose it in that state. This section summarizes the various possible modes of operation:
+
+#### Local network
+
+If you can only access the webtop within your local network, then you don't really have to do anything in terms of securing it
+
+#### VPN
+
+If your setup already uses a VPN like wireguard, tailscale, netbird, etc., you can use it to control the access to the webtop interface that way. This is usually the easiest way. You can either add the host on which the container runs on to your VPN or alternatively the container itself. See further down below for setup instructions for VPNs like tailscale or netbird within the container
+
+#### Authentication layer
+
+Alternatively, you can use a proper separate authentication solution in front of the actual webtop environment. You can use authentication providers like Authelia, Authentik, KeyCloak, and others to put in front of your webtop. This also allows you to expose the system publicly without the need for a VPN, assuming that you have set up your authentication system correctly.
+
+#### Mobile app
+
+If the primary use of the webtop is for you to access it from a mobile device when you are away from your desktop, then you can use the XPipe mobile app on Android and iOS. This app supports an SSH-only approach where only the SSH port needs to be publicly exposed. The app will then connect via SSH key auth and tunnel the connection via SSH, making it secure to use. This can then be publicly exposed as the SSH port is secured via a key that is only available to the mobile app.
+
+### Networking
+
+By default, a docker container does not have access to the network tunnel driver ([TUN](https://en.wikipedia.org/wiki/TUN/TAP)) or the host system. For most types of connections, this one is not needed, so it will work fine without it. However, tools like Netbird require the TUN to function within the container.
+
+#### Netbird
+
+If you are planning to use Netbird in the container, you will have to pass the TUN device to the container and run it with privileged network permissions. Otherwise, the Netbird daemon won't be able to start. You can do this by passing the following arguments to the container:
+
+`--cap-add=NET_ADMIN --privileged`
+
+#### Tailscale
+
+If you are planning to use Tailscale in the container, you will have the choice to either pass the TUN device to the container and run it with privileged network permissions or use user-level networking with Tailscale.
+
+If you assign privileges with `--cap-add=NET_ADMIN --privileged`, everything will work automatically. You will only have to log in once into Tailscale in the container when prompted.
+
+If you don't assign privileges to the container, XPipe will automatically detect this and switch to user-mode networking. This involves routing traffic over a local HTTP proxy managed by Tailscale. If you then use this proxy entry as a gateway for all connections within XPipe, all traffic will be routed over your Tailscale network as usual. When using external applications in the container, you will have to make sure that the application uses the proxy at `http://localhost:1055` as well.
+
+![](/images/webtop-proxy.png)
 
 ### Language Support
 
@@ -70,130 +119,60 @@ The environment variable `LC_ALL` can be used to start this image in a different
 
 The web interface has the option for "IME Input Mode" in the settings, which will allow non english characters to be used from a non en_US keyboard on the client. Once enabled, it will perform the same as a local Linux installation set to your locale.
 
-### DRI3 GPU Acceleration
-
-The webtop performance is decent even without any hardware acceleration. So using a dedicated GPU for the container isn't really necessary or noticeable. However, if you are looking for the maximum performance, utilizing hardware acceleration is a possibility.
-
-Render devices can be mounted into the container and leveraged by applications using:
-
-`--device /dev/dri:/dev/dri`
-
-This feature only supports **Open Source** GPU drivers:
-
-| Driver | Description |
-| :----: | --- |
-| Intel | i965 and i915 drivers for Intel iGPU chipsets |
-| AMD | AMDGPU, Radeon, and ATI drivers for AMD dedicated or APU chipsets |
-| NVIDIA | nouveau2 drivers only, closed source NVIDIA drivers lack DRI3 support |
-
-The container should automatically detect and use a compatible render device when possible.
-
-### Networking
-
-By default, a docker container does not have access to the network tunnel driver ([TUN](https://en.wikipedia.org/wiki/TUN/TAP)) or the host system. For most types of connections, this one is not needed, so it will work fine without it. However, tools like Tailscale or Netbird require the TUN.
-
-#### Netbird
-
-If you are planning to use Netbird in the container, you will have to pass the TUN device to the container and run it with privileged network permissions. Otherwise, the Netbird daemon won't be able to start. You can do this by passing the following arguments to the container:
-
-`--cap-add=NET_ADMIN --privileged`
-
-You will only have to log in once into Netbird in the container when prompted.
-
-#### Tailscale
-
-If you are planning to use Tailscale in the container, you will have the choice to either pass the TUN device to the container and run it with privileged network permissions or use user-level networking with Tailscale.
-
-If you assign privileges, everything will work automatically. You will only have to log in once into Tailscale in the container when prompted.
-
-If you don't assign privileges to the container with `--cap-add=NET_ADMIN --privileged`, XPipe will automatically detect this and switch to user-mode networking. This involves routing traffic over a local HTTP proxy managed by Tailscale. If you then use this proxy entry as a gateway for all connections within XPipe, all traffic will be routed over your Tailscale network as usual. When using external applications in the container, you will have to make sure that the application uses the proxy at `http://localhost:1055` as well.
-
-![](/images/webtop-proxy.png)
-
-### Installation commands
-
-To help you get started creating a container from this image, you can either use docker-compose or the docker cli.
-
-<Callout type="info">The webtop image is available for both `linux/amd64` and `linux/arm64` platforms.</Callout>
-
-#### docker-compose
-
-```yaml
-services:
-  webtop:
-    image: ghcr.io/xpipe-io/xpipe-webtop:latest
-    container_name: xpipe-webtop
-    cap_add:
-      - NET_ADMIN # optional, to enable tailscale
-    privileged: true # optional, to enable tailscale
-    environment:
-      - SUBFOLDER=/ #optional, to run in a subfolder reverse proxy
-    volumes:
-      - /path/to/data:/config
-      - /var/run/docker.sock:/var/run/docker.sock #optional, to access host containers
-    ports:
-      - 127.0.0.1:3000:3000
-      - 127.0.0.1:3001:3001
-    restart: unless-stopped
-```
-
-#### docker cli
-
-```bash
-docker run -d \
-  --name=xpipe-webtop \
-  -e SUBFOLDER=/ `#optional, to run in a subfolder reverse proxy` \
-  --cap-add=NET_ADMIN `#optional, to enable tailscale` \
-  --privileged `#optional, to enable tailscale` \
-  -p 127.0.0.1:3000:3000 \
-  -p 127.0.0.1:3001:3001 \
-  -v /path/to/data:/config \
-  -v /var/run/docker.sock:/var/run/docker.sock `#optional, to access host containers` \
-  --restart unless-stopped \
-  ghcr.io/xpipe-io/xpipe-webtop:latest
-```
-
-<Callout type="info">The port bindings are explicitly only bound to the localhost interface in this sample to prevent you from accidentally exposing it to all public interfaces.</Callout>
-
-### Usage as an API server
+### API server
 
 By default, the nature of XPipe and the git vault is decentralized, meaning that there isn't a central backend server to manage your vault. This makes it a bit complicated in enterprise environments where server changes should be propagated to a synced vault automatically, as there is no central server to send those vault update requests to.
 
-You can choose to utilize the webtop container as a sort of central API server that you can host to automatically update a synced git vault via API requests. To enable this, you will have to pass the environment variable `XPIPE_API_SERVER=true` to the container and map the port `21721` with `-p 21721:21721`. This makes the container listen on port 21721 to accept HTTP API requests. For more details on the API for automated connection and vault interaction, see the [API page](/api). The rest of the webtop will work normally, meaning that you will still have access to the graphical interface when the API server setting is enabled.
-
-### Kasm Workspaces
-
-[Kasm Workspaces](https://kasmweb.com/docs/latest/install/single_server_install.html) provides browser-based access to on-demand containerized desktops and applications. It is essentially a system to run graphical web-based desktops like this with less setup than a manual docker setup would require. If you are using Kasm Workspaces, this image is also available in the [XPipe Kasm Registry](https://kasm.xpipe.io). You can add this registry to your registry list, which allows you to automatically retrieve XPipe Webtop in your Kasm Workspace. It is preconfigured, so it will run out-of-the-box.
+You can choose to utilize the webtop container as a central API server that you can host to automatically update a synced git vault via API requests. To enable this, you will have to pass the environment variable `XPIPE_API_SERVER=true` to the container and map the port `21721` with `-p 21721:21721`. This makes the container listen on port 21721 to accept HTTP API requests. For more details on the API for automated connection and vault interaction, see the [API page](/api). The rest of the webtop will work normally, meaning that you will still have access to the graphical interface when the API server setting is enabled.
 
 ## Usage
 
-You will initially start out with an empty installation of XPipe. It is therefore recommended to use the [git sync](/guide/sync) feature of XPipe to quickly transfer all your connections to the new webtop installation. All your data is stored in your user directory at `/config`, you should therefore make it a persistent docker volume to preserve this data. You can also install further applications, however, these will not be preserved on container rebuilds or upgrades as these packages are usually not installed into the user home.
+You will initially start out with an empty installation of XPipe. It is therefore recommended to use the [git sync](/guide/sync) feature of XPipe to quickly transfer all your connections to the new webtop installation.
 
-### VNC actions
+### Data and programs
 
-To perform various VNC actions, such as simulating special key presses, changing the clipboard, changing the display configuration, and more, open the sidebar on the left side:
+All your data is stored in your user directory in the container at `/config`, so you should therefore make it a persistent docker volume to preserve this data. You can also install further applications with apt, however, these will not be preserved on container rebuilds or upgrades as these packages are usually not installed into the user home. Only their configuration in the user dir will survive.
 
-![](/images/webtop-sidebar.png)
+The XPipe webtop comes with the ability to install all supported programs automatically via the built-in package installer. This dialog will open whenever a package is required to be installed:
+
+![](/images/webtop-install.png)
+
+This will open a terminal which will install and configure the selected packages. XPipe might restart afterwards, and the programs will be available to you. XPipe will also remember which programs are selected, in case a container is rebuilt and data outside of the user home is deleted. This means that you can quickly restore your selected packages on container updates.
+
+### Screen settings
+
+To control the screen and display settings, open the sidebar on the left:
+
+![](/images/webtop-screen.png)
+
+The most used setting for you will probably be the UI scaling setting. Changing this setting will change the dpi of the desktop environment, and the XPipe application will automatically restart to apply the new display scale.
+
+Within XPipe, you can open the mode switcher to choose between mobile and desktop mode for XPipe and the desktop environment:
+
+![](/images/webtop-mode.png)
+
+The main changes of these modes is the window handling within KDE and the display within XPipe.
 
 ### Clipboard
 
-The clipboard handling is dependent on how well your current browser supports it. It is recommended that you use chrome, that way you will have the seamless clipboard where changes on both sides are instantly reflected.
+The clipboard handling is dependent on how well your current browser supports it. It is recommended that you use a chrome-based browser, that way you will have the seamless clipboard where changes on both sides are instantly reflected.
 
-If you are using another browser like firefox, the clipboard is not as seamless and you have to manually set it each time. You can do that in the sidebar that you can expand on the left in the clipboard section. On firefox, you also sometimes get a paste button when focusing the webtop. This is a firefox-specific issue and will disappear if you use another browser.
+If you are using Firefox, the clipboard is not as seamless. You can set the clipboard manually in the sidebar that you can expand on the left in the clipboard section. You also sometimes get a paste button when focusing the webtop, sometimes only after re-focusing the webtop twice. This button can also be used to set the clipboard when it shows up.
 
-### External access
+### System access
 
-If you want to have access to the system shell of the webtop container or access the file system from the outside, you can use XPipe as normal from your desktop. The webtop container is just another Docker container in the eyes of XPipe, so you will have easy access to it if you have access to the docker context of the host.
+If you want to have access to the system shell and file system of the webtop container or access the file system from the outside, you can use XPipe as normal from your desktop. The webtop container is just another container in the eyes of XPipe, so you will have easy access to it if you have access to the host and have added it to XPipe.
 
 ![](/images/webtop-docker.png)
+
 
 ## Updating
 
 You can upgrade XPipe independently of the container image as usual in the settings menu or via the automatic updater prompt. An image update is only needed if there were changes made to the image. This information will be included in the changelog for XPipe updates.
 
-An image update requires a container recreation to update it. This will destroy the volume, excluding the bind mount at `/config` for the user data. Since all revelant configuration is stored in this directory, you won't lose any user data.
+An image update requires a container recreation to update it. This will destroy the volume, excluding the bind mount at `/config` for the user data. Since all relevant configuration is stored in this directory, you won't lose any user data if you created a bind mount for this directory.
 
-Other system data, e.g. packages that you installed or upgraded yourself, will be discarded alongside the volume. XPipe itself will automatically install the latest version on relaunch. It will prompt you to reinstall any lost packages on relaunch, so after a few minutes, you will have the same system back again and working.
+Other system data, e.g. packages that you installed or upgraded yourself, will be discarded alongside the volume. XPipe will prompt you to reinstall any lost packages on relaunch, so after a few minutes, you will have the same system back again and working.
 
 Update image:
 ```bash
@@ -212,26 +191,4 @@ You can also remove the old dangling images:
 docker image prune
 ```
 
-## Contributing
-
-If you want to make local modifications to these images for development purposes or just to customize the logic:
-
-```bash
-git clone https://github.com/xpipe-io/xpipe-webtop.git
-cd xpipe-webtop
-docker buildx build .
-```
-
-### Running
-
-#### Automated
-
-You can find 
-
-You can make use of a local development within the container by cloning the repository with `git clone https://github.com/xpipe-io/xpipe` and then passing a bind mount to `<path to repo dir>:/config/xpipe-dev`. This will then trigger a gradle build within the container. You can either run the development build in a terminal or also attach a debugger by passing the environment variable `XPIPE_DEBUG=1`. The started XPipe app will then listen for a remote JDWP debugger to attach at port `7857`.
-
-You can run the tests to check if all packages install correctly with
-
-```bash
-docker run --rm --entrypoint bash xpipe-webtop-test -l -c /apps/test.sh
-```
+On Proxmox, the upgrade process is not as smooth as it does not have a similar system of bind mounts. You can recreate the container via the wizard and if needed, copy the contents of `/config` manually to the new container. You can do so with XPipe's file browser by opening both container systems and copying the dir to the new system.
