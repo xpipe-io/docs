@@ -186,22 +186,22 @@ or something like this if it has encrypted credentials configured in-place:
       "type" : "localIdentity",
       "username" : "User",
       "password" : {
-        "secret" : {
-          "type" : "locked",
-          "encryptedValue" : "PTSOUnuY4eNTakHvnhZdbPuxBwYLD3FtUl-V_AL_W0jVVrdGeJtTntcHjrXK8aXqv4_eRYE3HkBKSosBWFOrEkygWMbqTrjwUlFyG8O0htvnsuSJdkPqoYA8bEbOgcdk_PbeSWEWqlODHNnx9f-c3PSh4zas57AycebWoIYPZx1wgQdZ2HdBtlFhpn3HL25CbvL8woPH8S7FDqN1C0x7cdujMKlynMKIZ2qg"
-        },
-        "encryptedToken" : {
-          "token" : "5wuy5IADZvzjAl0IKurM66C6SMZsOuhStsdX8nGZvg=="
-        }
+        "secrets" : [ {
+          "name" : "vault",
+          "principal" : "be815152-05d2-4094-84d3-f0eea9200d5f",
+          "iteration" : 1,
+          "secret" : "qJu3y-hwyo1Q63Btf68My6zOV9RL_wom9k6UjlFcIU9OmhLy6RTJxEwtq9x7O5h-tjCzKdWpN99VFU80QoFzsTx_NqXniZh3SS1fT_LMFQ5Feh8tYH9BIy9OvBFvuWTwRF7YmoWIAv8NCcpNLeROGtGHW0X6VuJQkBKiLQhJavHaiJNnORGj9Ud0cv1uDubQWgRtcYdYsFJlrsxr6naUVXTm9i9knUeTDjgrPg==",
+          "token" : "YneQNpGM33zWvPUMoUaf9u_eDIyhH6PZDJ1PfFfEfgR1deQiVXTbVQBdzthtODZqd4JNQTl3jCp5rcZ2EhvfSg=="
+        } ]
       },
       "sshIdentity" : {
-        "secret" : {
-          "type" : "locked",
-          "encryptedValue" : "zPcMsYaHh9n0QcTdliQ94PQAV4mdAGnIz8N_OcVC58-f7F9shDUDIUTqL0PFSAoewpzM"
-        },
-        "encryptedToken" : {
-          "token" : "5wuy5IADZvzjAl0IKurM66C6SMZsOuhStsdX8nGZvg=="
-        }
+        "secrets" : [ {
+          "name" : "vault",
+          "principal" : "be815152-05d2-4094-84d3-f0eea9200d5f",
+          "iteration" : 1,
+          "secret" : "vAWh6XbCT5-Z0O7kLfYkAZTelm5KSPwrG5sMAgGsjgRRxxtaXxcW0wWRePKunYvHo7ag",
+          "token" : "V2XrIJH9GFhgyRFbn_rBcMz45c-lnwLHzL0AQ7XT0I5AfOM60zK_92xZHnbXgmk2tyBC79WaYazMFlxIsHg28w=="
+        } ]
       }
     }
   },
@@ -220,7 +220,7 @@ The challenge when adding identities via the API is encrypting secrets so that t
 
 ```python
 encrypted_secret = client.secret_encrypt("passw0rd")
-# {'secret': {'type': 'locked', 'encryptedValue': '5Tqtd68uFhef8evQV8fKG9nXisgRb2wvfdgeV8LdbxB1V6qi'}, 'encryptedToken': {'token': 'xmz9eAjJ4ms4yqIv9lrYhnsm1RhJVw0AijOee1IZew=='}}
+# {"secrets":[{"name":"vault","principal":"be815152-05d2-4094-84d3-f0eea9200d5f","iteration":1,"secret":"WJKXh5cZCq33JOIRn8cfKcs8nJCRT7rU_3t7UfASGwbCp1k8","token":"ixTTpdpjZpEVfYEXOnUbgO4a7I008tPG-tTq2jg45VMT1iEyXoFB05IsaMuAx8OdiRZ--cjtFsw1cK-IuhkIHQ=="}]}
 print(encrypted_secret)
 
 decrypted_secret = client.secret_decrypt(encrypted_secret)
@@ -228,7 +228,7 @@ decrypted_secret = client.secret_decrypt(encrypted_secret)
 print(decrypted_secret)
 ```
 
-Note that you can't decrypt the secrets of these samples yourself if you try it as your XPipe instance uses another unique encryption key. If you're also using a custom vault user passphrase, then the encryption key is unique to your user as well.
+Note that you can't decrypt the secrets of these samples yourself if you try, as your XPipe instance uses another unique encryption key. If you're also using a custom vault user passphrase or have configured a team vault, then the encryption key is unique to your user and roles as well.
 
 ### Encrypting password auth information
 
@@ -376,6 +376,32 @@ data = {
     "scripts": None
 }
 ```
+
+### Controlling the access scope
+
+You can also control the access scope of a secret by passing a custom principal. A principal is a vault user or role that has access to the secret. You can pass this principal to the `/secret/encrypt` endpoint to control who has access to this secret. If you don't pass a principal, the secret is available to the whole vault. If you pass a principal, e.g. `my-user` for a personal vault or `["role1", "role2"]` for a team vault, then only this selection has access to the secret:
+
+```python
+encrypted_secret = client.secret_encrypt("passw0rd", ["role1", "role2"])
+# {"secrets":[{"name":"role1","principal":"7bf51507-0a58-4703-869d-765a781c0b94","iteration":1,"secret":"oE87dJArBFPSnT98EujbRwf0TNjpHCoyvKNdyxi0KPLzbbTL","token":"5pVhGtEBOGJ9e8m807AWb12hcet4of1930TNKP4GJ1v7PkoudDbyAUSyykU8pnTXJzAr_a3ruzNPyfnj9jL8Ow=="},{"name":"role2","principal":"3209a888-be37-4037-b8b0-b14adda69ea2","iteration":1,"secret":"g-1vinHvLm0KSzKx9RtXOTuTgbn_ubyLilxPFDpiCjlk1TIp","token":"aHTc4ZbuL07WBeDjYttk5IbGYif4n5Zm3tTOQ6ap1B07jKUEchoPbyroD6hnqUDrgLX7cHxBc1T_grkpVjbHFw=="}]}
+print(encrypted_secret)
+```
+
+When creating synced identities via the API, you will also have to explicitly set the `accessScope` property along with encrypting the secrets with the correct principals. Instead of the principal names like `role1`, the store data uses the principal UUIDs to prevent issues when renaming them. You can find the the principal UUIDs in the `user.json` or `roles.json` file within your synced storage git repo.
+
+Assuming that you want to make this synced identity accessible to `role1` and `role2`, and have already encrypted the password and key data with the `/secret/encrypt` endpoint and the right principals, you can then create the store with:
+
+```
+{
+  "type" : "sycnedIdentity",
+  "username" : "User",
+  "password" : <encrypted password json>,
+  "sshIdentity" : <encrypted key json>
+  "accessScope" : [ "95061f85-59dd-46cd-8dbd-73f8f9a07800", "5d3dc174-62d9-40d2-81cb-2ca66c6bb1d1" ]
+}
+```
+
+The secret system is cryptographically secure, and the identity access scope is only visual. On the UI level, the `accessScope` value is used to determine whether a user has access to a connection. If the `accessScope` and actual secret encryption principals do not match, the user will get decryption errors if they don't have access to the underlying secrets. So the actually security-relevant principals are those for the encrypted secrets.
 
 ## Actions
 

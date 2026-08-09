@@ -73,7 +73,7 @@ Many S3 providers require HTTPS usage and do not support plain HTTP connections 
 
 ### Content encodings
 
-Files that or stored in a S3 bucket can be encoded with something like gzip to save storage space. XPipe will seamlessly handle content encodings, meaning that if you edit a gzipped file, it will be downloaded locally and uncompressed first. You can then edit the file. Any changes that are saved are then written to the remote server as a gzip compressed file again.
+Files that are stored in a S3 bucket can be encoded with something like gzip to save storage space. XPipe will seamlessly handle content encodings, meaning that if you edit a gzipped file, it will be downloaded locally and uncompressed first. You can then edit the file. Any changes that are saved are then written to the remote server as a gzip compressed file again.
 
 You can inspect the file metadata to find out about any content encodings in the context menu:
 
