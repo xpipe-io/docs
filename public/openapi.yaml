@@ -726,7 +726,8 @@ paths:
                       "secret" : "0M5kljBv_jtlJgg2a6USgWRUhuuaYFsGciLGQh1N-A==",
                       "token" : "3GhDK7KbgKaOd5OhIRHjhL4c-DfiohKB-XSzLX6oU6bBtivBd137G0q6hCpMOxFJUFPywm_YSg161Xw51gwkig=="
                     } ]
-                  } }
+                    }
+                  }
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -755,14 +756,15 @@ paths:
               simple:
                 summary: Decrypt secret which was encrypted with the vault key
                 value: { "encrypted": {
-                  "secrets" : [ {
-                    "name" : "vault",
-                    "principal" : "be815152-05d2-4094-84d3-f0eea9200d5f",
-                    "iteration" : 1,
-                    "secret" : "0M5kljBv_jtlJgg2a6USgWRUhuuaYFsGciLGQh1N-A==",
-                    "token" : "3GhDK7KbgKaOd5OhIRHjhL4c-DfiohKB-XSzLX6oU6bBtivBd137G0q6hCpMOxFJUFPywm_YSg161Xw51gwkig=="
+                  "secrets": [ {
+                    "name": "vault",
+                    "principal": "be815152-05d2-4094-84d3-f0eea9200d5f",
+                    "iteration": 1,
+                    "secret": "0M5kljBv_jtlJgg2a6USgWRUhuuaYFsGciLGQh1N-A==",
+                    "token": "3GhDK7KbgKaOd5OhIRHjhL4c-DfiohKB-XSzLX6oU6bBtivBd137G0q6hCpMOxFJUFPywm_YSg161Xw51gwkig=="
                   } ]
-                } }
+                  }
+                }
       responses:
         '200':
           description: The request was successful. The secret was decrypted.
@@ -1202,6 +1204,9 @@ components:
         principals:
           type: array
           description: The optional principals to restrict access to. Can be principal names or their UUIDs
+          items:
+            type: string
+            description: The principal name or UUID
       required:
         - value
     SecretEncryptResponse:
@@ -1352,9 +1357,15 @@ components:
             stackTrace:
               type: array
               description: The java stack trace information
+              items:
+                type: string
+                description: The individual stack elements
             suppressed:
               type: array
               description: Any suppressed exceptions
+              items:
+                type: object
+                description: The optional suppressed exceptions
             localizedMessage:
               type: string
               description: Not used

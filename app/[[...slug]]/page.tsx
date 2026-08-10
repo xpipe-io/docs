@@ -1,4 +1,5 @@
-import {openapi, source} from '@/lib/source';
+import {openapi} from '@/lib/openapi';
+import {source} from '@/lib/source';
 import {
   DocsPage,
   DocsBody,

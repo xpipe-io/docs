@@ -7,12 +7,6 @@ import { openapiPlugin, openapiSource } from 'fumadocs-openapi/server';
 import { createOpenAPI } from 'fumadocs-openapi/server';
 import path from 'node:path';
 
-export const openapi = createOpenAPI({
-    input: ["./public/openapi.yaml"],
-    // This is apparently broken?
-    // proxyUrl: "/api/proxy"
-});
-
 export const source = loader(
     multiple({
         docs: docs.toFumadocsSource(),

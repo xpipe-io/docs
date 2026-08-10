@@ -1,0 +1,2096 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "XPipe API Documentation",
+    "description": "The XPipe API provides programmatic access to XPipe’s features.\n\nThe XPipe application will start up an HTTP server that can be used to send requests.\nNote that this server is HTTP-only for now as it runs only on localhost. HTTPS requests are not accepted.\n\nSee the authentication handshake below on how to authenticate prior to sending requests.\nFor development, you can also skip the authentication step by disabling it in the settings menu.\n\nIn the context of the API, XPipe refers to any kind of connection, identity, script, and others as a \"store\".\nThis just refers to the fact that those entries store json configuration data and some metadata.\n\nCertain store IDs are hardcoded, e.g. the ID of the local machine store. This makes it easier to perform actions on it across systems.\nThe local machine store ID is \"f0ec68aa-63f5-405c-b178-9a4454556d6b\". This one will be used in many of these samples.\n",
+    "contact": {
+      "name": "XPipe - Contact us",
+      "url": "mailto:hello@xpipe.io"
+    },
+    "version": "24.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:21721",
+      "description": "XPipe Daemon API"
+    }
+  ],
+  "paths": {
+    "/handshake": {
+      "post": {
+        "summary": "Establish session",
+        "description": "Prior to sending requests to the API, you first have to establish a new API session via the handshake endpoint.\nIn the response you will receive a session token that you can use to authenticate during this session.\n\nThis is done so that the daemon knows what kind of clients are connected and can manage individual capabilities for clients.\nIf your client is running on the same system as the daemon, you can choose the local authentication method to avoid having to deal with API keys.\nIf your client does not have file system access, e.g. if it is running remotely, then you have to use an API key.\n\nNote that for development you can also turn off the required authentication in the XPipe settings menu, allowing you to send unauthenticated requests.\n",
+        "operationId": "handshake",
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HandshakeRequest"
+              },
+              "examples": {
+                "local": {
+                  "summary": "Local application handshake",
+                  "value": {
+                    "auth": {
+                      "type": "Local",
+                      "authFileContent": "<Contents of the local file beacon-auth"
+                    },
+                    "client": {
+                      "type": "Api",
+                      "name": "My client name"
+                    }
+                  }
+                },
+                "local-ptb": {
+                  "summary": "Local PTB application handshake",
+                  "value": {
+                    "auth": {
+                      "type": "Local",
+                      "authFileContent": "<Contents of the local file beacon-auth"
+                    },
+                    "client": {
+                      "type": "Api",
+                      "name": "My client name"
+                    }
+                  }
+                },
+                "remote": {
+                  "summary": "API key handshake",
+                  "value": {
+                    "auth": {
+                      "type": "ApiKey",
+                      "key": "<API key>"
+                    },
+                    "client": {
+                      "type": "Api",
+                      "name": "My client name"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The handshake was successful. The returned token can be used for authentication in this session. The token is valid as long as XPipe is running.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HandshakeResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/store/query": {
+      "post": {
+        "summary": "Query stores",
+        "description": "Queries all stores using various filters.\n\nThe filters support globs and can match the category names and store names.\nAll matching is case insensitive.\n",
+        "operationId": "storeQuery",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StoreQueryRequest"
+              },
+              "examples": {
+                "all": {
+                  "summary": "All",
+                  "value": {
+                    "categoryFilter": "**",
+                    "storeFilter": "**",
+                    "typeFilter": "*"
+                  }
+                },
+                "simple": {
+                  "summary": "Local machine",
+                  "value": {
+                    "categoryFilter": "default",
+                    "storeFilter": "local machine",
+                    "typeFilter": "*"
+                  }
+                },
+                "globs": {
+                  "summary": "Podman containers with globs",
+                  "value": {
+                    "categoryFilter": "**",
+                    "storeFilter": "**/podman/*",
+                    "typeFilter": "*"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The query was successful. The body contains all matched stores.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StoreQueryResponse"
+                },
+                "examples": {
+                  "standard": {
+                    "summary": "Matched stores",
+                    "value": {
+                      "found": [
+                        "f0ec68aa-63f5-405c-b178-9a4454556d6b"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/store/info": {
+      "post": {
+        "summary": "Get store info",
+        "description": "Queries detailed information about a store.\n",
+        "operationId": "storeInfo",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StoreInfoRequest"
+              },
+              "examples": {
+                "simple": {
+                  "summary": "Single store",
+                  "value": {
+                    "stores": [
+                      "f0ec68aa-63f5-405c-b178-9a4454556d6b"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The query was successful. The body contains the detailed store information.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StoreInfoResponse"
+                },
+                "examples": {
+                  "standard": {
+                    "summary": "Single store information",
+                    "value": {
+                      "infos": [
+                        {
+                          "store": "f0ec68aa-63f5-405c-b178-9a4454556d6b",
+                          "category": [
+                            "default"
+                          ],
+                          "name": [
+                            "local machine"
+                          ],
+                          "type": "local",
+                          "rawData": {},
+                          "usageCategory": "shell",
+                          "lastUsed": "2024-05-31T11:53:02.408504600Z",
+                          "lastModified": "2024-06-23T21:15:25.608097Z",
+                          "created": "2024-05-31T10:32:02.508504600Z",
+                          "state": {}
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/store/add": {
+      "post": {
+        "summary": "Add store",
+        "description": "Creates the new store in the xpipe vault from raw json data.\nThis can also perform an optional validation first to make sure that the store can be established.\n\nIf an equivalent store already exists, no new one will be added and the existing one's ID will be returned.\n\nFor details on the JSON schema of a connection type, take a look at the existing vault data of other connections.\n",
+        "operationId": "storeAdd",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StoreAddRequest"
+              },
+              "examples": {
+                "simple": {
+                  "summary": "Add new pwsh environment",
+                  "value": {
+                    "name": "my connection",
+                    "validate": true,
+                    "category": "97458c07-75c0-4f9d-a06e-92d8cdf67c40",
+                    "data": {
+                      "type": "shellEnvironment",
+                      "commands": null,
+                      "host": "f0ec68aa-63f5-405c-b178-9a4454556d6b",
+                      "shell": "pwsh",
+                      "elevated": false
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The request was successful. The store was added.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StoreAddResponse"
+                },
+                "examples": {
+                  "standard": {
+                    "summary": "Returned store",
+                    "value": {
+                      "store": "36ad9716-a209-4f7f-9814-078d3349280c"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/category/add": {
+      "post": {
+        "summary": "Add category",
+        "description": "Creates a new empty category in the vault.\n\nNew categories always need a parent as it's not allowed to create root categories.\n",
+        "operationId": "categoryAdd",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CategoryAddRequest"
+              },
+              "examples": {
+                "simple": {
+                  "summary": "Add new category",
+                  "value": {
+                    "name": "my category",
+                    "parent": "97458c07-75c0-4f9d-a06e-92d8cdf67c40"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The request was successful. The category was added.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CategoryAddResponse"
+                },
+                "examples": {
+                  "standard": {
+                    "summary": "Category information",
+                    "value": {
+                      "category": "36ad9716-a209-4f7f-9814-078d3349280c"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/category/query": {
+      "post": {
+        "summary": "Query categories",
+        "description": "Queries all categories using a filter.\n\nThe filter supports globs and can match the category names.\nAll matching is case insensitive.\n",
+        "operationId": "categoryQuery",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CategoryQueryRequest"
+              },
+              "examples": {
+                "all": {
+                  "summary": "All",
+                  "value": {
+                    "filter": "**"
+                  }
+                },
+                "simple": {
+                  "summary": "Default",
+                  "value": {
+                    "filter": "all connections/default"
+                  }
+                },
+                "globs": {
+                  "summary": "First level categories",
+                  "value": {
+                    "filter": "all connections/*"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The query was successful. The body contains all matched categories.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CategoryQueryResponse"
+                },
+                "examples": {
+                  "standard": {
+                    "summary": "Matched categories",
+                    "value": {
+                      "found": [
+                        "97458c07-75c0-4f9d-a06e-92d8cdf67c40"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/category/info": {
+      "post": {
+        "summary": "Get category info",
+        "description": "Queries detailed information about categories.\n",
+        "operationId": "categoryInfo",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CategoryInfoRequest"
+              },
+              "examples": {
+                "simple": {
+                  "summary": "Single category",
+                  "value": {
+                    "categories": [
+                      "97458c07-75c0-4f9d-a06e-92d8cdf67c40"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The query was successful. The body contains the detailed category information.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CategoryInfoResponse"
+                },
+                "examples": {
+                  "standard": {
+                    "summary": "Single category information",
+                    "value": {
+                      "infos": [
+                        {
+                          "category": "97458c07-75c0-4f9d-a06e-92d8cdf67c40",
+                          "parentCategory": "bfb0b51a-e7a3-4ce4-8878-8d4cb5828d6c",
+                          "name": [
+                            "all connections",
+                            "default"
+                          ],
+                          "lastUsed": "2024-05-31T11:53:02.408504600Z",
+                          "lastModified": "2024-06-23T21:15:25.608097Z",
+                          "config": {}
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/category/remove": {
+      "post": {
+        "summary": "Remove categories",
+        "description": "Removes a set of categories. This can include any possible children categories and stores associated with the category.\n\nSome special categories, for example the root categories, can not be removed.\n",
+        "operationId": "categoryRemove",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CategoryRemoveRequest"
+              },
+              "examples": {
+                "simple": {
+                  "summary": "Remove single category",
+                  "value": {
+                    "categories": [
+                      "36ad9716-a209-4f7f-9814-078d3349280c"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The removal was successful."
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/store/remove": {
+      "post": {
+        "summary": "Remove stores",
+        "description": "Removes a set of stores. This includes any possible children associated with the store.\n\nSome stores, for example the local machine, can not be removed.\n",
+        "operationId": "storeRemove",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StoreRemoveRequest"
+              },
+              "examples": {
+                "simple": {
+                  "summary": "Remove single store",
+                  "value": {
+                    "stores": [
+                      "36ad9716-a209-4f7f-9814-078d3349280c"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The removal was successful."
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/store/refresh": {
+      "post": {
+        "summary": "Refresh store",
+        "description": "Performs a refresh on the specified store.\n\nThis will update the store state information and also any children if the store type has any.\n",
+        "operationId": "storeRefresh",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StoreRefreshRequest"
+              },
+              "examples": {
+                "simple": {
+                  "summary": "Refresh store",
+                  "value": {
+                    "store": "36ad9716-a209-4f7f-9814-078d3349280c"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The request was successful. The store state was updated."
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/shell/start": {
+      "post": {
+        "summary": "Start shell connection",
+        "description": "Starts a new shell session for a connection. If an existing shell session is already running for that connection, this operation will do nothing.\n\nNote that there are a variety of possible errors that can occur here when establishing the shell connection.\nThese errors will be returned with the HTTP return code 500.\n",
+        "operationId": "shellStart",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ShellStartRequest"
+              },
+              "examples": {
+                "local": {
+                  "summary": "Start local shell",
+                  "value": {
+                    "store": "f0ec68aa-63f5-405c-b178-9a4454556d6b"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The operation was successful. The shell session was started.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShellStartResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/shell/stop": {
+      "post": {
+        "summary": "Stop shell connection",
+        "description": "Stops an existing shell session for a connection.\n\nThis operation will return once the shell has exited.\nIf the shell is busy or stuck, you might have to work with timeouts to account for these cases.\n",
+        "operationId": "shellStop",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ShellStopRequest"
+              },
+              "examples": {
+                "local": {
+                  "summary": "Stop local shell",
+                  "value": {
+                    "store": "f0ec68aa-63f5-405c-b178-9a4454556d6b"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The operation was successful. The shell session was stopped."
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/shell/exec": {
+      "post": {
+        "summary": "Run command in shell session",
+        "description": "Runs a command in an active shell session and waits for it to finish. The exit code and output will be returned in the response.\n\nNote that a variety of different errors can occur when executing the command.\nIf the command finishes, even with an error code, a normal HTTP 200 response will be returned.\nHowever, if any other error occurs like the shell not responding or exiting unexpectedly, an HTTP 500 response will be returned.\n",
+        "operationId": "shellExec",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ShellExecRequest"
+              },
+              "examples": {
+                "user": {
+                  "summary": "echo $USER",
+                  "value": {
+                    "store": "f0ec68aa-63f5-405c-b178-9a4454556d6b",
+                    "command": "echo $USER"
+                  }
+                },
+                "invalid": {
+                  "summary": "invalid",
+                  "value": {
+                    "store": "f0ec68aa-63f5-405c-b178-9a4454556d6b",
+                    "command": "invalid"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The operation was successful. The shell command finished.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShellExecResponse"
+                },
+                "examples": {
+                  "user": {
+                    "summary": "echo $USER",
+                    "value": {
+                      "exitCode": 0,
+                      "stdout": "root",
+                      "stderr": ""
+                    }
+                  },
+                  "fail": {
+                    "summary": "invalid",
+                    "value": {
+                      "exitCode": 127,
+                      "stdout": "",
+                      "stderr": "invalid: command not found"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/fs/blob": {
+      "post": {
+        "summary": "Store raw file blob",
+        "description": "Stores arbitrary binary data in a blob such that it can be used later on to for example write to a remote file.\n\nThis will return a uuid which can be used as a reference to the blob.\nYou can also store normal text data in blobs if you intend to create text or shell script files with it.\n",
+        "operationId": "fsData",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/octet-stream": {
+              "schema": {
+                "type": "string",
+                "format": "binary"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The operation was successful. The data was stored.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FsBlobResponse"
+                },
+                "examples": {
+                  "success": {
+                    "summary": "Success",
+                    "value": {
+                      "blob": "854afc45-eadc-49a0-a45d-9fb76a484304"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/fs/read": {
+      "post": {
+        "summary": "Read a remote file",
+        "description": "Reads the entire content of a remote file through an active shell session.\n",
+        "operationId": "fsRead",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FsReadRequest"
+              },
+              "examples": {
+                "simple": {
+                  "summary": "Read file",
+                  "value": {
+                    "store": "f0ec68aa-63f5-405c-b178-9a4454556d6b",
+                    "path": "/home/user/myfile.txt"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The operation was successful. The file was read.",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/fs/write": {
+      "post": {
+        "summary": "Write blob to a remote file",
+        "description": "Writes blob data to a file through an active shell session.\n",
+        "operationId": "fsWrite",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FsWriteRequest"
+              },
+              "examples": {
+                "simple": {
+                  "summary": "Write simple file",
+                  "value": {
+                    "store": "f0ec68aa-63f5-405c-b178-9a4454556d6b",
+                    "blob": "854afc45-eadc-49a0-a45d-9fb76a484304",
+                    "path": "/home/user/myfile.txt"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The operation was successful. The file was written."
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/fs/script": {
+      "post": {
+        "summary": "Write blob to a shell script",
+        "description": "Creates a shell script in the temporary directory of the file system that is access through the shell connection.\n\nThis can be used to run more complex commands on remote systems.\n",
+        "operationId": "fsScript",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FsScriptRequest"
+              },
+              "examples": {
+                "standard": {
+                  "summary": "Standard write",
+                  "value": {
+                    "store": "f0ec68aa-63f5-405c-b178-9a4454556d6b",
+                    "blob": "854afc45-eadc-49a0-a45d-9fb76a484304"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The operation was successful. The script file was created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FsScriptResponse"
+                },
+                "examples": {
+                  "success": {
+                    "summary": "Success",
+                    "value": {
+                      "path": "/tmp/xpipe-123.sh"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/action": {
+      "post": {
+        "summary": "Execute an action",
+        "description": "Executes an action, which is defined by its own schema. To obtain the schema and data for any action within XPipe, use the action shortcut menu.\n",
+        "operationId": "action",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ActionRequest"
+              },
+              "examples": {
+                "simple": {
+                  "summary": "Launch local machine terminal",
+                  "value": {
+                    "action": {
+                      "ref": "f0ec68aa-63f5-405c-b178-9a4454556d6b",
+                      "id": "open"
+                    },
+                    "confirm": false
+                  }
+                },
+                "batch": {
+                  "summary": "Run a script in batch mode",
+                  "value": {
+                    "action": {
+                      "ref": [
+                        "3c7ebb2a-e420-4190-b885-23fc9fada2ca",
+                        "30ee96ae-6b4c-4cde-8262-fd64ec93ad29"
+                      ],
+                      "scriptStore": "cd34e0a7-2f3e-4327-ae51-5d8537f56bb1",
+                      "id": "runTerminalStore"
+                    },
+                    "confirm": false
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The action was executed successfully."
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/secret/encrypt": {
+      "post": {
+        "summary": "Encrypts a secret",
+        "description": "For stores, the secrets are encrypted in json form.\n\nWhen creating stores in an automated fashion, secrets have to be first converted into the proper representation. To obtain the representation of a secret of an existing store, use the /secret/decrypt endpoint.\n\nThe secret encryption method depends on your vault setup. Without any vault user and passphrase, the secret will be encrypted with a generic vault key. If you have a vault user with custom passphrase or a team set up, the secret can be encrypted with that key.\n\nYou can also control the access scope of a secret by passing a custom principal. A principal is a vault user or role that has access to the secret. You can pass this principal to this endpoint to control who has access to this secret.\n",
+        "operationId": "secretEncrypt",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SecretEncryptRequest"
+              },
+              "examples": {
+                "simple": {
+                  "summary": "Encrypt string",
+                  "value": {
+                    "value": "123"
+                  }
+                },
+                "principal": {
+                  "summary": "Limit access to a certain role in a team vault",
+                  "value": {
+                    "value": "123",
+                    "principals": [
+                      "my-role",
+                      "my-other-role"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The request was successful. The secret was encrypted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SecretEncryptResponse"
+                },
+                "examples": {
+                  "standard": {
+                    "summary": "Encrypted representation. This case was encrypted with the vault principal for all users",
+                    "value": {
+                      "encrypted": {
+                        "secrets": [
+                          {
+                            "name": "vault",
+                            "principal": "be815152-05d2-4094-84d3-f0eea9200d5f",
+                            "iteration": 1,
+                            "secret": "0M5kljBv_jtlJgg2a6USgWRUhuuaYFsGciLGQh1N-A==",
+                            "token": "3GhDK7KbgKaOd5OhIRHjhL4c-DfiohKB-XSzLX6oU6bBtivBd137G0q6hCpMOxFJUFPywm_YSg161Xw51gwkig=="
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/secret/decrypt": {
+      "post": {
+        "summary": "Decrypts a secret",
+        "description": "For stores, the secrets are encrypted in json form.\n\nWhen creating stores in an automated fashion, secrets have to be first converted into the proper representation. This endpoint can be used to obtain the representation of a secret of an existing store.\n\nA vault secret can be decrypted as long as you have access to at least principal\n",
+        "operationId": "secretDecrypt",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SecretDecryptRequest"
+              },
+              "examples": {
+                "simple": {
+                  "summary": "Decrypt secret which was encrypted with the vault key",
+                  "value": {
+                    "encrypted": {
+                      "secrets": [
+                        {
+                          "name": "vault",
+                          "principal": "be815152-05d2-4094-84d3-f0eea9200d5f",
+                          "iteration": 1,
+                          "secret": "0M5kljBv_jtlJgg2a6USgWRUhuuaYFsGciLGQh1N-A==",
+                          "token": "3GhDK7KbgKaOd5OhIRHjhL4c-DfiohKB-XSzLX6oU6bBtivBd137G0q6hCpMOxFJUFPywm_YSg161Xw51gwkig=="
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The request was successful. The secret was decrypted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SecretDecryptResponse"
+                },
+                "examples": {
+                  "standard": {
+                    "summary": "Decrypted secret",
+                    "value": {
+                      "decrypted": "123"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/daemon/version": {
+      "post": {
+        "summary": "Query daemon version",
+        "description": "Retrieves version information from the daemon",
+        "operationId": "daemonVersion",
+        "responses": {
+          "200": {
+            "description": "The operation was successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DaemonVersionResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ShellStartRequest": {
+        "type": "object",
+        "properties": {
+          "store": {
+            "type": "string",
+            "description": "The store uuid"
+          }
+        },
+        "required": [
+          "store"
+        ]
+      },
+      "ShellStartResponse": {
+        "type": "object",
+        "properties": {
+          "shellDialect": {
+            "type": "integer",
+            "description": "The shell dialect"
+          },
+          "osType": {
+            "type": "string",
+            "description": "The general type of operating system"
+          },
+          "osName": {
+            "type": "string",
+            "description": "The display name of the operating system"
+          },
+          "ttyState": {
+            "type": "string",
+            "description": "Whether a tty/pty has been allocated for the connection. If allocated, input and output will be unreliable. It is not recommended to use a shell connection then."
+          },
+          "temp": {
+            "type": "string",
+            "description": "The location of the temporary directory"
+          }
+        },
+        "required": [
+          "shellDialect",
+          "osType",
+          "osName",
+          "temp"
+        ]
+      },
+      "ShellStopRequest": {
+        "type": "object",
+        "properties": {
+          "store": {
+            "type": "string",
+            "description": "The store uuid"
+          }
+        },
+        "required": [
+          "store"
+        ]
+      },
+      "ShellExecRequest": {
+        "type": "object",
+        "properties": {
+          "store": {
+            "type": "string",
+            "description": "The store uuid"
+          },
+          "command": {
+            "type": "string",
+            "description": "The command to execute"
+          }
+        },
+        "required": [
+          "store",
+          "command"
+        ]
+      },
+      "ShellExecResponse": {
+        "type": "object",
+        "properties": {
+          "exitCode": {
+            "type": "integer",
+            "description": "The exit code of the command"
+          },
+          "stdout": {
+            "type": "string",
+            "description": "The stdout output of the command"
+          },
+          "stderr": {
+            "type": "string",
+            "description": "The stderr output of the command"
+          }
+        },
+        "required": [
+          "exitCode",
+          "stdout",
+          "stderr"
+        ]
+      },
+      "FsBlobResponse": {
+        "type": "object",
+        "properties": {
+          "blob": {
+            "type": "string",
+            "description": "The data uuid"
+          }
+        },
+        "required": [
+          "blob"
+        ]
+      },
+      "FsWriteRequest": {
+        "type": "object",
+        "properties": {
+          "store": {
+            "type": "string",
+            "description": "The store uuid"
+          },
+          "blob": {
+            "type": "string",
+            "description": "The blob uuid"
+          },
+          "path": {
+            "type": "string",
+            "description": "The target filepath"
+          }
+        },
+        "required": [
+          "store",
+          "blob",
+          "path"
+        ]
+      },
+      "FsReadRequest": {
+        "type": "object",
+        "properties": {
+          "store": {
+            "type": "string",
+            "description": "The store uuid"
+          },
+          "path": {
+            "type": "string",
+            "description": "The target file path"
+          }
+        },
+        "required": [
+          "store",
+          "path"
+        ]
+      },
+      "FsScriptRequest": {
+        "type": "object",
+        "properties": {
+          "store": {
+            "type": "string",
+            "description": "The store uuid"
+          },
+          "blob": {
+            "type": "string",
+            "description": "The blob uuid"
+          }
+        },
+        "required": [
+          "store",
+          "blob"
+        ]
+      },
+      "FsScriptResponse": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "The generated script file path"
+          }
+        },
+        "required": [
+          "path"
+        ]
+      },
+      "StoreQueryRequest": {
+        "type": "object",
+        "properties": {
+          "categoryFilter": {
+            "type": "string",
+            "description": "The filter string to match categories. Categories are delimited by / if they are hierarchical. The filter supports globs."
+          },
+          "storeFilter": {
+            "type": "string",
+            "description": "The filter string to match store names. Store names are delimited by / if they are hierarchical. The filter supports globs."
+          },
+          "typeFilter": {
+            "type": "string",
+            "description": "The filter string to store types. Every unique type of store like SSH or docker has its own type identifier that you can match. The filter supports globs."
+          }
+        },
+        "required": [
+          "categoryFilter",
+          "storeFilter",
+          "typeFilter"
+        ]
+      },
+      "StoreQueryResponse": {
+        "type": "object",
+        "properties": {
+          "found": {
+            "type": "array",
+            "description": "The found stores",
+            "items": {
+              "type": "string",
+              "description": "The store uuid"
+            }
+          }
+        },
+        "required": [
+          "found"
+        ]
+      },
+      "CategoryQueryRequest": {
+        "type": "object",
+        "properties": {
+          "filter": {
+            "type": "string",
+            "description": "The filter string to match category names. Category names are delimited by / if they are hierarchical. The filter supports globs."
+          }
+        },
+        "required": [
+          "filter"
+        ]
+      },
+      "CategoryQueryResponse": {
+        "type": "object",
+        "properties": {
+          "found": {
+            "type": "array",
+            "description": "The found categories",
+            "items": {
+              "type": "string",
+              "description": "The category uuid"
+            }
+          }
+        },
+        "required": [
+          "found"
+        ]
+      },
+      "CategoryInfoRequest": {
+        "type": "object",
+        "properties": {
+          "categories": {
+            "type": "array",
+            "description": "The categories",
+            "items": {
+              "type": "string",
+              "description": "The unique id of the category"
+            }
+          }
+        },
+        "required": [
+          "categories"
+        ]
+      },
+      "CategoryInfoResponse": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "description": "The array of information for each category",
+          "properties": {
+            "category": {
+              "type": "string",
+              "description": "The unique id of the category"
+            },
+            "parentCategory": {
+              "type": "string",
+              "description": "The unique id of the parent category, if present"
+            },
+            "name": {
+              "type": "array",
+              "description": "The full category name path as an array",
+              "items": {
+                "type": "string",
+                "description": "Individual category name"
+              }
+            },
+            "lastModified": {
+              "type": "string",
+              "description": "The timestamp of when the category configuration was last modified in ISO 8601"
+            },
+            "lastUsed": {
+              "type": "string",
+              "description": "The timestamp of when the category was last launched in ISO 8601"
+            },
+            "config": {
+              "type": "object",
+              "description": "The internal configuration data of the category"
+            }
+          },
+          "required": [
+            "category",
+            "parentCategory",
+            "name",
+            "lastUsed",
+            "lastModified",
+            "config"
+          ]
+        }
+      },
+      "StoreInfoRequest": {
+        "type": "object",
+        "properties": {
+          "stores": {
+            "type": "array",
+            "description": "The stores",
+            "items": {
+              "type": "string",
+              "description": "The unique id of the store"
+            }
+          }
+        },
+        "required": [
+          "stores"
+        ]
+      },
+      "StoreInfoResponse": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "description": "The array of information for each store",
+          "properties": {
+            "store": {
+              "type": "string",
+              "description": "The unique id of the store"
+            },
+            "category": {
+              "type": "array",
+              "description": "The full category path as an array",
+              "items": {
+                "type": "string",
+                "description": "Individual category name"
+              }
+            },
+            "name": {
+              "type": "array",
+              "description": "The full store name path as an array",
+              "items": {
+                "type": "string",
+                "description": "Individual store name"
+              }
+            },
+            "type": {
+              "type": "string",
+              "description": "The type identifier of the store"
+            },
+            "rawData": {
+              "type": "object",
+              "description": "The raw internal configuration data for the store. The schema for these is internal and should not be relied upon."
+            },
+            "usageCategory": {
+              "type": "string",
+              "description": "The category of how this store can be used.",
+              "enum": [
+                "shell",
+                "tunnel",
+                "script",
+                "command",
+                "desktop",
+                "group",
+                "serial",
+                "identity",
+                "fileSystem"
+              ]
+            },
+            "lastModified": {
+              "type": "string",
+              "description": "The timestamp of when the store configuration was last modified in ISO 8601"
+            },
+            "lastUsed": {
+              "type": "string",
+              "description": "The timestamp of when the store was last launched in ISO 8601"
+            },
+            "created": {
+              "type": "string",
+              "description": "The timestamp of when the store was created"
+            },
+            "state": {
+              "type": "object",
+              "description": "The internal persistent state information about the store"
+            },
+            "cache": {
+              "type": "object",
+              "description": "The temporary cache data for the store"
+            }
+          },
+          "required": [
+            "store",
+            "category",
+            "name",
+            "type",
+            "rawData",
+            "usageCategory",
+            "lastUsed",
+            "lastModified",
+            "created",
+            "state",
+            "cache"
+          ]
+        }
+      },
+      "StoreRefreshRequest": {
+        "type": "object",
+        "properties": {
+          "store": {
+            "type": "string",
+            "description": "The store uuid"
+          }
+        },
+        "required": [
+          "store"
+        ]
+      },
+      "StoreAddRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The store name"
+          },
+          "data": {
+            "type": "object",
+            "description": "The raw store store data. Schemas for store types are not documented, but you can find the store data of your existing stores in the xpipe vault."
+          },
+          "validate": {
+            "type": "boolean",
+            "description": "Whether to perform a store validation before adding it, i.e., probe the store first. If validation is enabled and fails, the store will not be added"
+          },
+          "category": {
+            "type": "string",
+            "description": "The category uuid to put the store in. If not specified, the default category will be used"
+          }
+        },
+        "required": [
+          "name",
+          "data",
+          "validate"
+        ]
+      },
+      "StoreAddResponse": {
+        "type": "object",
+        "properties": {
+          "store": {
+            "type": "string",
+            "description": "The store uuid"
+          }
+        },
+        "required": [
+          "store"
+        ]
+      },
+      "CategoryAddRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The category name"
+          },
+          "parent": {
+            "type": "string",
+            "description": "The parent category uuid to put the new category in"
+          }
+        },
+        "required": [
+          "name",
+          "parent"
+        ]
+      },
+      "CategoryAddResponse": {
+        "type": "object",
+        "properties": {
+          "category": {
+            "type": "string",
+            "description": "The category uuid"
+          }
+        },
+        "required": [
+          "category"
+        ]
+      },
+      "StoreRemoveRequest": {
+        "type": "object",
+        "properties": {
+          "stores": {
+            "type": "array",
+            "description": "The stores to remove",
+            "items": {
+              "type": "string",
+              "description": "The unique id of the store"
+            }
+          }
+        },
+        "required": [
+          "stores"
+        ]
+      },
+      "CategoryRemoveRequest": {
+        "type": "object",
+        "properties": {
+          "categories": {
+            "type": "array",
+            "description": "The categories to remove",
+            "items": {
+              "type": "string",
+              "description": "The unique id of the category"
+            }
+          },
+          "removeChildrenCategories": {
+            "type": "boolean",
+            "description": "Whether to also remove any children categories"
+          },
+          "removeContents": {
+            "type": "boolean",
+            "description": "Whether to also remove any store entries in the categories. If this is false, any stores are moved to the default category instead."
+          }
+        },
+        "required": [
+          "categories",
+          "removeChildrenCategories",
+          "removeContents"
+        ]
+      },
+      "ActionRequest": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "object",
+            "description": "The raw action data in json form. The best way to obtain this data is to use the action shortcut creation functionality."
+          },
+          "confirm": {
+            "type": "boolean",
+            "description": "If the action is modifying something and the category has been configured to confirm all modifications, a confirmation dialog will be shown if this is is true."
+          }
+        },
+        "required": [
+          "action",
+          "confirm"
+        ]
+      },
+      "SecretEncryptRequest": {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string",
+            "description": "The raw string value to encrypt"
+          },
+          "principals": {
+            "type": "array",
+            "description": "The optional principals to restrict access to. Can be principal names or their UUIDs",
+            "items": {
+              "type": "string",
+              "description": "The principal name or UUID"
+            }
+          }
+        },
+        "required": [
+          "value"
+        ]
+      },
+      "SecretEncryptResponse": {
+        "type": "object",
+        "properties": {
+          "encrypted": {
+            "type": "object",
+            "description": "The internal encrypted representation of the secret"
+          }
+        },
+        "required": [
+          "encrypted"
+        ]
+      },
+      "SecretDecryptRequest": {
+        "type": "object",
+        "properties": {
+          "encrypted": {
+            "type": "object",
+            "description": "The internal encrypted representation of the secret"
+          }
+        },
+        "required": [
+          "encrypted"
+        ]
+      },
+      "SecretDecryptResponse": {
+        "type": "object",
+        "properties": {
+          "decrypted": {
+            "type": "string",
+            "description": "The decrypted secret"
+          }
+        }
+      },
+      "HandshakeRequest": {
+        "type": "object",
+        "properties": {
+          "auth": {
+            "$ref": "#/components/schemas/AuthMethod"
+          },
+          "client": {
+            "$ref": "#/components/schemas/ClientInformation"
+          }
+        },
+        "required": [
+          "auth",
+          "client"
+        ]
+      },
+      "HandshakeResponse": {
+        "type": "object",
+        "properties": {
+          "sessionToken": {
+            "type": "string",
+            "description": "The generated bearer token that can be used for authentication in this session"
+          }
+        },
+        "required": [
+          "sessionToken"
+        ]
+      },
+      "DaemonVersionResponse": {
+        "type": "object",
+        "properties": {
+          "version": {
+            "type": "string",
+            "description": "The version of the running daemon"
+          },
+          "canonicalVersion": {
+            "type": "string",
+            "description": "The canonical version of the running daemon"
+          },
+          "buildVersion": {
+            "type": "string",
+            "description": "The build timestamp"
+          },
+          "jvmVersion": {
+            "type": "string",
+            "description": "The version of the Java Virtual Machine in which the daemon is running"
+          },
+          "pro": {
+            "type": "boolean",
+            "description": "Whether the daemon supports professional edition features"
+          }
+        },
+        "required": [
+          "version",
+          "canonicalVersion",
+          "buildVersion",
+          "jvmVersion",
+          "pro"
+        ]
+      },
+      "AuthMethod": {
+        "discriminator": {
+          "propertyName": "type",
+          "mapping": {
+            "apiKey": "#/components/schemas/ApiKey",
+            "local": "#/components/schemas/Local"
+          }
+        },
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/ApiKey"
+          },
+          {
+            "$ref": "#/components/schemas/Local"
+          }
+        ]
+      },
+      "ApiKey": {
+        "description": "API key authentication",
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "key": {
+            "type": "string",
+            "description": "The API key"
+          }
+        },
+        "required": [
+          "key",
+          "type"
+        ]
+      },
+      "Local": {
+        "description": "Authentication method for local applications. Uses file system access as proof of authentication.\n\nYou can find the authentication file at:\n- %TEMP%\\xpipe\\beacon-auth on Windows\n- $TMP/xpipe/$USER/beacon-auth on Linux\n- $TMPDIR/xpipe/beacon-auth on macOS\n\nFor the PTB releases the dir name is changed to xpipe-ptb to prevent collisions.\n",
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "authFileContent": {
+            "type": "string",
+            "description": "The contents of the local file beacon-auth. This file is automatically generated when XPipe starts."
+          }
+        },
+        "required": [
+          "authFileContent",
+          "type"
+        ]
+      },
+      "ClientInformation": {
+        "type": "object",
+        "discriminator": {
+          "propertyName": "type"
+        },
+        "properties": {
+          "type": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "type"
+        ]
+      },
+      "ApiClientInformation": {
+        "description": "Provides information about the client that connected to the XPipe API.",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ClientInformation"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "The name of the client."
+              }
+            },
+            "required": [
+              "name"
+            ]
+          }
+        ]
+      },
+      "ClientErrorResponse": {
+        "description": "Error returned in case of a client exception",
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "The error message"
+          }
+        },
+        "required": [
+          "message"
+        ]
+      },
+      "ServerErrorResponse": {
+        "description": "Error returned in case of a server exception with HTTP code 500",
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "object",
+            "description": "The exception information",
+            "properties": {
+              "cause": {
+                "type": "object",
+                "description": "The exception cause"
+              },
+              "stackTrace": {
+                "type": "array",
+                "description": "The java stack trace information",
+                "items": {
+                  "type": "string",
+                  "description": "The individual stack elements"
+                }
+              },
+              "suppressed": {
+                "type": "array",
+                "description": "Any suppressed exceptions",
+                "items": {
+                  "type": "object",
+                  "description": "The optional suppressed exceptions"
+                }
+              },
+              "localizedMessage": {
+                "type": "string",
+                "description": "Not used"
+              },
+              "message": {
+                "type": "string",
+                "description": "The error message"
+              }
+            },
+            "required": [
+              "message"
+            ]
+          }
+        },
+        "required": [
+          "error"
+        ]
+      }
+    },
+    "responses": {
+      "Success": {
+        "description": "The action was successfully performed."
+      },
+      "BadRequest": {
+        "description": "Bad request. Please check error message and your parameters.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ClientErrorResponse"
+            }
+          }
+        }
+      },
+      "Unauthorized": {
+        "description": "Authorization failed. Please supply a `Bearer` token via the `Authorization` header."
+      },
+      "Forbidden": {
+        "description": "Authorization failed. Please supply a valid `Bearer` token via the `Authorization` header."
+      },
+      "NotFound": {
+        "description": "The requested resource could not be found."
+      },
+      "InternalServerError": {
+        "description": "Internal error.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ServerErrorResponse"
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "The bearer token used is the session token that you receive from the handshake exchange."
+      }
+    }
+  },
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ]
+}
