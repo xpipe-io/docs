@@ -48,11 +48,8 @@ services:
     image: ghcr.io/xpipe-io/xpipe-webtop:ptb
     container_name: xpipe-webtop
     hostname: xpipe-webtop
-    cap_add:
-      - NET_ADMIN # Optional, see the network section below
-    privileged: true # Optional, see the network section below
-    shm_size: 256mb # Some apps in the webtop use a lot of shared memory, so increase it to this
     environment:
+      - XPIPE_VPN=none # See the VPN section below on what this does
       - LC_ALL=en_US.UTF-8
       - TZ=Europe/Berlin
       - PUID=1000 # Set this to your user id to make the mounted volume use the same owner as your local user
@@ -65,6 +62,10 @@ services:
       - 127.0.0.1:21222:21222 # SSH (optional, see below)
       - 127.0.0.1:21721:21721 # API (optional, see below)
     restart: unless-stopped
+    shm_size: 256mb # Some apps in the webtop use a lot of shared memory, so this needs to be increased here from the default value
+    cap_add:
+      - NET_ADMIN # Optional, see the VPN section below
+    privileged: true # Optional, see the VPN section below
 ```
 
 <Callout type="info">The port bindings are explicitly only bound to the localhost interface in this sample to prevent you from accidentally exposing it to all public interfaces.</Callout>
@@ -79,7 +80,7 @@ If you can only access the webtop within your local network, then you don't real
 
 #### VPN
 
-If your setup already uses a VPN like wireguard, tailscale, netbird, etc., you can use it to control the access to the webtop interface that way. This is usually the easiest way. You can either add the host on which the container runs on to your VPN or alternatively the container itself. See further down below for setup instructions for VPNs like tailscale or netbird within the container
+If your setup already uses a VPN like tailscale, netbird, etc., you can use it to control the access to the webtop interface that way. This is usually the easiest way. See further down below for setup instructions for VPNs for the container
 
 #### Authentication layer
 
@@ -87,27 +88,27 @@ Alternatively, you can use a proper separate authentication solution in front of
 
 #### Mobile app
 
-If the primary use of the webtop is for you to access it from a mobile device when you are away from your desktop, then you can use the XPipe mobile app on Android and iOS. This app supports an SSH-only approach where only the SSH port needs to be publicly exposed. The app will then connect via SSH key auth and tunnel the connection via SSH, making it secure to use. This can then be publicly exposed as the SSH port is secured via a key that is only available to the mobile app.
+If the primary use of the webtop is for you to access it from a mobile device when you are away from your desktop, then you can use the XPipe mobile app on Android and iOS. This app supports an SSH-only approach where only the SSH port needs to be reachable. The app will then connect via SSH key auth and tunnel the connection via SSH, making it secure to use.
 
-### Networking
+This can then be publicly exposed as the SSH port is secured via a key that is only available to the mobile app. The mobile setup also supports using VPNs when they are configured for the container.
 
-By default, a docker container does not have access to the network tunnel driver ([TUN](https://en.wikipedia.org/wiki/TUN/TAP)) or the host system. For most types of connections, this one is not needed, so it will work fine without it. However, tools like Netbird require the TUN to function within the container.
+### VPN configuration
 
-#### Netbird
+You can add the container to a VPN if your VPN is supported. Currently supported are Tailscale and Netbird. You can enable this feature by setting the environment varible `XPIPE_VPN=tailscale` or `XPIPE_VPN=netbird`.
 
-If you are planning to use Netbird in the container, you will have to pass the TUN device to the container and run it with privileged network permissions. Otherwise, the Netbird daemon won't be able to start. You can do this by passing the following arguments to the container:
-
-`--cap-add=NET_ADMIN --privileged`
+This allows you to connect to the container from within your VPN and also connect to other systems within your VPN from the container.
 
 #### Tailscale
 
-If you are planning to use Tailscale in the container, you will have the choice to either pass the TUN device to the container and run it with privileged network permissions or use user-level networking with Tailscale.
+For tailscale, the container does not need to be privileged, but requires the host system on which the container is running on to have tailscale installed. This is required, otherwise the connectivity will not work.
 
-If you assign privileges with `--cap-add=NET_ADMIN --privileged`, everything will work automatically. You will only have to log in once into Tailscale in the container when prompted.
+#### Netbird
 
-If you don't assign privileges to the container, XPipe will automatically detect this and switch to user-mode networking. This involves routing traffic over a local HTTP proxy managed by Tailscale. If you then use this proxy entry as a gateway for all connections within XPipe, all traffic will be routed over your Tailscale network as usual. When using external applications in the container, you will have to make sure that the application uses the proxy at `http://localhost:1055` as well.
+By default, a docker container does not have access to the network tunnel driver ([TUN](https://en.wikipedia.org/wiki/TUN/TAP)) on the host system. Tools like Netbird require the TUN to function within the container.
 
-![](/images/webtop-proxy.png)
+If you are planning to use Netbird for the container, you will have to pass the TUN device to the container and run it with privileged network permissions. Otherwise, the Netbird daemon won't be able to start. You can do this by passing the following arguments to the container:
+
+`--cap-add=NET_ADMIN --privileged`
 
 ### Language Support
 
@@ -128,6 +129,20 @@ You can choose to utilize the webtop container as a central API server that you 
 ## Usage
 
 You will initially start out with an empty installation of XPipe. It is therefore recommended to use the [git sync](/guide/sync) feature of XPipe to quickly transfer all your connections to the new webtop installation.
+
+### Initial configuration
+
+When you create a webtop through the wizard, a webtop connection entry will automatically be added to the connection hub:
+
+![](/images/webtop-entry.png)
+
+Alternatively, XPipe will also autodetect a webtop container when it is added manually when the relevant list of container entries is refreshed in the connection hub.
+
+Once the webtop is added, you can transfer your local settings to the webtop system:
+
+![](/images/webtop-transfer.png)
+
+Also, if you want to have access to the system shell and file system of the webtop container or access the file system from the outside, you can use XPipe as normal from your desktop. The webtop container is just another container in the eyes of XPipe, so you will have easy access to it if you have access to the host and have added it to XPipe.
 
 ### Data and programs
 
@@ -158,13 +173,6 @@ The main changes of these modes is the window handling within KDE and the displa
 The clipboard handling is dependent on how well your current browser supports it. It is recommended that you use a chrome-based browser, that way you will have the seamless clipboard where changes on both sides are instantly reflected.
 
 If you are using Firefox, the clipboard is not as seamless. You can set the clipboard manually in the sidebar that you can expand on the left in the clipboard section. You also sometimes get a paste button when focusing the webtop, sometimes only after re-focusing the webtop twice. This button can also be used to set the clipboard when it shows up.
-
-### System access
-
-If you want to have access to the system shell and file system of the webtop container or access the file system from the outside, you can use XPipe as normal from your desktop. The webtop container is just another container in the eyes of XPipe, so you will have easy access to it if you have access to the host and have added it to XPipe.
-
-![](/images/webtop-docker.png)
-
 
 ## Updating
 

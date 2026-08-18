@@ -1,25 +1,27 @@
 ---
 title: Team vault
-description: Fine-grained access control for vaults via users and groups
+description: Role-based access control for teams
 ---
 
 ## Introduction
 
-By default, XPipe starts out with an empty vault that does not have any passphrase lock, meaning that you can start XPipe without having to unlock it. This default vault does its best at encrypting the contained data, however, this is not as secure as giving it a custom encryption passphrase that only you know. You can do this in the vault settings menu:
+By default, XPipe starts out with an empty vault that does not have any passphrase lock, meaning that you can start XPipe without having to unlock it. This default vault does its best at encrypting the contained data, however, this is not as secure as giving it a custom encryption passphrase that only you know.
+
+You can do this in the vault settings menu:
 
 ![](/images/vault-single-user.png)
 
-Once this is set, XPipe can encrypt all data with your personal key. A team vault is the continuation of this idea where multiple vault users are added to a vault, each with their own individual passphrase. With this setup, multiple users can work on the same vault data while having the option to use their own passphrase for encryption to not give other users access to their connections. To have multiple users sync the vault data, the [git synchronization](/guide/sync) has to be configured.
+Once this is set, XPipe can encrypt all data with your personal key. A team vault is the continuation of this idea where multiple users have access to the vault. To manage this, a team vault uses role-based access control (RBAC) so that you can manage who has access to what. With this setup, multiple users can work on the same vault data while having restricted access to some connections and identities. To have multiple users sync the vault data, the [git synchronization](/guide/sync) has to be configured.
 
-A team vault enables fine-grained access control via those personal encryption keys. However, a team vault is optional, meaning that if you are using XPipe with multiple users, it is not required to be configured. For example, if all team members should have access to all connections and identities, then vault users or a team vault aren't needed. The same applies for when you are just using individual local identities, as those are not synced and do not require any fine-grained access control.
+A team vault enables fine-grained access control. However, a team vault is optional, meaning that if you are using XPipe with multiple users, it is not required to be configured. For example, if all team members should have access to all connections and identities, then a team vault isn't needed. The same applies for when you are just using individual local identities, as those are not synced and do not require any fine-grained access control.
 
 <Callout type="info">Team vaults with multiple users are supported starting from the Professional plan.</Callout>
 
 ## Identity scope
 
-Having a vault user configured enabled you to modify the scope of identities and associated connections. Without vault users, those are available to everyone with access to the vault. With a vault user, you have the option to mark any identity as personal
+Having a vault role configured enables you to modify the scope of identities and associated connections. Without one, those identities are available to everyone with access to the vault.
 
-You can control whether any identity should be available only for your user or all users in a team vault. If you don't use a team vault, this option is greyed out.
+You can control whether any identity should be available only for certain roles or all roles in a team vault. If you don't use a team vault, this option is greyed out.
 
 ![](/images/id-personal.png)
 
@@ -27,41 +29,63 @@ This setting is visible in the connection hub where personal (= only available t
 
 ![](/images/id-scope.png)
 
-An identity that is not available to a user, e.g. if it belongs to another user and the identity is marked as personal, then the identity will not show up for any other user. Any connections using this identity will also not show up for any other user. This allows you to keep connections and identities for yourself, even in a shared team vault.
+If an identity is not available to certain roles, then the identity will not show up for other users who don't have at least access to one role allowed role. Any connections using this identity will also not be accessible. This allows you to restrict access to connections and identities, even in a shared team vault.
 
-Then, configuring a connection to use this personal identity will automatically make XPipe also encrypt the connection itself and all subconnections with your personal key as well. This will result in only your user having access to the identity and all associated connections. Any kind of key files associated with personal identities are also added to the repository using your personal key for encryption when needed.
+Configuring a connection to use this role-based identity will automatically make XPipe encrypt the connection itself and all subconnections with the role's secret key as well. This will result in only the role having access to the identity and all associated connections. Anyone without access to the role's secret key can't decrypt the data. Any kind of key files associated with identities are also added to the repository using the role's key for encryption when needed.
 
-<Callout type="info">Other vault users can still see that changes are made to all your personal connections and identities. However, they can't decrypt the changes itself and will only see binary diffs in the repository.</Callout>
+<Callout type="info">Other vault users can still see that changes are made to inaccessible connections and identities. However, they can't decrypt the changes itself and will only see binary diffs in the repository.</Callout>
 
 For more information, see the [identities docs](/guide/identities).
+
+## Role management
+
+Each role has its own unique secret key to encrypt the data with. The RBAC within XPipe works on top of your existing RBAC within your organization via different integrations. For example, in the case of the password manager integration, the distribution of the individual role secrets can automatically be handled via your password manager, as that one probably supports RBAC already.
+
+Essentially, you configure a few randomly generated passphrases/secrets in your organization password manager and distribute those along your various roles you want to create. Then, everything in XPipe will work on top of this existing RBAC. The level of access to a role is then automatically defined via the availability of the role secret in the password manager for each user. If you are given access to a new role in your password manager from your organization admin, you can just restart XPipe and you will have automatic access to the data of that role as well. The same goes with offboarding from a role or alltogether.
 
 ## Setup
 
 To start off, each team member first has to sync to the same git repository. With no team vault settings configured yet, all members who sync with that repository will have full access to the same connections with this configuration.
 
-You can then configure the vault authentication in the `Vault` settings menu. First, you can choose between user-based and group-based authentication.
-
-### User-based authentication
-
-Each member has their own passphrase to either remember or stored in a password manager. With this passphrase, each team member can choose to encrypt certain connections and identities to only be available for themselves. This is suitable for smaller teams and requires minimal setup.
-
-![](/images/user-auth.png)
-
-### Group-based authentication
-
-Each member can be assigned a group, which requires a group secret to unlock. With vault groups, this secret can be queried automatically, e.g. via commands, HTTP requests, password manager, and more. It is essentially the right type of authentication for larger teams where an organization administrator can configure the group assignments from a central location.
-
-It is essentially what many people refer to as role-based access control (RBAC), however, that name was not chosen, to distinguish it from that as each member can only be a member of one group. There is not a flexible system of multiple roles that can be assigned to each user.
-
-That administrator can, for example, hook up the vault authentication to an Azure Key Vault and manage access via Azure Active Directory permissions and the Azure CLI.
+You can then configure the vault authentication in the `Vault Access` settings menu. First, you can enable role-based authentication.
 
 ![](/images/group-auth.png)
 
-## Changing authentication secrets
+### Creating roles
 
-If, at a later date, you want to change the passphrase / group secrets of a vault user / group, you can do so at the edit button for the user / group entry. This action will re-encrypt the entire vault data and restart. This operation will take a while as this is a compute-intensive operation.
+Each team member must have access to a supported password manager. Assuming that the secrets in that password manager are managed by an organization administrator, they can make the group secret available to group members in the password manager. For details on how to use password managers in XPipe, see the [password manager page](/guide/password-manager).
 
-You can also delete a user / group. This will perform the same operation with the main difference that all personal / group-only connections will be encrypted with the generic vault key again, meaning that they will be accessible to everyone.
+Each role has its own unique secret key to encrypt the data with. The RBAC within XPipe works on top of your existing RBAC within your organization via different integrations. For example, in the case of the password manager integration, the distribution of the individual role secrets can automatically be handled via your password manager, as that one probably supports RBAC already.
+
+The first step is to create the `all` role, which is the base role for anyone that should have access to the vault. Your organization administrator should create an entry in your password manager and make it available to all vault users in the password manager. Then, you can create this role by selecting the created secret:
+
+![](/images/vault-all-secret.png)
+
+This operation might take a bit. Once it is done, you can create further roles as needed:
+
+![](/images/vault-role1-secret.png)
+
+## Unlocking the vault
+
+Now, when you start XPipe and unlock the vault, XPipe will automatically connect to your password manager to retrieve those role secrets to decrypt the vault data. If everything works out, XPipe will only ask you for your password manager unlock and then start up. If, any role secret retrieval failed, you will receive this message:
+
+![](/images/vault-unlock-fail.png)
+
+This means that the secret key for this role is unavailable. You can skip this error, but you will not have access to any vault data for this role. This error could mean that your password manager failed, you no longer have access to the role (i.e. it was removed by an admin from your password manager) or the role secret was changed.
+
+## Enabling and disabling roles
+
+On unlock, XPipe will try to use all enabled roles. If you don't want to unlock a certain role because you don't have access to it or your access was just removed, you can prevent XPipe from trying to unlock the role each time by disabling it. You can uncheck the checkbox for a role to do this:
+
+![](/images/vault-role-disable.png)
+
+XPipe will then only unlock the enabled roles on your system.
+
+## Changing secrets
+
+If, at a later date, you want to change the role secret key you have access to, you can do so at the edit button for the role entry. This action will re-encrypt the entire vault data and will take a while as this is a compute-intensive operation.
+
+You can also delete a role if you have access to it. This will perform the same operation with the main difference that all role-based connections will be re-encrypted to remove the specific role secret key from it.
 
 ## Merge conflicts
 
@@ -73,21 +97,17 @@ In most cases, you won't have to do anything as it can be handled automatically.
 
 ## Central API server
 
-By default, the nature of XPipe and the git vault is decentralized, meaning that there isn't a central backend server to manage your vault. This makes it a bit complicated in enterprise environments where server changes should be propagated to a synced vault automatically via the [HTTP API](/api), as there is no central server to send those vault update requests to.
+By default, the nature of XPipe and the git vault is decentralized, meaning that there isn't a central backend server to manage your vault. This makes it a bit complicated in enterprise environments where server changes should be propagated to a synced vault automatically via for example the [HTTP API](/api), as there is no central server to send those vault update requests to.
 
-You can deploy the [XPipe Webtop container](/guide/webtop#usage-as-an-api-server) as an API server to have a central server that is linked to your vault and can handle connection updates via the API without any user involvement.
+You can deploy the [XPipe Webtop container](/guide/webtop#api-server) as an API server to have a central server that is linked to your vault and can handle connection updates via the API without any user involvement.
 
-## Additional considerations
+## Trust considerations
 
-A team vault is essentially just a git repository consisting out of files that are encrypted with various keys. There is no database or other service involved. This introduces a few limitations that it is good to be aware of.
+A team vault is essentially just a git repository consisting out of files that are encrypted with various keys. There is no database or other service involved.
 
-### Trust
+This authentication system for encryption and decryption is not the most complex system you will find when compared to other solutions. It is designed to be relatively simple and robust. Each team member has full control over all connection entries they have been granted access for, meaning that they can modify them, delete them, and inspect the used passwords and keys for them. There is no fine-grained permission system akin to an administrator only granting something like read-only permissions to certain connections. Each team member has to be trusted with the connection access that they are given.
 
-This authentication system for encryption and decryption is not the most complex system you will find when compared to other solutions. It is designed to be relatively simple and robust. Each team member has full control over all connection entries they have been granted access for, meaning that they can modify them, delete them, and inspect the used passwords and keys for them. There is no fine-grained permission system akin to an administrator only granting something like read-only permissions to certain connections. Each team member has to be trusted with the connection access that they are given. If you are looking to minimize possible leaks of secrets in this scenario, using security keys like Yubikeys for server authentication is the best option. This will prevent the possibility of any used private keys being leaked when an individual user's system is compromised.
-
-### Scaling limits
-
-Furthermore, this vault sync system is not designed for an arbitrary number of users. The maximum amount of users who can share a vault is often limited by git itself. If you have something like 50 users working on one shared vault with the same connections, there will probably be a lot of continuous pushing and pulling going on, including a lot of merge conflicts at some point. The git workflow does not scale well when working on the same data, this is also true for other normal repositories.
+If you are looking to minimize possible leaks of secrets in this scenario, using security keys like Yubikeys for server authentication is the best option. This will prevent the possibility of any used private keys being leaked when an individual user's system is compromised.
 
 ## Multiple vaults
 
@@ -95,45 +115,6 @@ A workspace is a completely separate data storage location, independent of other
 
 ![](/images/workspace-settings.png)
 
-For fine-grained access control, like a few team members having access to a few specific connections outside of the normal group borders, you can try using multiple workspaces. In many cases, a separate workspace with a separate sync repository configured is the best option to solve these cases. Separate workspaces also work well when reducing the aforementioned increasing load on git repositories when more and more users start syncing to it.
+For fine-grained access control, like a few team members having access to a few specific connections outside of the normal role borders, you can try using multiple workspaces. In many cases, a separate workspace with a separate sync repository configured is the best option to solve these cases.
 
 For more info, see the [workspaces page](/guide/workspaces).
-
-## Example setups
-
-This is how each variant of the team vault authentication could look like for group-based authentication.
-
-![](/images/group-auth-options.png)
-
-### Password manager
-
-Each group member must have access to a supported password manager. Assuming that the secrets in that password manager are managed by an organization administrator, they can make the group secret available to group members in the password manager. If a password manager is configured in the XPipe settings, you can then retrieve that group secret to unlock the vault with the necessary name or key of the secret in the password manager.
-
-For details on how to use password managers in XPipe, see the [password manager page](/guide/password-manager).
-
-### Command
-
-If your secret is not stored in a password manager, and instead at the central location with built-in access control like an Azure Key Vault, the command option is probably the right one for you. It will simply execute a command and read the secret from stdout. Assuming that the necessary CLI tools are available on your system, this gives you a lot of flexibility on how and where to retrieve the secret from.
-
-For example, you could follow this [guide to create an Azure Key Vault](https://learn.microsoft.com/en-us/azure/key-vault/secrets/quick-create-cli) and retrieve the command with the [Azure CLI](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Many CLI tools like the Azure CLI return json output. You can extract the raw values using a tool like [jq](https://jqlang.org/download/). For example, if you create a new key vault called `xpipe-auth-vault` and the secret called `my-group-secret`, you can then pass the secret to XPipe by specifying the following command with the jq extraction for the raw value:
-
-```bash
-az keyvault secret show --name "my-group-secret" --vault-name "xpipe-auth-vault" | jq -r .value
-```
-
-The access control is built in as the Azure CLI requires you to authenticate to your Azure Active Directory setup, which automatically gives you the permissions you were assigned to. You just need to be assigned permissions to read the associated secret vault, and this command will work.
-
-### File-based secret
-
-If your organization administrator can manage the file system of devices, creating a simple file containing the group secret is also an option. Although this is not as secure as the other ones. This file can then be used to obtain the groups secret. The file path in XPipe also supports `~` on all operating systems to allow you to refer to files in your home directory regardless of which operating system you're using.
-
-### HTTP request
-
-You can also run a small HTTP server to handle the group secret authentication for you. Essentially, you can specify an HTTP URL in XPipe that will get called with a POST request. XPipe expects the group secret to be written in the body of the response. The access control can be implemented for example by matching the request IPs against a fixed table, for example, in an office set up with fixed device IPs. This approach requires a bit of manual scripting to create this HTTP server, but can be a good solution for certain setups.
-
-### Manual login
-
-If the configured authentication method fails, or you don't have one configured yet, you can also just log in to the group manually in the login dialog.
-
-
-
