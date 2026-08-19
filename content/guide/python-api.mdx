@@ -58,8 +58,9 @@ if __name__ == "__main__":
 
 ## Stores and connections
 
-In the context of the API, XPipe refers to any kind of connection, identity, script, and others as a `store`.
-This just refers to the fact that those entries store json configuration data and some metadata.
+In the context of the API, XPipe refers to any kind of connection, identity, script, and others as a `store`. This just refers to the fact that those entries store json configuration data and some metadata.
+
+In general, the process of adding, editing, and removing stores is the same, regardless of the type of store. Only the json data and the capabilities of the store will differ.
 
 ## Querying connections
 
@@ -75,29 +76,32 @@ client = Client()
 # store_query accepts glob-based filters on the category, store name, and store type
 
 # Find all stores in the default category and all its subcategories
-stores = client.store_query(categories="Default/**")
+stores = client.store_query(categories="all connections/default**")
+
+# Find all stores in the subcategories of default
+stores = client.store_query(categories="all connections/default/**")
 
 # Find all stores in the default category without any subcategories
-stores = client.store_query(categories="Default/*")
+stores = client.store_query(categories="all connections/default")
 
 # Find all top level stores in the default category
-stores = client.store_query(categories="Default", stores="*")
+stores = client.store_query(categories="all connections/default", stores="*")
 
-# Find all stores in the default category, including any sub stores
-stores = client.store_query(categories="Default", stores="**")
+# Find all stores in the default category, including any children
+stores = client.store_query(categories="all connections/default", stores="**")
 
 # Find all SSH config stores on the local machine
-stores = client.store_query(categories="Default", stores="Local Machine/SSH user config/*")
+stores = client.store_query(categories="all connections/default", stores="Local Machine/SSH user config/*")
 
 # Find only ssh config host stores in the "MyCategory" category that has the word "MyCompany" in its name
 # - Searching for strings is case-insensitive here
 # - This will not include subcategories of "MyCategory"
 # - You can find all the available store type names by just querying all stores and taking a look add the individual type names of the stores.
-stores = client.store_query(categories="MyCategory", types="sshConfigHost", stores="*MyCompany*")
+stores = client.store_query(categories="**/MyCategory", types="sshConfigHost", stores="*MyCompany*")
 
 # Query a specific store by name in a category
 # This will only return one element, so we can just access that
-store = client.store_query(categories="MyCategory", stores="MyConnectionName")[0]
+store = client.store_query(categories="**/MyCategory", stores="MyConnectionName")[0]
 
 # Query the local machine connection
 store = client.store_query(stores="Local Machine")[0]
@@ -117,12 +121,10 @@ Since each store reference is just a UUID string, you have to retrieve informati
 [**API reference**](/api/store-info)
 
 ```python
-from xpipe_api import Client
-
 client = Client()
 
 # Returns an array of UUID strings
-stores = client.store_query(categories="Default/**")
+stores = client.store_query(categories="all connections/default")
 
 # Works in bulk, so it expects an array of stores
 infos = client.store_info(stores)
@@ -158,7 +160,7 @@ client = Client()
 store = "f0ec68aa-63f5-405c-b178-9a4454556d6b"
 
 # The schema is just a json object
-schema = client.store_info(stores)[0]["config"]
+schema = client.store_info([store])[0]["config"]
 ```
 
 For an SSH connection, it could, for example, look something like this if it references an existing identity:
@@ -227,12 +229,12 @@ When adding connections with credentials, it is preferred to create the identity
 The challenge when adding identities via the API is encrypting secrets so that they can be stored correctly:
 
 ```python
-encrypted_secret = client.secret_encrypt("passw0rd")
+encrypted_secret = client.secret_encrypt_default("s3cret")
 # {"secrets":[{"name":"vault","principal":"be815152-05d2-4094-84d3-f0eea9200d5f","iteration":1,"secret":"WJKXh5cZCq33JOIRn8cfKcs8nJCRT7rU_3t7UfASGwbCp1k8","token":"ixTTpdpjZpEVfYEXOnUbgO4a7I008tPG-tTq2jg45VMT1iEyXoFB05IsaMuAx8OdiRZ--cjtFsw1cK-IuhkIHQ=="}]}
 print(encrypted_secret)
 
 decrypted_secret = client.secret_decrypt(encrypted_secret)
-# passw0rd
+# s3cret
 print(decrypted_secret)
 ```
 
@@ -240,7 +242,7 @@ Note that you can't decrypt the secrets of these samples yourself if you try, as
 
 ### Encrypting password auth information
 
-When specifying information about any kind of password authentication, you will have to encrypt more than just a raw password. As XPipe supports many different ways of retrieving secrets for password authentication, you will have to include this information as well.
+When specifying information about any kind of password authentication, you will have to encrypt more than just a raw password. As XPipe supports many different ways of retrieving secrets for password authentication, you will have to encrypt this information as well.
 
 ```python
 # No password is used at all
@@ -248,7 +250,7 @@ raw_password_auth = {
     'type' : 'none'
 }
 
-encrypted_password_auth = client.secret_encrypt(json.dumps(raw_password_auth))
+encrypted_password_auth = client.secret_encrypt_default(json.dumps(raw_password_auth))
 # {'secret': {'type': 'locked', 'encryptedValue': '0N_LSNW_Gu_kz-HzBmNC5VcMY7kJuIN-Dam0bv370fSTgIJyGPENklzovp_9kCdvPS206m-giPr-fVfV6Q=='}, 'encryptedToken': {'token': 'bDTjRHsCMgvwPiXPEt5xF6JbLuj5UuaBSheF75pB5A=='}}
 print(encrypted_password_auth)
 ```
@@ -259,18 +261,16 @@ There are also other types of schemas for password auth available. For example, 
 # Password is used
 raw_password_auth = {
   'type': 'inPlace',
-  'value': client.secret_encrypt("passw0rd")
+  'value': 'passw0rd'
 }
 
 # {'secret': {'type': 'locked', 'encryptedValue': 'UhC-BIzAKx2NVNsUajnibzbctPEAIysJ9FqEcYTDG0ur-XroO-21RLUxgyxItkk3BqP8YsMLFUHYYVaEb5IsCbTD_A-M_9zj4lGBYVkFwLpdyLWXGp6m9CaNDoJv5-m4-DTzr_eS9HsDNb_hHmfAG9Vc8I4dSc6HdLbk4zF4DKvFgqN9JfljzHzmPDSnBafDIV9ZRbtKavOZ0ZvH2Ph7jO5Jr64cqX0GiPEXlU1IA95koiViLOjC2hXx4xxCxn8zvq3mHYjZLMKiGzrQqwGfAppwGE1hZbS0em9OUErG8mLKvhJCQkwEFYqJxw=='}, 'encryptedToken': {'token': 'Ifnc2k1nxdF2ZPQcn8zq6engoYi3nm1iKZ1UF3SDlg=='}}
-encrypted_password_auth = client.secret_encrypt(json.dumps(raw_password_auth))
+encrypted_password_auth = client.secret_encrypt_default(json.dumps(raw_password_auth))
 ```
 
 ### Encrypting key information
 
-For SSH, any identities like key references also need to be encrypted. XPipe itself doesn't store the private keys itself, it will only keep references like a file path. These are, however, still encrypted.
-
-With that, you can now create store schemas and add them like this:
+For SSH, anything like key references also need to be encrypted. With that, you can now create store schemas and add them like this:
 
 ```python
 # No SSH key is used at all
@@ -278,7 +278,7 @@ raw_key = '''{
     "type" : "none"
 }'''
 
-encrypted_key = client.secret_encrypt(raw_key)
+encrypted_key = client.secret_encrypt_default(raw_key)
 # {'secret': {'type': 'locked', 'encryptedValue': '0N_LSNW_Gu_kz-HzBmNC5VcMY7kJuIN-Dam0bv370fSTgIJyGPENklzovp_9kCdvPS206m-giPr-fVfV6Q=='}, 'encryptedToken': {'token': 'bDTjRHsCMgvwPiXPEt5xF6JbLuj5UuaBSheF75pB5A=='}}
 print(encrypted_key)
 ```
@@ -295,10 +295,26 @@ raw_key = '''{
   }
 }'''
 
-encrypted_key = client.secret_encrypt(raw_key)
+encrypted_key = client.secret_encrypt_default(raw_key)
 ```
 
-Of course, there are also more variants for SSH keys. To inspect the key information of an existing store, you can use the `secret_decrypt` function.
+To store an SSH key in-place, you can do this:
+
+```python
+# SSH key
+raw_key = '''{
+  "type" : "inPlaceKey",
+  "key" : "<PRIVATE KEY>",
+  "publicKey": "<PUBLIC KEY>",
+  "password" : {
+    "type" : "none"
+  }
+}'''
+
+encrypted_key = client.secret_encrypt_default(raw_key)
+```
+
+Of course, there are also more variants for SSH keys. To inspect the key information of an existing store, you can use the `secret_decrypt` function on the identity data of a connection.
 
 ### Putting it together
 
@@ -308,6 +324,23 @@ Now that the password and key information have been encrypted, you can add a new
 from xpipe_api import Client
 
 client = Client()
+
+# We can create JSON data either via python dicts
+raw_password_auth = {
+  'type': 'inPlace',
+  'value': "passw0rd"
+}
+encrypted_password_auth = client.secret_encrypt_default(json.dumps(raw_password_auth))
+
+# Or we can use raw JSON strings
+raw_key = '''{
+  "type" : "file",
+  "file" : "C:/Users/User/.ssh/key.pem",
+  "password" : {
+    "type" : "none"
+  }
+}'''
+encrypted_key = client.secret_encrypt_default(raw_key)
 
 # The connection schema
 data = {
@@ -334,18 +367,45 @@ data = {
 category = "97458c07-75c0-4f9d-a06e-92d8cdf67c40"
 
 # The validate option controls whether XPipe should verify that a connection can be established to the system
-client.store_add(name="My Connection", conn_data=data, validate=True, category=category)
+client.store_add(name="My Connection", conn_data=data, validate=False, category=category)
 ```
+
+### Adding other stores
+
+While the process of adding an SSH connection has been quite complex due to the encryption, other ways aren't that complex.
+
+To start off, you can also skip adding any data you don't want to include and instead leave it empty. This will still add the connection, but will keep it in an invalid state where you have to configure any missing data in the XPipe interface if you click on it. If you are looking to just import the hostnames first without all the secrets, assigning `"identity": None` also works.
+
+Furthermore, most store types, for example shell environments, do not require any secrets and can therefore be created much easier:
+
+```python
+# The connection schema
+data = {
+    "type": "shellEnvironment",
+    "commands": "echo test",
+    "host": "f0ec68aa-63f5-405c-b178-9a4454556d6b",
+    "shell": "pwsh",
+    "elevated": False,
+    "user": None,
+    "scripts": None
+}
+
+# The target category to put this connection into
+category = "97458c07-75c0-4f9d-a06e-92d8cdf67c40"
+
+# The validate option controls whether XPipe should verify that a connection can be established to the system
+client.store_add(name="My Environment", conn_data=data, validate=False, category=category)
+```
+
+## Adding identities
+
+The previous example created connections with an inline identity, i.e. one that was not created as a separate entry. For identities that will only be assigned to one connection, this is usually good enough. If you intend to assign the same identity to multiple systems, using reusable identities is the better choice.
 
 ### Using reusable identities
 
-To skip the need to pass secrets in-place, you can also create identities instead. Once you have created an identity in XPipe, you can then just use the identity UUID as a reference:
+Once you have created an identity in XPipe, you can then just use the identity UUID as a reference:
 
 ```python
-from xpipe_api import Client
-
-client = Client()
-
 # The connection schema
 data = {
     "type": "ssh",
@@ -363,26 +423,90 @@ data = {
 }
 ```
 
-This will make the store creation much easier. You can also create identities through the same API and with the same encrypted values for the password and SSH key; however, it is easier to use in the GUI.
+### Creating local identities
 
-### Adding other stores
-
-While the process of adding an SSH connection has been quite complex due to the encryption, other ways aren't that complex.
-
-To start off, you can also skip adding any data you don't want to include and instead leave it empty. This will still add the connection, but will keep it in an invalid state where you have to configure any missing data in the XPipe interface if you click on it. If you are looking to just import the hostnames first without all the secrets, assigning `"identity": None` also works.
-
-Furthermore, most store types, for example shell environments, do not require any secrets and can therefore be created much easier:
+You can also create identities through the same API and with the same encrypted values for the password and SSH key:
 
 ```python
-data = {
-    "type": "shellEnvironment",
-    "commands": "echo test",
-    "host": "f0ec68aa-63f5-405c-b178-9a4454556d6b",
-    "shell": "pwsh",
-    "elevated": False,
-    "user": None,
-    "scripts": None
+raw_password_auth = {
+    'type': 'passwordManager',
+    'key': "<identifier of password in password manager>"
 }
+encrypted_password_auth = client.secret_encrypt_default(json.dumps(raw_password_auth))
+
+raw_key = {
+    'type': 'none',
+}
+encrypted_key = client.secret_encrypt_default(json.dumps(raw_key))
+
+data = {
+    "type": "localIdentity",
+    "username": "User",
+    "password": encrypted_password_auth,
+    "sshIdentity": encrypted_key
+}
+
+# Local Identities category
+category = "e784de4e-abea-4cb8-a839-fc557cd23097"
+
+client.store_add(name="My Local Identity", conn_data=data, validate=False, category=category)
+```
+
+### Creating synced identities
+
+You can do the same with synced identities. The difference here is that you can control who has access in the case of team vaults.
+
+```python
+# Control the access for synced identities
+scope = ["role1"]
+
+raw_password_auth = {
+    'type': 'prompt'
+}
+encrypted_password_auth = client.secret_encrypt(json.dumps(raw_password_auth), scope)
+
+# Only available if your password manager supports retrieving SSH keys
+# raw_key = '''{
+#   "type" : "passwordManagerAgent",
+#   "identifier" : "<name of key in password manager>"
+# }'''
+raw_key = '''{
+  "type" : "none",
+}'''
+encrypted_key = client.secret_encrypt(raw_key, scope)
+
+data = {
+    "type": "syncedIdentity",
+    "username": "User",
+    "password": encrypted_password_auth,
+    "sshIdentity": encrypted_key,
+    "accessScope": scope
+}
+
+# Synced identities category, only is available when sync is enabled in XPipe
+category = "69aa5040-28dc-451e-b4ff-1192ce5e1e3c"
+
+client.store_add(name="My Synced Identity", conn_data=data, validate=False, category=category)
+```
+
+### Creating password manager identities
+
+And finally, here is how to create password manager identities:
+
+```
+# Control the access for synced identities
+scope = ["role1"]
+
+data = {
+    "type": "passwordManagerIdentity",
+    "key": "<Password manager entry identifier>",
+    "accessScope": scope
+}
+
+# Synced identities category, only is available when sync is enabled in XPipe
+category = "69aa5040-28dc-451e-b4ff-1192ce5e1e3c"
+
+client.store_add(name="My Password Manager Identity", conn_data=data, validate=False, category=category)
 ```
 
 ### Controlling the access scope
@@ -391,23 +515,12 @@ You can also control the access scope of a secret by passing a custom principal.
 
 ```python
 encrypted_secret = client.secret_encrypt("passw0rd", ["role1", "role2"])
+
 # {"secrets":[{"name":"role1","principal":"7bf51507-0a58-4703-869d-765a781c0b94","iteration":1,"secret":"oE87dJArBFPSnT98EujbRwf0TNjpHCoyvKNdyxi0KPLzbbTL","token":"5pVhGtEBOGJ9e8m807AWb12hcet4of1930TNKP4GJ1v7PkoudDbyAUSyykU8pnTXJzAr_a3ruzNPyfnj9jL8Ow=="},{"name":"role2","principal":"3209a888-be37-4037-b8b0-b14adda69ea2","iteration":1,"secret":"g-1vinHvLm0KSzKx9RtXOTuTgbn_ubyLilxPFDpiCjlk1TIp","token":"aHTc4ZbuL07WBeDjYttk5IbGYif4n5Zm3tTOQ6ap1B07jKUEchoPbyroD6hnqUDrgLX7cHxBc1T_grkpVjbHFw=="}]}
 print(encrypted_secret)
 ```
 
-When creating synced identities via the API, you will also have to explicitly set the `accessScope` property along with encrypting the secrets with the correct principals. Instead of the principal names like `role1`, the store data uses the principal UUIDs to prevent issues when renaming them. You can find the the principal UUIDs in the `user.json` or `roles.json` file within your synced storage git repo.
-
-Assuming that you want to make this synced identity accessible to `role1` and `role2`, and have already encrypted the password and key data with the `/secret/encrypt` endpoint and the right principals, you can then create the store with:
-
-```
-{
-  "type" : "sycnedIdentity",
-  "username" : "User",
-  "password" : <encrypted password json>,
-  "sshIdentity" : <encrypted key json>
-  "accessScope" : [ "95061f85-59dd-46cd-8dbd-73f8f9a07800", "5d3dc174-62d9-40d2-81cb-2ca66c6bb1d1" ]
-}
-```
+When creating synced identities via the API, you will also have to explicitly set the `accessScope` property along with encrypting the secrets with the correct principals. Instead of the principal names like `role1`, the store data uses the principal UUIDs to prevent issues when renaming them. You can also use those UUIDs instead of principal display names in the API. You can find the principal UUIDs in the `user.json` or `roles.json` file within your synced storage git repo.
 
 The secret system is cryptographically secure, and the identity access scope is only visual. On the UI level, the `accessScope` value is used to determine whether a user has access to a store. If the `accessScope` and actual secret encryption principals do not match, the user will get decryption errors if they don't have access to the underlying secrets. So the actually security-relevant principals are those for the encrypted secrets.
 
@@ -418,13 +531,9 @@ You can perform actions for the desktop application from the API as well. For mo
 [**API reference**](/api/action)
 
 ```python
-from xpipe_api import Client
-
-client = Client()
-
 # Opens a terminal session for a connection
 client.action(json.loads('''{
-  "id" : "open"
+  "id" : "open",
   "ref" : "f0ec68aa-63f5-405c-b178-9a4454556d6b"
 }'''), confirm=False)
 
@@ -432,7 +541,7 @@ client.action(json.loads('''{
 client.action(json.loads('''{
   "id" : "toggleStore",
   "ref" : "4dc0c7d4-083e-446e-8a75-7a29490eaec1",
-  "enabled" : true,
+  "enabled" : true
 }'''), confirm=False)
 
 # Run a file browser action like chmod
@@ -484,6 +593,7 @@ print(client.shell_exec(store, "invalid"))
 version_format = re.compile(r'[0-9.]+')
 ret = client.shell_exec(store, "ssh -V")
 ssh_version = version_format.findall(ret["stderr"])[0]
+print("SSH version: " + ssh_version)
 
 # Clean up after ourselves by stopping the shell session
 client.shell_stop(store)
@@ -494,8 +604,6 @@ client.shell_stop(store)
 You can interact with the file system of any remote shell as well.
 
 ```python
-from xpipe_api import Client
-
 client = Client()
 
 store = "f0ec68aa-63f5-405c-b178-9a4454556d6b"
@@ -515,7 +623,7 @@ client.fs_write(store, blob_id, "~/test_file.txt")
 # You can do the same with script files as well
 # This will create an executable script in the system's temp directory
 script_write_content = "echo hello\necho world"
-blob_script_id = client.fs_blob(file_write_content)
+blob_script_id = client.fs_blob(script_write_content)
 script_path = client.fs_script(store, blob_script_id)
 
 # You can then use this script for your commands
