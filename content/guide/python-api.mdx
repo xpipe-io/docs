@@ -56,57 +56,65 @@ if __name__ == "__main__":
     asyncio.run(main())
 ```
 
+## Stores and connections
+
+In the context of the API, XPipe refers to any kind of connection, identity, script, and others as a `store`.
+This just refers to the fact that those entries store json configuration data and some metadata.
+
 ## Querying connections
 
-A connection reference is just a UUID string. You can query one or multiple existing connections stored in XPipe based on various filters.
+A store reference is just a UUID string. You can query one or multiple existing stores that are stored in XPipe based on various filters.
 
-[**API reference**](/api/connection-query)
+[**API reference**](/api/store-query)
 
 ```python
 from xpipe_api import Client
 
 client = Client()
 
-# connection_query accepts glob-based filters on the category, connection name, and connection type
+# store_query accepts glob-based filters on the category, store name, and store type
 
-# Find all connections in the default category and all its subcategories
-connections = client.connection_query(categories="Default/**")
+# Find all stores in the default category and all its subcategories
+stores = client.store_query(categories="Default/**")
 
-# Find all connections in the default category without any subcategories
-connections = client.connection_query(categories="Default/*")
+# Find all stores in the default category without any subcategories
+stores = client.store_query(categories="Default/*")
 
-# Find all top level connections in the default category
-connections = client.connection_query(categories="Default", connections="*")
+# Find all top level stores in the default category
+stores = client.store_query(categories="Default", stores="*")
 
-# Find all connections in the default category, including any sub connections
-connections = client.connection_query(categories="Default", connections="**")
+# Find all stores in the default category, including any sub stores
+stores = client.store_query(categories="Default", stores="**")
 
-# Find all SSH config connections on the local machine
-connections = client.connection_query(categories="Default", connections="Local Machine/SSH user config/*")
+# Find all SSH config stores on the local machine
+stores = client.store_query(categories="Default", stores="Local Machine/SSH user config/*")
 
-# Find only ssh config host connections in the "MyCategory" category that has the word "MyCompany" in its name
+# Find only ssh config host stores in the "MyCategory" category that has the word "MyCompany" in its name
 # - Searching for strings is case-insensitive here
 # - This will not include subcategories of "MyCategory"
-# - You can find all the available connection type names by just querying all connections and taking a look add the individual type names of the connections.
-connections = client.connection_query(categories="MyCategory", types="sshConfigHost", connections="*MyCompany*")
+# - You can find all the available store type names by just querying all stores and taking a look add the individual type names of the stores.
+stores = client.store_query(categories="MyCategory", types="sshConfigHost", stores="*MyCompany*")
 
-# Query a specific connection by name in a category
+# Query a specific store by name in a category
 # This will only return one element, so we can just access that
-connection = client.connection_query(categories="MyCategory", connections="MyConnectionName")[0]
+store = client.store_query(categories="MyCategory", stores="MyConnectionName")[0]
 
 # Query the local machine connection
-connection = client.connection_query(connections="Local Machine")[0]
+store = client.store_query(stores="Local Machine")[0]
 
-# A connection reference is just a UUID string, so you can also specify it fixed
-# If you have the HTTP API setting enabled in XPipe, you can copy the API UUID of a connection in its context menu
-connection = "f0ec68aa-63f5-405c-b178-9a4454556d6b"
+# A store reference is just a UUID string, so you can also specify it fixed
+store = "f0ec68aa-63f5-405c-b178-9a4454556d6b"
 ```
 
-## Getting connection information
+You can obtain the UUID of a store in the GUI as well via the context menu. If the API is enabled in the settings menu, you will find a new option in the context menu for stores and categories:
 
-Since each connection reference is just a UUID string, you have to retrieve information for it using another API call.
+![](/images/api-copy-uuid.png)
 
-[**API reference**](/api/connection-info)
+## Getting store information
+
+Since each store reference is just a UUID string, you have to retrieve information for it using another API call.
+
+[**API reference**](/api/store-info)
 
 ```python
 from xpipe_api import Client
@@ -114,43 +122,43 @@ from xpipe_api import Client
 client = Client()
 
 # Returns an array of UUID strings
-connections = client.connection_query(categories="Default/**")
+stores = client.store_query(categories="Default/**")
 
-# Works in bulk, so it expects an array of connections
-infos = client.connection_info(connections)
+# Works in bulk, so it expects an array of stores
+infos = client.store_info(stores)
 # Get the first info
 info = infos[0]
 
-# The connection UUID
-uuid = info["connection"]
+# The store UUID
+uuid = info["store"]
 # This is an array containing all category hierarchy names
 category = info["category"]
-# This is an array containing all connection hierarchy names
+# This is an array containing all store hierarchy names
 name = info["name"]
-# This is the connection type name that you can use in the query
+# This is the store type name that you can use in the query
 type = info["type"]
 # There is also some other data for internal state management, e.g. if a tunnel is running for example
 ```
 
-## Adding connections
+## Adding stores
 
-You can add custom connections as well.
+You can add custom stores as well.
 
-[**API reference**](/api/connection-add)
+[**API reference**](/api/store-add)
 
-The schema for each connection type is not publicly documented as it might be subject to change. However, you can see the current active schemas for every connection and use that as a basis.
+The schema for each store type is not publicly documented as it might be subject to change. However, you can see the current active schemas for every store and use that as a basis.
 
 ```python
 from xpipe_api import Client
 
 client = Client()
 
-# The connection reference to the connection you want to expect the schema of
-# If you have the HTTP API setting enabled in XPipe, you can copy the API UUID of a connection in its context menu
-connection = "f0ec68aa-63f5-405c-b178-9a4454556d6b"
+# The store reference to the store you want to expect the schema of
+# If you have the HTTP API setting enabled in XPipe, you can copy the API UUID of a store in its context menu
+store = "f0ec68aa-63f5-405c-b178-9a4454556d6b"
 
 # The schema is just a json object
-schema = client.connection_info(connections)[0]["config"]
+schema = client.store_info(stores)[0]["config"]
 ```
 
 For an SSH connection, it could, for example, look something like this if it references an existing identity:
@@ -262,7 +270,7 @@ encrypted_password_auth = client.secret_encrypt(json.dumps(raw_password_auth))
 
 For SSH, any identities like key references also need to be encrypted. XPipe itself doesn't store the private keys itself, it will only keep references like a file path. These are, however, still encrypted.
 
-With that, you can now create connection schemas and add them like this:
+With that, you can now create store schemas and add them like this:
 
 ```python
 # No SSH key is used at all
@@ -290,7 +298,7 @@ raw_key = '''{
 encrypted_key = client.secret_encrypt(raw_key)
 ```
 
-Of course, there are also more variants for SSH keys. To inspect the key information of an existing connection, you can use the `secret_decrypt` function.
+Of course, there are also more variants for SSH keys. To inspect the key information of an existing store, you can use the `secret_decrypt` function.
 
 ### Putting it together
 
@@ -326,7 +334,7 @@ data = {
 category = "97458c07-75c0-4f9d-a06e-92d8cdf67c40"
 
 # The validate option controls whether XPipe should verify that a connection can be established to the system
-client.connection_add(name="My Connection", conn_data=data, validate=True, category=category)
+client.store_add(name="My Connection", conn_data=data, validate=True, category=category)
 ```
 
 ### Using reusable identities
@@ -355,15 +363,15 @@ data = {
 }
 ```
 
-This will make the connection creation much easier. You can also create identities through the same API and with the same encrypted values for the password and SSH key; however, it is easier to use in the GUI.
+This will make the store creation much easier. You can also create identities through the same API and with the same encrypted values for the password and SSH key; however, it is easier to use in the GUI.
 
-### Adding other connections
+### Adding other stores
 
 While the process of adding an SSH connection has been quite complex due to the encryption, other ways aren't that complex.
 
 To start off, you can also skip adding any data you don't want to include and instead leave it empty. This will still add the connection, but will keep it in an invalid state where you have to configure any missing data in the XPipe interface if you click on it. If you are looking to just import the hostnames first without all the secrets, assigning `"identity": None` also works.
 
-Furthermore, most connection types, for example shell environments, do not require any secrets and can therefore be created much easier:
+Furthermore, most store types, for example shell environments, do not require any secrets and can therefore be created much easier:
 
 ```python
 data = {
@@ -401,7 +409,7 @@ Assuming that you want to make this synced identity accessible to `role1` and `r
 }
 ```
 
-The secret system is cryptographically secure, and the identity access scope is only visual. On the UI level, the `accessScope` value is used to determine whether a user has access to a connection. If the `accessScope` and actual secret encryption principals do not match, the user will get decryption errors if they don't have access to the underlying secrets. So the actually security-relevant principals are those for the encrypted secrets.
+The secret system is cryptographically secure, and the identity access scope is only visual. On the UI level, the `accessScope` value is used to determine whether a user has access to a store. If the `accessScope` and actual secret encryption principals do not match, the user will get decryption errors if they don't have access to the underlying secrets. So the actually security-relevant principals are those for the encrypted secrets.
 
 ## Actions
 
@@ -420,7 +428,7 @@ client.action(json.loads('''{
   "ref" : "f0ec68aa-63f5-405c-b178-9a4454556d6b"
 }'''), confirm=False)
 
-# Toggles the session state for a connection. If this connection is a tunnel, then this operation will start or stop the tunnel
+# Toggles the session state for a store. If this store is a tunnel, then this operation will start or stop the tunnel
 client.action(json.loads('''{
   "id" : "toggleStore",
   "ref" : "4dc0c7d4-083e-446e-8a75-7a29490eaec1",
@@ -450,11 +458,11 @@ import re
 
 client = Client()
 
-connection = "f0ec68aa-63f5-405c-b178-9a4454556d6b"
+store = "f0ec68aa-63f5-405c-b178-9a4454556d6b"
 
 # This will start a shell session for the connection
 # Note that this session is non-interactive, meaning that password prompts are not supported
-shell_info = client.shell_start(connection)
+shell_info = client.shell_start(store)
 
 # The shell dialect of the shell. For example cmd, powershell, bash, etc.
 dialect = shell_info["shellDialect"]
@@ -464,21 +472,21 @@ osType = shell_info["osType"]
 osName = shell_info["osName"]
 
 # Prints {'exitCode': 0, 'stdout': 'hello world', 'stderr': ''}
-print(client.shell_exec(connection, "echo hello world"))
+print(client.shell_exec(store, "echo hello world"))
 
 # Prints {'exitCode': 0, 'stdout': '<user>', 'stderr': ''}
-print(client.shell_exec(connection, "echo $USER"))
+print(client.shell_exec(store, "echo $USER"))
 
 # Prints {'exitCode': 127, 'stdout': 'invalid: command not found', 'stderr': ''}
-print(client.shell_exec(connection, "invalid"))
+print(client.shell_exec(store, "invalid"))
 
 # Extract ssh version from system
 version_format = re.compile(r'[0-9.]+')
-ret = client.shell_exec(connection, "ssh -V")
+ret = client.shell_exec(store, "ssh -V")
 ssh_version = version_format.findall(ret["stderr"])[0]
 
 # Clean up after ourselves by stopping the shell session
-client.shell_stop(connection)
+client.shell_stop(store)
 ```
 
 ## File system operations
@@ -490,30 +498,30 @@ from xpipe_api import Client
 
 client = Client()
 
-connection = "f0ec68aa-63f5-405c-b178-9a4454556d6b"
+store = "f0ec68aa-63f5-405c-b178-9a4454556d6b"
 
 # We need a shell for the file system
-client.shell_start(connection)
+client.shell_start(store)
 
 # You are responsible for decoding files in the correct file encoding
-file_bytes = client.fs_read(connection, "~/.ssh/config")
+file_bytes = client.fs_read(store, "~/.ssh/config")
 file_string = file_bytes.decode('utf-8')
 
 # Writing files can be done via blobs
 file_write_content = "test\nfile"
 blob_id = client.fs_blob(file_write_content)
-client.fs_write(connection, blob_id, "~/test_file.txt")
+client.fs_write(store, blob_id, "~/test_file.txt")
 
 # You can do the same with script files as well
 # This will create an executable script in the system's temp directory
 script_write_content = "echo hello\necho world"
 blob_script_id = client.fs_blob(file_write_content)
-script_path = client.fs_script(connection, blob_script_id)
+script_path = client.fs_script(store, blob_script_id)
 
 # You can then use this script for your commands
 # Prints {'exitCode': 0, 'stdout': 'hello\nworld', 'stderr': ''}
-print(client.shell_exec(connection, "\"" + script_path + "\""))
+print(client.shell_exec(store, "\"" + script_path + "\""))
 
 # Clean up after ourselves by stopping the shell session
-client.shell_stop(connection)
+client.shell_stop(store)
 ```

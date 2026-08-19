@@ -57,6 +57,12 @@ Once clicked, you enter the recording mode. The next action you perform in the G
 
 Each option uses inheritance to determine the effective value. If an option is not set, the option of the parent category will be applied, and so on. This means that you don't need to set an option for each category, only one parent. Once an option is set, you can unset it in the dialog by clicking on the selected value again.
 
+### Shared gateways
+
+In some cases, especially when dealing with a lot of connections in a category with the same gateway like a bastion server, you don't have to assign a gateway to each connection separately. Instead, you can configure a default gateway for the whole category, which will be then automatically assigned to all newly added connections in that category:
+
+![](/images/category-gateway.png)
+
 ### Shared identities
 
 In some cases, especially when dealing with a lot of connections in a category with the same login credentials, you don't have to assign an identity to each connection separately. Instead, you can configure a default identity for the whole category, which will be then automatically assigned to all newly added connections in that category:
