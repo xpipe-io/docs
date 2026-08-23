@@ -11,8 +11,6 @@ XPipe supports connecting to and managing your Hyper-V VMs running on a Windows 
 
 Interacting with Hyper-V requires Administrator privileges by default. This means that for remote hosts, your user needs to have those privileges. For local Hyper-V VMs on your local machine, XPipe needs to be run as Administrator in order to access them.
 
-<Callout type="info">Interacting with Hyper-V VMs requires at least the Homelab plan.</Callout>
-
 ## Guest agent
 
 To have access to a VM from the outside, the VM needs to have the Hyper-V Integration Services installed. These should be automatically installed on any recent operating system, including Linux. For more information, see [here](https://learn.microsoft.com/en-us/windows-server/virtualization/hyper-v/supported-linux-and-freebsd-virtual-machines-for-hyper-v-on-windows). Note that in practice, though, the quality of integrations on non-Windows systems might not be on the same level as for Windows systems.
