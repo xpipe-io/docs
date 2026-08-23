@@ -61,6 +61,8 @@ Due to the alternative implementation of how the file browser works internally b
 
 Especially Windows shells like cmd or PowerShell are significantly slower than POSIX compliant shells like bash. A more modern shell like pwsh for Windows has improved transfer speeds. Therefore, if you frequently transfer large files via Windows systems, installing pwsh with `winget install -e --id Microsoft.PowerShell` might make sense for you.
 
+### SFTP
+
 If you're looking to transfer large files and want to achieve optimal transfer speed for SSH connections, you can switch to using an SFTP session. You can switch to pure SFTP in any SSH-based file browser session in the context menu for a directory:
 
 ![](/images/sftp-open.png)
@@ -166,4 +168,17 @@ The tree view is fully controllable using your keyboard. You can navigate the me
 
 If you are using VsCode, you might be familiar with the remote workspaces feature where you can open and navigate remote directories via SSH. This feature is also integrated in the XPipe file browser so that you can automatically launch this remote workspace in VsCode automatically via the `Open in VsCode remote` option.
 
-Note that this operation might occasionally not properly open the remote system in VsCode if VsCode was not running before. When that happens, just trying again should make it work.
+![](/images/browser-vscode.png)
+
+Note that this operation might occasionally not properly open the remote system in VsCode if VsCode was not running before as the VsCOde SSH extension is a bit buggy. When that happens, just trying again should make it work.
+
+## Terminal docking
+
+On Windows, you can dock terminals to the XPipe application window. A docked terminal is fixed to the XPipe window but can also be detached from it. If you move the terminal window away manually, e.g. by dragging it or using keyboard shortcuts, it enters a detached state where XPipe no longer manages the terminal.
+
+![](/images/browser-dock.png)
+
+If you want to disable the terminal docking completely, you can do so in the settings menu:
+
+![Dock setting](/images/dock-setting.png)
+

@@ -68,7 +68,7 @@ The detailed encryption algorithm is an AES-128 GCM block-cipher with 12 IV byte
 
 Alternatively, you can also choose to prompt for some required secrets at runtime so you don't have to store a password for a connection anywhere. With XPipe, you have the option to input the password when you connect to that system and optionally cache it for the current XPipe session, so you don't have to reenter it until XPipe is restarted. This has the advantage of the password not being stored on any file system as it only persists in the main memory while XPipe is running.
 
-## Remote vaults
+## Synced vaults
 
 To seamlessly synchronize your connection data with other devices and team members, XPipe allows you to synchronize your connections with a remote git repository. Any updates and connection data from the local vault are then regularly committed to that repository by XPipe. This repository can then be cloned on other systems or by other collaborators to have access to the same connections.
 
@@ -78,17 +78,17 @@ This repository can be set up by yourself with any git service provider of your 
 
 ### File encryption
 
-When choosing to add a key file to the vault, you have the ability to also sync it with the remote git repository. This allows you to synchronize any required key files across all systems so you don't have to be concerned about missing key files on other systems. Any secret files committed to the repository are only committed in encrypted form similar to vault passwords. They will only be decrypted on the local system after pulling the remote data. This ensures that your remote vault does only contain encrypted sensitive data.
+When choosing to add a key file to the vault, you have the ability to also sync it with the remote git repository. This allows you to synchronize any required key files across all systems so you don't have to be concerned about missing key files on other systems. Any secret files committed to the repository are only committed in encrypted form similar to vault passwords. They will only be decrypted on the local system after pulling the remote data. This ensures that your synced vault does only contain encrypted sensitive data.
 
 ### Team vaults
 
-In the XPipe Professional plan, you have the option to use a remote vault as a team vault where multiple team members can interact with the same connection data. Team vaults also allow each user to encrypt certain server identities with their own user passphrase, allowing only that user to decrypt and have access to certain login information. That way, a team of users can maintain their list of available servers while also maintaining control login information for each user separately.
+In the XPipe Professional plan, you have the option to use a synced vault as a team vault where multiple team members can interact with the same connection data. Team vaults also allow each role to encrypt certain server identities with a unique role secret, allowing only users to decrypt and have access to certain login information. That way, a team of users can maintain their list of available servers while also controlling which user/role should have access to certain login information.
 
-### Security of remote vaults
+### Security of synced vaults
 
-Having connection data stored in a remote git service always bears the risk of this service being compromised and the git repository connection data being stolen. This risk also applies to local systems and its vaults being compromised, with the difference being that remote vaults are usually accessible from many users within a network.
+Having connection data stored in a synced git service always bears the risk of this service being compromised and the git repository connection data being stolen. This risk also applies to local systems and its vaults being compromised, with the difference being that synced vaults are usually accessible from many users within a network.
 
-The same security principles of local vaults also apply to remote vaults. The remote vault does not have to store any secrets if the vault is set up to fetch external secrets from providers like password managers. If the vault contains managed secrets, encrypting the vault with a strong custom passphrase should prevent any possible decryption of connection data.
+The same security principles of local vaults also apply to synced vaults. The synced vault does not have to store any secrets if the vault is set up to fetch external secrets from providers like password managers. If the vault contains managed secrets, encrypting the vault with a strong role secrets should prevent any possible decryption of connection data.
 
 ## Connections
 

@@ -100,6 +100,8 @@ If you have enabled GPG signing of your git commits, then this should work as ex
 
 The only more complicated case is on Windows where you can have potentially two `gpg` executables with the git bash gpg and the native [Gpg4win](https://www.gpg4win.org/) executable. By default, XPipe will choose the gpg client which has keys configured in it, under the assumption that you only use one of the two clients. If you switch between using both gpg clients, make sure that your git GPG key is available in gpg4win, as this client will be used if both clients have keys added.
 
+Furthermore, GPG signing will slow down operations somewhat as this process is not very fast when doing a lot of commits. If you don't like this slowdown, you can consider turning off GPG signing for the XPipe vault repository with `git config commit.gpgSign false` in the repository directory.
+
 ## Local repositories
 
 If you don't want to host your remote git repository on some server somewhere and instead prefer a local option, for example, a flash drive, to sync data between machines, you can do that as well.

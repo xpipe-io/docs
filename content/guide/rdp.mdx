@@ -15,25 +15,45 @@ If you go to the desktop connection creation menu, you will find that there are 
 
 ![](/images/rdp-menu.png)
 
-## Tunneled RDP connections
-
-The main type of RDP connections are tunneled RDP connections where essentially the remote RDP port is tunneled over SSH to your local machine. The advantage of this is that the RDP port doesn't have to be publicly exposed, and you can reuse authentication from an SSH connection. Furthermore, you will gain access to the more advanced SSH authentication options to connect to your RDP server compared to the often times basic password authentication for RDP.
-
-The only thing you need is an SSH connection to the remote system to select it as the target host. Since RDP is most often used for Windows systems, note that nowadays, having an SSH connection to a Windows Server is simple. The latest Windows Server versions ship a built-in OpenSSH server by default, and for slightly older versions the OpenSSH Server feature can easily be enabled. For more information, see [here](https://learn.microsoft.com/en-us/windows-server/administration/openssh/openssh_install_firstuse?tabs=gui&pivots=windows-server-2025).
-
-![](/images/rdp-creation.png)
-
-You can leave the use your identity section blank if you intend to use the same password authentication of your SSH connection. For other advanced authentication options, see the additional RDP options field described later on this page.
-
 ## Direct RDP connections
 
-Of course, you can also create direct RDP connections to a system without an SSH tunnel to the target system itself:
+The basic form of RDP connections are direct RDP connections to a system without an SSH tunnel to the target system itself:
 
 ![](/images/rdp-direct-creation.png)
 
 In this case, XPipe will just assemble the .rdp file with all the necessary options, including any additional RDP options you specified.
 
 The gateway option allows you to tunnel the RDP traffic over an intermediate system without establishing a tunnel to the target system. This is useful if you can only reach an RDP host over a bastion system and don't want to manually create tunnels all the time.
+
+### Remote desktop gateways
+
+You can also create and use remote desktop gateway servers for RDP:
+
+![](/images/rdg.png)
+
+You can control how the authentication for the gateway should be handled, depending on your individual configuration.
+
+After creating an RD gateway entry, you can set it as a gateway for your RDP connection. SSH gateways via tunneling are also supported for RDP, you can choose between both of these gateway types in the gateway field:
+
+![](/images/rdg-config.png)
+
+### SSH tunnel gateways
+
+As an alternative to remote desktop gateways, you can also choose to tunnel the traffic over an intermediate SSH tunnel:
+
+![](/images/rdg-tunnel.png)
+
+This allows you to connect to RDP servers behind some form of bastion server, for example, without requiring a proper remote desktop gateways server.
+
+## Tunneled RDP connections
+
+If your target RDP server is also running an SSH server, you can connect via this SSH server connection instead. The remote RDP port is then tunneled over SSH to your local machine. The advantage of this is that the RDP port doesn't have to be publicly exposed, and you can reuse authentication from an SSH connection. Furthermore, you will gain access to the more advanced SSH authentication options to connect to your RDP server compared to the often times basic password authentication for RDP.
+
+The only thing you need is an SSH connection to the remote system to select it as the target host. Since RDP is most often used for Windows systems, note that nowadays, having an SSH connection to a Windows Server is simple. The latest Windows Server versions ship a built-in OpenSSH server by default, and for slightly older versions the OpenSSH Server feature can easily be enabled. For more information, see [here](https://learn.microsoft.com/en-us/windows-server/administration/openssh/openssh_install_firstuse?tabs=gui&pivots=windows-server-2025).
+
+![](/images/rdp-creation.png)
+
+You can leave the use your identity section blank if you intend to use the same password authentication of your SSH connection. For other advanced authentication options, see the additional RDP options field described later on this page.
 
 ## Additional RDP options
 

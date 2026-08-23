@@ -89,29 +89,25 @@ Whenever you refresh the parent, the default docker context, any new container e
 
 ## Ordering
 
-As your connection grows, ordering individual connections in relative to their siblings will improve your user experience. By default, XPipe has two sorting mechanisms that work sequentially:
-- Each connection has an individual order index that you can set explicitly. The smaller the index, the more on top a connection will be shown. By default, every connection has an order index of 0
-- In case the primary order indices are not set, XPipe will use a default order. This can either be a last access date timestamp or an alphabetical order. By default, XPipe uses the last access timestamp order, meaning that connections will go on top of the list as soon as you access them
+XPipe has three ordering modes for connections: **Manual**, **Last used**, **Alphabetical**. You can see the currently active ordering mode in the status bar:
 
-You can see the currently active ordering mode in the status bar:
+![](/images/sort-status.png)
 
-![](/images/order-status.png)
+In the screenshot, you can see that the order is set to manual. You can toggle the ordering type and also switch the order between ascending and descending by clicking on them again.
 
-In the screenshot, you can see that the primary index-based order is set to ascending, and that the default order is set to ascending last access. You can toggle the orders between ascending and descending by clicking on them.
+In manual ordering mode, you have the ability to rearrange connections by drag and drop:
 
-![](/images/order-status-inv.png)
+![](/images/sort-drag.png)
 
-In this case, the primary order is set to index-based descending, and the default order is set to alphabetical ascending.
+You can't do this in the other ordering modes as their order is non-customizable.
 
-You can assign these primary order indices in the order menu:
+You can, however, also drag and drop connections to other categories, regardless of the ordering mode. The same goes for ordering individual categories next to each other:
 
-![](/images/order-menu.png)
+![](/images/sort-categories.png)
 
-Move to first/last will assign the next smallest/largest index value so that the connection is shown on top. Keep to first/last will assign the smallest/largest possible index, so that the connection will stay on top/bottom all the time, regardless of what other indices you set for other connections.
+If you select multiple connections via [batch mode](#batch-mode), you can drag and drop many connections at once:
 
-Explicitly assigned indices will show up next to the connection name like this:
-
-![](/images/order-list.png)
+![](/images/sort-batch.png)
 
 ## Connection notes
 
@@ -144,6 +140,10 @@ One use of this to enable a tiling window layout with an external terminal, for 
 Here is a sample of the Windows 11 snapping functionality to split the screen layout:
 
 ![](/images/hub-tile.png)
+
+You can toggle the right sidebar with this button when compact mode is enabled:
+
+![](/images/hub-tile-toggle.png)
 
 ## Icons
 

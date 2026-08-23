@@ -28,6 +28,14 @@ By default, XPipe will use the system proxy config for those requests if you hav
 
 The test button below the selection helps you verify whether you have connectivity.
 
+### No proxy list
+
+To control for which addresses the proxy should not be used, you can add a list of addresses in the settings menu:
+
+![](/images/no-proxy.png)
+
+This is equivalent to the `NO_PROXY` environment variable.
+
 ### Custom TLS certificates
 
 If you use an HTTP proxy and this proxy is decrypting TLS traffic, you will receive error messages about connections failing as XPipe does not know about the custom TLS certificate yet:
