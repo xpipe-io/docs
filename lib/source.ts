@@ -1,19 +1,12 @@
-import {
-    multiple,
-} from 'fumadocs-core/source';
+
 import { docs } from 'fumadocs-mdx:collections/server';
-import { type InferPageType, loader } from 'fumadocs-core/source';
-import { openapiPlugin, openapiSource } from 'fumadocs-openapi/server';
-import { createOpenAPI } from 'fumadocs-openapi/server';
-import path from 'node:path';
+import { loader } from 'fumadocs-core/source';
+import { openapiPlugin } from 'fumadocs-openapi/server';
 
 export const source = loader(
-    multiple({
-        docs: docs.toFumadocsSource(),
-    }),
     {
+        source: docs.toFumadocsSource(),
         baseUrl: '/',
         plugins: [openapiPlugin()],
     },
 );
-

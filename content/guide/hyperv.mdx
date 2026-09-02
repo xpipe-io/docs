@@ -9,7 +9,7 @@ XPipe supports connecting to and managing your Hyper-V VMs running on a Windows 
 
 ![](/images/hyperv.png)
 
-Interacting with Hyper-V requires Administrator privileges by default. This means that for remote hosts, your user needs to have those privileges. For local Hyper-V VMs on your local machine, XPipe needs to be run as Administrator in order to access them.
+Interacting with Hyper-V requires Administrator privileges by default, unless your Windows user is added to the local group called `Hyper-V Administrators`. If your user is not a part of this group, this means that for remote hosts, your user needs to have Administrator privileges. For local Hyper-V VMs on your local machine, XPipe needs to be run as Administrator in order to access them in that case.
 
 ## Guest agent
 

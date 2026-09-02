@@ -46,13 +46,13 @@ paths:
             examples:
               local:
                 summary: Local application handshake
-                value: { "auth": { "type": "Local", "authFileContent": "<Contents of the local file beacon-auth" }, "client": { "type": "Api", "name": "My client name" } }
+                value: { "auth": { "type": "local", "authFileContent": "<Contents of the local file beacon-auth" }, "client": { "type": "api", "name": "My client name" } }
               local-ptb:
                 summary: Local PTB application handshake
-                value: { "auth": { "type": "Local", "authFileContent": "<Contents of the local file beacon-auth" }, "client": { "type": "Api", "name": "My client name" } }
+                value: { "auth": { "type": "local", "authFileContent": "<Contents of the local file beacon-auth" }, "client": { "type": "api", "name": "My client name" } }
               remote:
                 summary: API key handshake
-                value: { "auth": { "type": "ApiKey", "key": "<API key>" }, "client": { "type": "Api", "name": "My client name" } }
+                value: { "auth": { "type": "apiKey", "key": "<API key>" }, "client": { "type": "api", "name": "My client name" } }
       responses:
         '200':
           description: The handshake was successful. The returned token can be used for authentication in this session. The token is valid as long as XPipe is running.

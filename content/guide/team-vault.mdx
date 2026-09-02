@@ -101,11 +101,19 @@ By default, the nature of XPipe and the git vault is decentralized, meaning that
 
 You can deploy the [XPipe Webtop container](/guide/webtop#api-server) as an API server to have a central server that is linked to your vault and can handle connection updates via the API without any user involvement.
 
-## Trust considerations
+## Additional considerations
 
 A team vault is essentially just a git repository consisting out of files that are encrypted with various keys. There is no database or other service involved.
 
-This authentication system for encryption and decryption is not the most complex system you will find when compared to other solutions. It is designed to be relatively simple and robust. Each team member has full control over all connection entries they have been granted access for, meaning that they can modify them, delete them, and inspect the used passwords and keys for them. There is no fine-grained permission system akin to an administrator only granting something like read-only permissions to certain connections. Each team member has to be trusted with the connection access that they are given.
+### History
+
+Since a git repository comes with a full history, this means that you will have to take that into consideration when looking at the effects of adding a connection or identity. If you accidentally add an identity that is accessible to all users when it should only be available to a certain role, you can't easily delete this from the git history once it is pushed. Even if you overwrite the remote repo via a force push, the local clones will still have this data if they pulled the changes at some point. The local clones can overwrite their local changes via the built-in merge conflict resolver of the synced vault, however they don't have to.
+
+If you want to avoid any such accidents, it is best to switch the [sync mode to manual](/guide/sync#sync-frequency). With this, changes will only be pushed once you made sure that everything is correct. If it isn't, you can just `git reset --hard <ref>` the local vault to delete the locally made commits and try again before pushing.
+
+### Trust
+
+The authentication system for encryption and decryption is not the most complex system you will find when compared to other solutions. It is designed to be relatively simple and robust. Each team member has full control over all connection entries they have been granted access for, meaning that they can modify them, delete them, and inspect the used passwords and keys for them. There is no fine-grained permission system akin to an administrator only granting something like read-only permissions to certain connections. Each team member has to be trusted with the connection access that they are given.
 
 If you are looking to minimize possible leaks of secrets in this scenario, using security keys like Yubikeys for server authentication is the best option. This will prevent the possibility of any used private keys being leaked when an individual user's system is compromised.
 
