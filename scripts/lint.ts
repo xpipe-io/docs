@@ -3,6 +3,7 @@ import GithubSlugger from 'github-slugger';
 import { source } from '@/lib/source';
 
 type AnySource = typeof source;
+type AnyPage = ReturnType<AnySource['getPages']>[number];
 
 async function checkLinks() {
     const scanned = await scanURLs({
@@ -36,7 +37,7 @@ async function checkLinks() {
     );
 }
 
-async function getHeadings(page: AnySource['$inferPage']): Promise<string[]> {
+async function getHeadings(page: AnyPage): Promise<string[]> {
     const raw = await page.data.getText('raw');
     return getHeadingIds(raw);
 }
