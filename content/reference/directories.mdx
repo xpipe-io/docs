@@ -23,19 +23,19 @@ Any necessary temporary shell scripts are directly created in the system temp di
 
 Any files they are being edited in the file browser are downloaded locally and re-uploaded once they are changed. These files are downloaded to
 * `%TEMP%\xpipe\bridge` on Windows
-* `/tmp/xpipe/$USER/bridge` on Linux
+* `/tmp/xpipe-$USER/bridge` on Linux
 * `$TMPDIR/xpipe/bridge` on macOS
 
 ## File downloads
 
 Any files they are being downloaded in the file browser are saved temporarily to the following directories
 * `%TEMP%\xpipe\download` on Windows
-* `/tmp/xpipe/$USER/download` on Linux
+* `/tmp/xpipe-$USER/download` on Linux
 * `$TMPDIR/download` on macOS
 
 ## Scripts
 
 When you choose to bring certain user scripts to a remote system, they are copied to the following directory and automatically added to the PATH:
 * `%TEMP%\xpipe\scripts` on Windows
-* `/tmp/xpipe/$USER/scripts` on Linux
-* `/tmp/xpipe/$USER/scripts` on macOS
+* `/tmp/xpipe-$USER/scripts` on Linux
+* `$TMPDIR/xpipe/scripts` on macOS
