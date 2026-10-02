@@ -87,7 +87,34 @@ In case your keys are stored in the OpenSSH agent, XPipe can automatically use t
 
 The detection of `SSH_AUTH_SOCK` is sometimes iffy with various types of shell init scripts because it requires the variable to be set in a way where XPipe can see it. If you set the variable in your fish init script, XPipe can't see it as it does not use fish as the local shell instance internally.
 
-Furthermore, if you set in something like a `.bashrc` file after an interactive shell check, the variable is also not picked up as the background shell that XPipe launches is not interactive. For example, at lof init scripts use `if [[ $- == *i* ]]`, `if [ -t 0 ] ; then`, or `if tty -s; then` to check for interactivity. This check returns false when called from XPipe, so any commands in there are skipped.
+Furthermore, if you set in something like a `.bashrc` file after an interactive shell check, the variable is also not picked up as the background shell that XPipe launches is not interactive. For example, at lof init scripts use `if [[ $- == *i* ]]`, `if [ -t 0 ] ; then`, or `if tty -s; then` to check for interactivity. This check returns false when called from XPipe, so any commands in there are skipped. For example, your .bashrc might have something like this:
+
+```bash
+# If not running interactively, don't do anything
+[[ $- != *i* ]] && return
+```
+
+If you do
+
+```bash
+# If not running interactively, don't do anything
+[[ $- != *i* ]] && return
+
+export SSH_AUTH_SOCK=...
+```
+
+this will not get picked up by XPipe. Instead, you can do:
+
+```bash
+export SSH_AUTH_SOCK=...
+
+# If not running interactively, don't do anything
+[[ $- != *i* ]] && return
+```
+
+<Callout type="info">
+    On macOS, the default shell would be zsh instead of bash. But the same logic applies.
+</Callout>
 
 In general, if XPipe does not pick up the env variable properly and can't find the socket, you can set a [custom socket location](#custom-agent-linux--macos).
 
